@@ -4,7 +4,7 @@ import { lazy, Suspense } from 'react';
 import UserContext from "./context/user";
 import IsUserLoggedIn from "./helpers/Is-user-logged-in";
 import ProtectedRoute from "./helpers/Protected-route";
-import Mypage from "./components/Mypage";
+import Mypage from "./page/Mypage";
 import Community from "./page/Community";
 
 const Intro = lazy(() => import("./page/Intro"))
@@ -19,7 +19,7 @@ const App = () => {
             // Loading logo
             <div className="w-screen h-screen flex items-center justify-center">
               <img
-                className="w-20 opacity-50"
+                className="w-32 opacity-50"
                 src="/logo/Ollim-logos_black.png"
                 alt="loading"
               />

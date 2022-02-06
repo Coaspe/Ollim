@@ -41,6 +41,7 @@ export const signOutAuth = () => {
     .then(() => {
       // Sign-out successful.
       console.log("Sign out");
+       window.location.reload()
     })
     .catch((error) => {
       // An error happened.
