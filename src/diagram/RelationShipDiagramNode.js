@@ -1,26 +1,69 @@
 import React, { memo, useState, useRef, useEffect, useCallback } from "react";
-import { Handle, removeElements } from "react-flow-renderer";
+import { Handle, removeElements, isEdge } from "react-flow-renderer";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import { elementsAction } from "./redux";
+import { elementsAction } from "../redux";
+import "./test.css";
 
 export default memo(({ id, data, isConnectable }) => {
   const elements = useSelector((state) => state.setElements.elements);
   const dispatch = useDispatch();
   const [click, setClick] = useState(false);
   const [labelToggle, setLabelToggle] = useState(false);
+  const [labelState, setLabelState] = useState(data.label);
+  const [descState, setDescState] = useState(data.label);
   const inputRef = useRef();
   const [mouseEnter, setMouseEnter] = useState(false);
+
   const setElements = useCallback(
     (elements) => {
       dispatch(elementsAction.setElements({ elements: elements }));
     },
     [dispatch]
   );
-  const onElementsRemove = (id) => {
+
+  const onElementsRemove = () => {
     const target = elements.find((data) => data.id === id);
     setElements([...removeElements([target], elements)]);
   };
+  const onDescChange = (event) => {
+    const tt = elements.slice();
+    const tmp = tt.map((e) => {
+      if (isEdge(e) || e.id !== id) {
+        return e;
+      }
+
+      const desc = event.target.value;
+
+      return {
+        ...e,
+        data: {
+          ...e.data,
+          desc,
+        },
+      };
+    });
+    setElements([...tmp]);
+  };
+  const onLabelChange = (event) => {
+    const tmp = elements.map((e) => {
+      if (isEdge(e) || e.id !== id) {
+        return e;
+      }
+
+      const label = event.target.value;
+
+      return {
+        ...e,
+        data: {
+          ...e.data,
+          label,
+        },
+      };
+    });
+    setElements([...tmp]);
+  };
+
   useEffect(() => {
     labelToggle && inputRef?.current.focus();
   }, [labelToggle]);
@@ -29,7 +72,6 @@ export default memo(({ id, data, isConnectable }) => {
       inputRef?.current.blur();
     }
   };
-
   return (
     <div
       onMouseEnter={() => {
@@ -38,7 +80,7 @@ export default memo(({ id, data, isConnectable }) => {
       onMouseLeave={() => {
         setMouseEnter(false);
       }}
-      className="border border-black relative flex items-center justify-center bg-white w-32 h-10 hover:bg-slate-100"
+      className="border border-black relative flex items-center justify-center bg-white w-28 h-28 hover:bg-slate-100"
     >
       {/* Show expand SVG when mouse enters in div */}
       <div
@@ -75,6 +117,7 @@ export default memo(({ id, data, isConnectable }) => {
           <path d="M6.31017 21.6385C5.88874 21.2769 5.79537 20.67 5.60863 19.4562L4.08861 9.57603C4.04742 9.3083 4.02682 9.17444 4.10165 9.08722C4.17647 9 4.31191 9 4.58279 9H18.4172C18.6881 9 18.8235 9 18.8983 9.08722C18.9731 9.17444 18.9526 9.3083 18.9114 9.57603L17.3913 19.4562C17.2046 20.67 17.1112 21.2769 16.6898 21.6385C16.2684 22 15.6543 22 14.4262 22H8.57374C7.34564 22 6.7316 22 6.31017 21.6385Z" />
         </svg>
       </div>
+
       <AnimatePresence>
         {click && (
           <motion.textarea
@@ -84,10 +127,13 @@ export default memo(({ id, data, isConnectable }) => {
             transition={{ duration: 0.2, ease: "easeInOut" }}
             role="tooltip"
             className="absolute -top-20 border border-black w-48 px-3 py-2 resize-none rounded-xl placeholder:italic"
-            value={data.desc}
-            placeholder={data.label}
+            value={descState}
+            placeholder={descState ? descState : data.label}
+            onBlur={(e) => {
+              onDescChange(e);
+            }}
             onChange={(event) => {
-              data.onChange(event, id);
+              setDescState(event.target.value);
             }}
           >
             {data.desc}
@@ -103,55 +149,107 @@ export default memo(({ id, data, isConnectable }) => {
       >
         {/* If double click occur, activate input to edit label */}
         {!labelToggle ? (
-          <strong>{data.label}</strong>
+          <strong className="text-2xl">{labelState}</strong>
         ) : (
           <input
             ref={inputRef}
-            onBlur={() => {
+            onBlur={(e) => {
+              onLabelChange(e);
               setLabelToggle(false);
             }}
             onChange={(event) => {
-              data.onLabelChange(event, id);
+              setLabelState(event.target.value);
             }}
             onKeyPress={onKeyPress}
             className="w-full text-center bg-transparent text-black"
             type="text"
-            value={data.label}
+            value={labelState}
           />
         )}
         <Handle
-          type="target"
+          className="test"
+          type="source"
           position="left"
-          style={{ background: "#555" }}
-          onConnect={(params) => console.log("handle onConnect", params)}
+          id="q"
+          style={{ top: 20 }}
           isConnectable={isConnectable}
         />
+        <Handle
+          className="test"
+          type="target"
+          position="left"
+          id="qq"
+          isConnectable={isConnectable}
+        />
+        <Handle
+          className="test"
+          type="source"
+          position="left"
+          id="qqq"
+          style={{ top: 90 }}
+          isConnectable={isConnectable}
+        />
+
         <Handle
           type="source"
           position="right"
           id="a"
-          style={{ top: 10, background: "#555" }}
+          style={{ top: 20 }}
+          isConnectable={isConnectable}
+        />
+        <Handle
+          type="target"
+          position="right"
+          id="aa"
           isConnectable={isConnectable}
         />
         <Handle
           type="source"
           position="right"
+          id="aaa"
+          style={{ top: 90 }}
+          isConnectable={isConnectable}
+        />
+
+        <Handle
+          type="target"
+          position="bottom"
           id="b"
-          style={{ bottom: 10, top: "auto", background: "#555" }}
+          style={{ left: 20 }}
           isConnectable={isConnectable}
         />
         <Handle
           type="source"
+          position="bottom"
+          id="bb"
+          isConnectable={isConnectable}
+        />
+        <Handle
+          type="target"
+          position="bottom"
+          id="bbb"
+          style={{ left: 90 }}
+          isConnectable={isConnectable}
+        />
+
+        <Handle
+          type="target"
           position="top"
           id="c"
-          style={{ background: "#555" }}
+          style={{ left: 20 }}
           isConnectable={isConnectable}
         />
         <Handle
           type="source"
           position="top"
-          id="d"
-          style={{ left: 15, right: "auto", background: "#555" }}
+          id="cc"
+          isConnectable={isConnectable}
+        />
+        <Handle
+          type="target"
+          position="top"
+          id="ccc"
+          style={{ left: 90 }}
           isConnectable={isConnectable}
         />
       </div>

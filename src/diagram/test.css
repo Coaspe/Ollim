@@ -1,0 +1,25 @@
+.react-flow__handle.target {
+  background: #f59aa8;
+}
+.react-flow__handle.target:hover {
+  background: #fef5f6;
+}
+.react-flow__handle.source {
+  background: #77c897;
+}
+.react-flow__handle.source:hover {
+  background: #b0dfc2;
+}
+div[data-handlepos="top"],
+div[data-handlepos="bottom"] {
+  width: 20%;
+}
+
+div[data-handlepos="left"],
+div[data-handlepos="right"] {
+  height: 20%;
+}
+
+.react-flow__handle {
+  border-radius: 10px;
+}

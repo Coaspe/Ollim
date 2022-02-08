@@ -6,7 +6,7 @@ import { getUserByEmail } from "../services/firebase"
 import Compressor from "compressorjs";
 import { signOutAuth } from "../helpers/auth-OAuth2"
 import NewWritingModal from "../components/NewWritingModal"
-import CustomNodeFlow from "../CustomNodeFlow"
+import CustomNodeFlow from "../diagram/RelationShipDiagram"
 
 const Mypage = () => {
     const { user: contextUser } = useContext(UserContext)
