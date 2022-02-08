@@ -5,22 +5,16 @@ import UserContext from "../context/user"
 import { getUserByEmail } from "../services/firebase"
 import Compressor from "compressorjs";
 import { signOutAuth } from "../helpers/auth-OAuth2"
-import JoditEditor from 'jodit-react';
+import NewWritingModal from "../components/NewWritingModal"
+import CustomNodeFlow from "../CustomNodeFlow"
+
 const Mypage = () => {
     const { user: contextUser } = useContext(UserContext)
     const [user, setUser] = useState<any>({})
     const [profileImage, setProfileImage] = useState("")
+    const [newWritingModalOpen, setNewWritingModalOpen] = useState(false)
     const [text, setText] = useState("")
-    const config = {
-        controls: {
-            font: {
-                list: {
-                    'Noto Serif KR,serif': '나눔명조'
-                }
-            }
-        },
-        language: 'ko'
-    };
+
     useEffect(() => {
         getUserByEmail(contextUser.email as string).then((res: any) => {
             setUser(res.data())
@@ -57,10 +51,12 @@ const Mypage = () => {
             },
         });
     };
+
     return (
         <>
-        { user && profileImage ?
+        {user && profileImage ?
             <div className="w-full font-noto bg-gradient-to-b from-[#e4d0ca] to-transparent bg-opacity-30">
+                {newWritingModalOpen && <NewWritingModal setNewWritingModalOpen={setNewWritingModalOpen}/>}
                 <div className="flex w-full items-center justify-between px-20">
                     {/* logo */}
                     <img className="h-28" src="logo/Ollim-logos_transparent.png" alt="header logo" />
@@ -118,8 +114,11 @@ const Mypage = () => {
                             </div>
                         </div>
                         <div className="flex w-full items-center justify-center mt-10">
-                            <motion.button whileHover={{ y:"-10%" }} className="mr-5 px-4 py-3 rounded-2xl bg-white shadow-md font-semibold">
+                            {/* <motion.button whileHover={{ y:"-10%" }} className="mr-5 px-4 py-3 rounded-2xl bg-white shadow-md font-semibold">
                                 작품 추가
+                            </motion.button> */}
+                            <motion.button onClick={()=>{setNewWritingModalOpen(true)}} whileHover={{ y:"-10%" }} className="mr-5 px-4 py-3 rounded-2xl bg-white shadow-md font-semibold">
+                                새 작품 쓰기
                             </motion.button>
                             <motion.button whileHover={{ y:"-10%" }} className="px-4 py-3 rounded-2xl bg-white shadow-md font-semibold">
                                 다른 작가의 작품보기
@@ -166,7 +165,11 @@ const Mypage = () => {
                         </div>
                     </div>
                 </div>
-                <JoditEditor value={text} config={config} />
+                    {/* <Editor text={text} setText={setText}  /> */}
+                    <div className="w-full h-1/3">
+                <CustomNodeFlow />
+
+                    </div>
             </div>
             :
             <div className="w-screen h-screen flex items-center justify-center bg-gradient-to-b from-[#e4d0ca] to-transparent bg-opacity-30">

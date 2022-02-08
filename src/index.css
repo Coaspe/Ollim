@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@layer utilities {
+  .placeholder-italic::placeholder {
+    font-style: italic;
+  }
+}
