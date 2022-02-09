@@ -55,7 +55,7 @@ const Mypage = () => {
     return (
         <>
         {user && profileImage ?
-            <div className="w-full font-noto bg-gradient-to-b from-[#e4d0ca] to-transparent bg-opacity-30">
+            <div className="relative w-full font-noto bg-gradient-to-b from-[#e4d0ca] to-transparent bg-opacity-30">
                 {newWritingModalOpen && <NewWritingModal setNewWritingModalOpen={setNewWritingModalOpen}/>}
                 <div className="flex w-full items-center justify-between px-20">
                     {/* logo */}
@@ -148,20 +148,20 @@ const Mypage = () => {
                             </div> */}
                         </div>
                         <div className="flex items-center flex-col mt-20 w-2/3">
-                            <span className="text-2xl font-extrabold mb-3">작성중인 글</span>
-                            <div className="flex items-center justify-between w-full gap-5">
-                                <MypageWriting key="1"/>
-                                <MypageWriting key="2"/>
-                                <MypageWriting key="3"/>
+                            <span className="text-2xl font-extrabold mb-20 z-0">작성중인 글</span>
+                            <div className="grid grid-cols-3 items-center justify-between w-full gap-5">
+                                <MypageWriting key="1" type="novel"/>
+                                <MypageWriting key="2" type="novel"/>
+                                <MypageWriting key="3" type="novel"/>
                             </div>
                         </div>
                         <div className="flex items-center flex-col mt-20 w-2/3">
-                            <span className="text-2xl font-extrabold mb-3">완결된 글</span>
-                            <div className="flex items-center justify-between w-full gap-5">
-                                <MypageWriting key="1"/>
-                                <MypageWriting key="2"/>
-                                <MypageWriting key="3"/>
-                            </div>
+                            <span className="text-2xl font-extrabold mb-20">완결된 글</span>
+                            <motion.div layout className="flex items-center justify-between w-full gap-5">
+                                <MypageWriting key="1" type="novel"/>
+                                <MypageWriting key="2" type="novel"/>
+                                <MypageWriting key="3" type="novel"/>
+                            </motion.div>
                         </div>
                     </div>
                 </div>

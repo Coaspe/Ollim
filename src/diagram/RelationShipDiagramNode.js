@@ -1,4 +1,4 @@
-import React, { memo, useState, useRef, useEffect, useCallback } from "react";
+import { memo, useState, useRef, useEffect, useCallback } from "react";
 import { Handle, removeElements, isEdge } from "react-flow-renderer";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
@@ -67,11 +67,13 @@ export default memo(({ id, data, isConnectable }) => {
   useEffect(() => {
     labelToggle && inputRef?.current.focus();
   }, [labelToggle]);
+
   const onKeyPress = (e) => {
     if (e.key === "Enter") {
       inputRef?.current.blur();
     }
   };
+
   return (
     <div
       onMouseEnter={() => {
@@ -126,9 +128,9 @@ export default memo(({ id, data, isConnectable }) => {
             exit={{ opacity: [1, 0], y: [0, 10] }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
             role="tooltip"
-            className="absolute -top-20 border border-black w-48 px-3 py-2 resize-none rounded-xl placeholder:italic"
+            className="absolute text-xs -top-20 border border-black w-48 h-16 px-3 py-2 resize-none rounded-xl placeholder:italic focus:outline-none"
             value={descState}
-            placeholder={descState ? descState : data.label}
+            placeholder={descState ? descState : "간략한 설명을 기록하세요."}
             onBlur={(e) => {
               onDescChange(e);
             }}
@@ -149,7 +151,9 @@ export default memo(({ id, data, isConnectable }) => {
       >
         {/* If double click occur, activate input to edit label */}
         {!labelToggle ? (
-          <strong className="text-2xl">{labelState}</strong>
+          <strong className={`text-2xl ${!labelState && "text-gray-400"}`}>
+            {labelState ? labelState : "이름"}
+          </strong>
         ) : (
           <input
             ref={inputRef}
@@ -161,7 +165,7 @@ export default memo(({ id, data, isConnectable }) => {
               setLabelState(event.target.value);
             }}
             onKeyPress={onKeyPress}
-            className="w-full text-center bg-transparent text-black"
+            className="w-full text-center bg-transparent text-black focus:outline-none"
             type="text"
             value={labelState}
           />

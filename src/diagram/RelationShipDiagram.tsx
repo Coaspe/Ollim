@@ -5,20 +5,21 @@ import ReactFlow, {
   Controls,
   ControlButton,
   Elements,
-  Position,
   Background,
 } from 'react-flow-renderer';
 import { useDispatch, useSelector } from 'react-redux';
-import localforage from 'localforage';
 import ColorSelectorNode from './RelationShipDiagramNode';
 import { elementsAction } from '../redux';
 import { RootState } from '../redux/store';
+import ButtonEdge from './ButtonEdge';
 
 const onNodeDragStop = (event:any, node:any) => console.log('drag stop', node);
 const onElementClick = (event:any, element:any) => console.log('click', element);
 
 const initBgColor = '#faf6f5';
-
+const edgeTypes = {
+  buttonedge: ButtonEdge,
+};
 const connectionLineStyle = { stroke: '#000' };
 const snapGrid = [20, 20];
 const nodeTypes = {
@@ -34,6 +35,15 @@ const CustomNodeFlow = () => {
   const setElements = useCallback((elements: Elements<any>) => {
       dispatch(elementsAction.setElements({elements: elements}))
   }, [dispatch])
+  const onLoad = useCallback(
+    (rfi) => {
+      if (!reactflowInstance) {
+        setReactflowInstance(rfi);
+        console.log('flow loaded:', rfi);
+      }
+    },
+    [reactflowInstance]
+  );
 
   const addNode = () => {
 
@@ -51,31 +61,22 @@ const CustomNodeFlow = () => {
     pos.current[1] += 10
     setElements([...elements, addedNode])
   }
-
   const onConnect = (params: any) => {
       setElements(
-        [...addEdge({ ...params, animated: true, style: { stroke: '#000' } }, elements)]
+        [...addEdge({ ...params, type: 'buttonedge', data: { label: "" } }, elements)]
       )
   }
   
-  const onLoad = useCallback(
-    (rfi) => {
-      if (!reactflowInstance) {
-        setReactflowInstance(rfi);
-        console.log('flow loaded:', rfi);
-      }
-    },
-    [reactflowInstance]
-  );
-
   // Fit view on mounted
   useEffect(() => {
     if (reactflowInstance && elements.length > 0) {
       reactflowInstance.fitView();
     }
   }, [reactflowInstance]);
-
-
+  useEffect(() => {
+      reactflowInstance && console.log(reactflowInstance.toObject());
+  }, [elements])
+  
   return (
     <ReactFlow
       elements={elements}
@@ -87,6 +88,7 @@ const CustomNodeFlow = () => {
       nodeTypes={nodeTypes}
       connectionLineStyle={connectionLineStyle}
       snapToGrid={true}
+      edgeTypes={edgeTypes}
       snapGrid={snapGrid as [number, number]}
       defaultZoom={1.5}
     >
@@ -103,7 +105,6 @@ const CustomNodeFlow = () => {
       />
       <Controls>
         <ControlButton onClick={(e) => {
-          
           addNode()
         }}>
           ⬜

@@ -8,6 +8,9 @@ module.exports = {
       colors: {
         logoBrown: "#905C4C",
       },
+      fontSize: {
+        xs: ".55rem",
+      },
     },
   },
   plugins: [],
