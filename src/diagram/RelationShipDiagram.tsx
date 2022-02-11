@@ -9,9 +9,10 @@ import ReactFlow, {
 } from 'react-flow-renderer';
 import { useDispatch, useSelector } from 'react-redux';
 import ColorSelectorNode from './RelationShipDiagramNode';
-import { elementsAction } from '../redux';
+import { diagramAction, elementsAction } from '../redux';
 import { RootState } from '../redux/store';
 import ButtonEdge from './ButtonEdge';
+import { toObjectElements } from '../type';
 
 const onNodeDragStop = (event:any, node:any) => console.log('drag stop', node);
 const onElementClick = (event:any, element:any) => console.log('click', element);
@@ -35,11 +36,15 @@ const CustomNodeFlow = () => {
   const setElements = useCallback((elements: Elements<any>) => {
       dispatch(elementsAction.setElements({elements: elements}))
   }, [dispatch])
+
+  const setDiagram = useCallback((diagram: toObjectElements) => {
+      dispatch(diagramAction.setDiagram({diagram}))
+  }, [dispatch])
+
   const onLoad = useCallback(
     (rfi) => {
       if (!reactflowInstance) {
         setReactflowInstance(rfi);
-        console.log('flow loaded:', rfi);
       }
     },
     [reactflowInstance]
@@ -73,8 +78,9 @@ const CustomNodeFlow = () => {
       reactflowInstance.fitView();
     }
   }, [reactflowInstance]);
+
   useEffect(() => {
-      reactflowInstance && console.log(reactflowInstance.toObject());
+    reactflowInstance && setDiagram(reactflowInstance.toObject());
   }, [elements])
   
   return (

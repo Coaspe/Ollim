@@ -1,26 +1,71 @@
 import { motion } from "framer-motion"
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import MypageWriting from "../components/MypageWriting"
 import UserContext from "../context/user"
-import { getUserByEmail } from "../services/firebase"
+import { getPoemArrayInfo, getUserByEmail, getUserWritings, getNovelArrayInfo, getScenarioArrayInfo, getUserByUID } from "../services/firebase"
 import Compressor from "compressorjs";
 import { signOutAuth } from "../helpers/auth-OAuth2"
 import NewWritingModal from "../components/NewWritingModal"
 import CustomNodeFlow from "../diagram/RelationShipDiagram"
+import { useDispatch, useSelector } from "react-redux"
+import { RootState } from "../redux/store"
+import { getFirestoreNovel, getFirestorePoem, getFirestoreScenario, getFirestoreUser, getFirestoreUserWritings } from "../type"
+import { userInfoAction } from "../redux"
+import { useParams } from "react-router-dom"
 
 const Mypage = () => {
+    // profile owner's uid
+    const { uid } = useParams()
+    
     const { user: contextUser } = useContext(UserContext)
-    const [user, setUser] = useState<any>({})
     const [profileImage, setProfileImage] = useState("")
     const [newWritingModalOpen, setNewWritingModalOpen] = useState(false)
-    const [text, setText] = useState("")
+    const [userWritings, setUserWritings] = useState({} as getFirestoreUserWritings)
+    const [onWritingCategory, setOnWritingCategory] = useState("TOTAL")
+
+    const xx = useRef(0)
+    const [poems, setPoems] = useState<Array<getFirestorePoem>>([])
+    const [novels, setNovels] = useState<Array<getFirestoreNovel>>([])
+    const [scenarioes, setScenarioes] = useState<Array<getFirestoreScenario>>([])
+    const [totalWritings, setTotalWritings] = useState<Array<getFirestoreScenario | getFirestoreNovel | getFirestorePoem>>([])
+    const [profileOwnerInfo, setProfileOwnerInfo] = useState<getFirestoreUser>({} as getFirestoreUser)
+
+    const dispatch = useDispatch()
+    // header context userInfo
+    const userInfo = useSelector((state: RootState) => state.setUserInfo.userInfo)
+    const setUserInfo = (userInfo: getFirestoreUser) => {
+        dispatch(userInfoAction.setUserInfo({userInfo}))
+    }
 
     useEffect(() => {
-        getUserByEmail(contextUser.email as string).then((res: any) => {
-            setUser(res.data())
-            setProfileImage(res.data().profileImg)
+        getUserByUID(uid as string).then((res: any) => {
+            const data = res.docs[0].data();
+            
+            setProfileOwnerInfo(data)
+            getUserWritings(data.uid).then((writings) => {setUserWritings(writings as getFirestoreUserWritings)})
+            setProfileImage(data.profileImg)
+        })
+        getUserByUID(contextUser.uid).then((res: any) => {
+            const data = res.docs[0].data()
+            setUserInfo(data)
         })
     }, [])
+
+    useEffect(() => {
+        const getWritings = async () => {
+            const poems = await getPoemArrayInfo(userWritings.poemDocID)
+            const novel = await getNovelArrayInfo(userWritings.novelDocID)
+            const scenario = await getScenarioArrayInfo(userWritings.scenarioDocID)
+
+            setPoems((poems as Array<getFirestorePoem>).sort((a, b) => (b.dateCreated - a.dateCreated)))
+            setNovels((novel as Array<getFirestoreNovel>).sort((a, b) => (b.dateCreated - a.dateCreated)))
+            setScenarioes((scenario as Array<getFirestoreScenario>).sort((a, b) => (b.dateCreated - a.dateCreated)))
+            setTotalWritings(Array.prototype.concat(poems, novel, scenario).sort((a, b) => (b.dateCreated - a.dateCreated)))
+        }
+        if (userWritings.poemDocID && userWritings.novelDocID && userWritings.scenarioDocID) {
+            getWritings()
+        }
+    }, [userWritings])
 
     const handleFileOnChange = (event: any) => {
         const element = event.target.files[0]
@@ -54,7 +99,7 @@ const Mypage = () => {
 
     return (
         <>
-        {user && profileImage ?
+        {profileOwnerInfo && profileImage ?
             <div className="relative w-full font-noto bg-gradient-to-b from-[#e4d0ca] to-transparent bg-opacity-30">
                 {newWritingModalOpen && <NewWritingModal setNewWritingModalOpen={setNewWritingModalOpen}/>}
                 <div className="flex w-full items-center justify-between px-20">
@@ -78,7 +123,7 @@ const Mypage = () => {
                         
                         {/* Username */}
                         <div className="flex items-center justify-center">
-                            <span className="text-2xl font-bold my-7 mr-3">{user.username}</span>
+                            <span className="text-2xl font-bold my-7 mr-3">{profileOwnerInfo.username}</span>
                             <svg
                             onClick={signOutAuth}
                             className="w-7 cursor-pointer"
@@ -124,14 +169,21 @@ const Mypage = () => {
                                 다른 작가의 작품보기
                             </motion.button>
                         </div>
+
+                        {/* Calendar */}
                         <div className="w-2/3 my-10 grid grid-cols-3 gap-4">
-                            {/* <div className="border border-black grid grid-cols-7 place-items-center">
-                                {new Array(28).fill(0).map((data)=>(
-                                    <div key={`${data}1`} className="text-sm w-5 h-5 border border-black rounded-lg flex items-center justify-center">
+                            <div className="border border-black grid grid-cols-7 place-items-center">
+                                    {new Array(28).fill(0).map(() => {
+                                        xx.current += 1
+                                        return xx.current
+                                    }).map((data) => {
+                                        console.log(data);
                                         
-                                    </div>
-                                ))}
-                            </div> */}
+                                        return(<div key={`${data}`} className="text-sm w-5 h-5 border border-black rounded-lg flex items-center justify-center">
+                                        
+                                        </div>)
+                                    })}
+                            </div>
                             {/* <div className="border border-black grid grid-cols-7 place-items-center">
                                 {new Array(31).fill(0).map((data)=>(
                                     <div key={`${data}2f`} >
@@ -147,29 +199,39 @@ const Mypage = () => {
                                 ))}
                             </div> */}
                         </div>
+                        
+                        {/* On writing, Done */}
                         <div className="flex items-center flex-col mt-20 w-2/3">
-                            <span className="text-2xl font-extrabold mb-20 z-0">작성중인 글</span>
+                            <div className="w-full grid grid-cols-3 items-center mb-20">
+                                <span className="text-2xl font-extrabold justify-center col-start-2 w-full text-center">작성중인 글</span>
+                                <div className="grid grid-cols-4 col-start-3 gap-4 text-sm">
+                                    <button className={`rounded-lg hover:bg-gray-300 ${onWritingCategory === "NOVEL" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("NOVEL")}}>소설</button>
+                                    <button className={`rounded-lg hover:bg-gray-300 ${onWritingCategory === "POEM" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("POEM")}}>시</button>
+                                    <button className={`rounded-lg hover:bg-gray-300 ${onWritingCategory === "SCENARIO" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("SCENARIO")}}>시나리오</button>
+                                    <button className={`rounded-lg hover:bg-gray-300 ${onWritingCategory === "TOTAL" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("TOTAL")}}>전체</button>
+                                </div>
+                            </div>
+                            
                             <div className="grid grid-cols-3 items-center justify-between w-full gap-5">
-                                <MypageWriting key="1" type="novel"/>
-                                <MypageWriting key="2" type="novel"/>
-                                <MypageWriting key="3" type="novel"/>
+                                {onWritingCategory === "NOVEL" && novels.map((data) => (<MypageWriting key={data.dateCreated} data={data} />))}
+                                {onWritingCategory === "POEM" && poems.map((data) => (<MypageWriting key={data.dateCreated} data={data} />))}
+                                {onWritingCategory === "SCENARIO" && scenarioes.map((data) => (<MypageWriting key={data.dateCreated} data={data} />))}
+                                {onWritingCategory === "TOTAL" && totalWritings.map((data) => (<MypageWriting key={data.dateCreated} data={data} />))}
                             </div>
                         </div>
                         <div className="flex items-center flex-col mt-20 w-2/3">
                             <span className="text-2xl font-extrabold mb-20">완결된 글</span>
                             <motion.div layout className="flex items-center justify-between w-full gap-5">
-                                <MypageWriting key="1" type="novel"/>
-                                <MypageWriting key="2" type="novel"/>
-                                <MypageWriting key="3" type="novel"/>
+                                {totalWritings.map((data)=>(<MypageWriting key={data.dateCreated} data={data} />))}
                             </motion.div>
                         </div>
                     </div>
                 </div>
-                    {/* <Editor text={text} setText={setText}  /> */}
-                    <div className="w-full h-1/3">
-                <CustomNodeFlow />
-
-                    </div>
+                
+                {/* <Editor text={text} setText={setText}  /> */}
+                <div className="w-full h-1/3">
+                    <CustomNodeFlow />
+                </div>
             </div>
             :
             <div className="w-screen h-screen flex items-center justify-center bg-gradient-to-b from-[#e4d0ca] to-transparent bg-opacity-30">

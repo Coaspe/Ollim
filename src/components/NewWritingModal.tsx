@@ -5,19 +5,24 @@ import { useDispatch, useSelector } from "react-redux";
 import CustomNodeFlow from "../diagram/RelationShipDiagram";
 import { elementsAction } from "../redux";
 import { RootState } from "../redux/store";
+import { addPoem, addNovel, addScenario } from "../services/firebase";
+import { addNovelScenarioArg, addPoemArg, genre, page, scope } from "../type";
 
 interface NewWritingProps {
     setNewWritingModalOpen:React.Dispatch<React.SetStateAction<boolean>>
 }
 const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) => {
 
-    const [page, setPage] = useState("MAIN")
-    const [genrn, setGenrn] = useState("novel")
+    const [page, setPage] = useState<page>("MAIN")
+    const [genrn, setGenrn] = useState<genre>("NOVEL")
     const [genrnError, setGenrnError] = useState(false)
-    const dispatch = useDispatch()
     const [title, setTitle] = useState("")
     const [titleError, setTitleError] = useState(false)
     const [synopsis, setSynopsis] = useState("")
+    const [scope, setScope] = useState<scope>("PUBLIC")
+    const dispatch = useDispatch()
+    const userInfo = useSelector((state: RootState) => state.setUserInfo.userInfo)
+    const diagram = useSelector((state: RootState) => state.setDiagram.diagram)
     const setElements = useCallback((elements: Elements<any>) => {
       dispatch(elementsAction.setElements({elements: elements}))
     }, [dispatch])
@@ -30,7 +35,6 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
             setElements([])
         }
     }, [])
-
     const handleGenrnError = () => {
         genrnError && setGenrnError(false)
     }
@@ -41,11 +45,11 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
         <motion.div onClick={() => {setNewWritingModalOpen(false)}} className="font-noto flex items-center justify-center z-20 fixed w-full h-full" animate={{ backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"] }} transition={{ duration: 0.2, ease: "easeIn" }}>
             
             {/* First page: Decide Gerne, Title, Synopsis*/}
-            {page === "MAIN" && 
+            {page === "MAIN" && userInfo &&
             <div onClick={(e) => { e.stopPropagation() }} className="relative w-1/2 h-3/4 py-5 px-5 flex flex-col items-center rounded-xl bg-[#faf6f5]">
 
                 {/* right arrow (scenario, novel) or confirm svg (poem) */}
-                {genrn !== 'poem' ?
+                {genrn !== 'POEM' ?
                 <motion.svg whileHover={{ y: "-10%" }} x="0px" y="0px" className={`w-8 absolute top-5 right-5 cursor-pointer`}
                     onClick={() => {
                         if (!genrn && !title) {
@@ -78,6 +82,14 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                             setTitleError(true)
                             handleGenrnError()
                         } else {
+                            // Send firestore post
+                            const data: addPoemArg = {
+                                userUID: userInfo.uid,
+                                userEmail: userInfo.userEmail,
+                                title,
+                                opening: synopsis
+                            }
+                            addPoem(data)
                             setNewWritingModalOpen(false)
                         }
                     }}
@@ -94,50 +106,59 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                         {genrnError && <motion.span className="text-sm ml-2 font-bold text-red-400" animate={{ opacity: [0, 1] }} transition={{ duration: 0.1 }}>장르를 선택해주세요!</motion.span>}
                     </div>
                     <div className="flex items-center justify-between mt-5 w-1/2">
-                        <span className={`text-md font-bold cursor-pointer border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${genrn === "novel" && "bg-[#f5e1db]"}`}
+                        <span className={`text-md font-bold cursor-pointer border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${genrn === "NOVEL" && "bg-[#f5e1db]"}`}
                             onClick={() => {
-                                setGenrn("novel")
+                                setGenrn("NOVEL")
                                 handleGenrnError()
                             }}>소설</span>
-                        <span className={`text-md font-bold cursor-pointer border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${genrn === "poem" && "bg-[#f5e1db]"}`}
+                        <span className={`text-md font-bold cursor-pointer border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${genrn === "POEM" && "bg-[#f5e1db]"}`}
                             onClick={() => {
-                                setGenrn("poem")
+                                setGenrn("POEM")
                                 handleGenrnError()
                             }}>시</span>
-                        <span className={`text-md font-bold cursor-pointer border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${genrn === "scenario" && "bg-[#f5e1db]"}`}
+                        <span className={`text-md font-bold cursor-pointer border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${genrn === "SCENARIO" && "bg-[#f5e1db]"}`}
                             onClick={() => {
-                                setGenrn("scenario")
+                                setGenrn("SCENARIO")
                                 handleGenrnError()
                             }}>시나리오</span>
                     </div>
                 </div>
 
                 {/* Title div */}
-                <div className="mt-10 flex flex-col items-start w-3/4">
-                    <div className="flex items-center">
-                        <span className="text-2xl font-black">제목</span>
-                        {titleError && <motion.span className="text-sm ml-2 font-bold text-red-400" animate={{ opacity: [0, 1] }} transition={{ duration: 0.1 }}>제목을 입력해주세요!</motion.span>}
-                    </div>
-                    <input className="text-lg font-md border-2 border-[#e4d0ca] py-2 px-3 mt-5 rounded-xl w-1/2 placeholder:italic"
-                        placeholder="제목을 입력해주세요."
-                        type="text"
-                        value={title}
-                        onChange={(e) => {
-                            setTitle(e.target.value)
-                            e.target.value && handleTitleError()
-                        }} />
-                        
+                <div className="mt-10 flex w-3/4 items-center">
+                    <div className="flex flex-col items-start w-1/2 h-full">
+                        <div className="flex items-center">
+                            <span className="text-2xl font-black">제목</span>
+                            {titleError && <motion.span className="text-sm ml-2 font-bold text-red-400" animate={{ opacity: [0, 1] }} transition={{ duration: 0.1 }}>제목을 입력해주세요!</motion.span>}
+                        </div>
+                        <input className="text-lg font-md border-2 border-[#e4d0ca] py-2 px-3 mt-5 rounded-xl w-full placeholder:italic"
+                            placeholder="제목을 입력해주세요."
+                            type="text"
+                            value={title}
+                            onChange={(e) => {
+                                setTitle(e.target.value)
+                                e.target.value && handleTitleError()
+                            }} />
+                        </div>
+                        <div className="flex flex-col items-start w-1/2 h-full">
+                            <span className="text-2xl font-black">공개 범위</span>
+                            <div className="w-full flex items-center justify-between mt-5 py-2 px-3">
+                                <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${scope === "PUBLIC" && "bg-[#f5e1db]"}`} onClick={()=>{setScope("PUBLIC")}}>모두</button>
+                                <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${scope === "FOLLOWERS" && "bg-[#f5e1db]"}`} onClick={()=>{setScope("FOLLOWERS")}}>팔로워</button>
+                                <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${scope === "PRIVATE" && "bg-[#f5e1db]"}`} onClick={()=>{setScope("PRIVATE")}}>비공개</button>
+                            </div>
+                        </div>
                 </div>
 
                 {/* Opening article div */}
                 <div className="mt-10 flex flex-col items-start w-3/4">
-                    <span className="text-2xl font-black">{genrn === 'poem' ? "여는 말" : "시놉시스"}</span>
-                    <textarea className="resize-none border-2 border-[#e4d0ca] py-2 px-3 mt-5 rounded-xl h-28 w-full italic" placeholder={genrn === 'poem' ? "전시될 여는말을 서술해주세요." : "전시될 시놉시스를 간략하게 서술해주세요."} value={synopsis} spellCheck="false" onChange={(e) => { setSynopsis(e.target.value) }} />
+                    <span className="text-2xl font-black">{genrn === 'POEM' ? "여는 말" : "시놉시스"}</span>
+                    <textarea className="resize-none border-2 border-[#e4d0ca] py-2 px-3 mt-5 rounded-xl h-28 w-full italic" placeholder={genrn === 'POEM' ? "전시될 여는말을 서술해주세요." : "전시될 시놉시스를 간략하게 서술해주세요."} value={synopsis} spellCheck="false" onChange={(e) => { setSynopsis(e.target.value) }} />
                 </div>
             </div>}
 
             {/* (if Novel and Scenario) Second page: Decide Characters relationships diagram */}
-            {page === "DIAGRAM" && (genrn === "scenario" || genrn === "novel") &&
+            {page === "DIAGRAM" && (genrn === "SCENARIO" || genrn === "NOVEL") &&
             <div onClick={(e) => { e.stopPropagation() }} className="relative w-1/2 h-3/4 py-5 px-5 flex flex-col items-center rounded-xl bg-[#faf6f5]">
 
                 {/* arrow div */}
@@ -157,9 +178,19 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                     <motion.svg whileHover={{ y: "-10%" }} x="0px" y="0px"
                         className={`w-8 cursor-pointer`}
                         onClick={() => {
+                            const data: addNovelScenarioArg = {
+                                userEmail: userInfo.userEmail,
+                                userUID: userInfo.uid,
+                                title,
+                                synopsis,
+                                diagram
+                            }
+                            genrn === "NOVEL" ? addNovel(data) : addScenario(data)
+                            setNewWritingModalOpen(false)
                         }}
                          viewBox="0 0 50 50">
-                        <path d="M25 42c-9.4 0-17-7.6-17-17S15.6 8 25 8s17 7.6 17 17-7.6 17-17 17zm0-32c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z"/><path d="M24.7 34.7l-1.4-1.4 8.3-8.3-8.3-8.3 1.4-1.4 9.7 9.7z"/><path d="M16 24h17v2H16z"/>
+                        <path d="M25 42c-9.4 0-17-7.6-17-17S15.6 8 25 8s17 7.6 17 17-7.6 17-17 17zm0-32c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z"/>
+                        <path d="M23 32.4l-8.7-8.7 1.4-1.4 7.3 7.3 11.3-11.3 1.4 1.4z"/>
                     </motion.svg>
                     </div>
                     

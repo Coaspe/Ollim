@@ -1,29 +1,32 @@
 import { firebase, firestore, rtDBRef } from "../lib/firebase";
 import {
-  collection,
-  getDocs,
-  limit,
-  orderBy,
-  query,
-  where,
-  startAfter,
   updateDoc,
   doc,
   getDoc,
   setDoc,
-  arrayRemove,
   arrayUnion,
-  onSnapshot,
+  addDoc,
+  collection,
+  query,
+  where,
+  getDocs
 } from "firebase/firestore";
+import { addNovelScenarioArg, addPoemArg, toObjectElements } from "../type";
 
 export const singInWithGoogleInfoToFB = (info: any) => {
+  setDoc(doc(firestore, "writings", info.user.uid), {
+    novelDocID: [],
+    poemDocID: [],
+    scenarioDocID: [],
+    totalCommits: [],
+  })
   return setDoc(doc(firestore, "users", info.user.email), {
     userEmail: info.user.email.toLowerCase(),
     uid: info.user.uid,
     username: info.user.displayName.toLowerCase(),
     following: [],
     followers: [],
-    postDocId: [],
+    writingsDocId: [],
     dateCreated: Date.now(),
     profileImg: info.user.photoURL,
     profileCaption: "",
@@ -36,6 +39,107 @@ export async function doesEmailExist(userEmail: string) {
   return result.exists();
 }
 
+export const getUserByUID = async (uid: string) => {
+  const q = query(collection(firestore, "users"), where("uid", "==", uid))
+  return getDocs(q)
+}
 export const getUserByEmail = async (email: string) => {
   return getDoc(doc(firestore, "users", email))
+}
+
+export const addPoem = async (data: addPoemArg) => {
+  const docRef = await addDoc(collection(firestore, "poem"), {
+    ...data,
+    killingVerse: [],
+    tempSave: [],
+    done: false,
+    dateCreated: new Date().getTime(),
+    genre: "POEM",
+    private: false
+  });
+  
+  updateDoc(doc(firestore, "writings", data.userUID), {
+    poemDocID: arrayUnion(docRef.id)
+  })
+
+  updateDoc(doc(firestore, "users", data.userEmail), {
+    writingsDocID: arrayUnion(docRef.id)
+  })
+}
+export const addNovel = async (data: addNovelScenarioArg) => {
+  const docRef = await addDoc(collection(firestore, "novel"), {
+    ...data,
+    killingVerse: [],
+    tempSave: [],
+    done: false,
+    dateCreated: new Date().getTime(),
+    genre: "NOVEL",
+    private: false
+  });
+  updateDoc(doc(firestore, "writings", data.userUID), {
+    novelDocID: arrayUnion(docRef.id)
+  })
+  updateDoc(doc(firestore, "users", data.userEmail), {
+    writingsDocID: arrayUnion(docRef.id)
+  })
+}
+export const addScenario = async (data: addNovelScenarioArg) => {
+  const docRef = await addDoc(collection(firestore, "scenario"), {
+    ...data,
+    killingVerse: [],
+    tempSave: [],
+    done: false,
+    dateCreated: new Date().getTime(),
+    genre: "SCENARIO",
+    private: false
+  });
+  
+  updateDoc(doc(firestore, "writings", data.userUID), {
+    scenarioDocID: arrayUnion(docRef.id)
+  })
+
+  updateDoc(doc(firestore, "users", data.userEmail), {
+    writingsDocID: arrayUnion(docRef.id)
+  })
+}
+
+export const getUserWritings = async (userUID: string) => {
+  return (await getDoc(doc(firestore, "writings", userUID))).data()
+}
+export const addElements = (elements: toObjectElements) => {
+  addDoc(collection(firestore, "test"), elements)
+}
+
+export const getPoemArrayInfo = (poemDocIDs: Array<string>) => {
+  return Promise.all(poemDocIDs.map(async (docID: string) => {
+    const tmp = await getDoc(doc(firestore, "poem", docID))
+    if (tmp.exists()) {
+      const data = tmp.data()
+      console.log(data);
+      return {...data, id: tmp.id}
+    }
+  }
+  ))
+}
+export const getNovelArrayInfo = (novelDocIDs: Array<string>) => {
+  return Promise.all(novelDocIDs.map(async (docID: string) => {
+    const tmp = (await getDoc(doc(firestore, "novel", docID)))
+    if (tmp.exists()) {
+      const data = tmp.data()
+      const id = tmp.id
+      return {...data, id: tmp.id}
+    }
+  }
+  ))
+}
+export const getScenarioArrayInfo = (scenarioDocIDs: Array<string>) => {
+  return Promise.all(scenarioDocIDs.map(async (docID: string) => {
+    const tmp = (await getDoc(doc(firestore, "scenario", docID)))
+    if (tmp.exists()) {
+      const data = tmp.data()
+      const id = tmp.id
+      return {...data, id: tmp.id}
+    }
+  }
+  ))
 }

@@ -17,16 +17,15 @@ export const signInWithGoogle = (navi: NavigateFunction) => {
   provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
   return signInWithPopup(auth, provider)
     .then((result) => {
-      console.log(result);
-      console.log(typeof(result));
       doesEmailExist(result.user.email as string).then((r: any) => {
         if (!r) {
-          console.log(r);
+          // if not exists sign in
           singInWithGoogleInfoToFB(result).then(() => {
-            navi("/");
+            navi(`/${result.user.uid}`)
           });
         } else {
-          navi("/");
+          // if exists login
+         navi(`/${result.user.uid}`)
         }
       });
     })

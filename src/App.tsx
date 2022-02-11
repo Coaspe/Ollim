@@ -6,6 +6,7 @@ import IsUserLoggedIn from "./helpers/Is-user-logged-in";
 import ProtectedRoute from "./helpers/Protected-route";
 import Mypage from "./page/Mypage";
 import Community from "./page/Community";
+import Writing from "./page/Writing";
 
 const Intro = lazy(() => import("./page/Intro"))
 
@@ -28,7 +29,7 @@ const App = () => {
         >
           <Routes>
             <Route
-              path="/"
+              path="/:uid"
               element={
                 <ProtectedRoute user={user}>
                   <Mypage />
@@ -39,7 +40,7 @@ const App = () => {
             <Route
               path="/community"
               element={
-                  <Community />
+                <Community />
               }
             />
 
@@ -49,6 +50,12 @@ const App = () => {
                 <IsUserLoggedIn user={user}>
                   <Intro />
                 </IsUserLoggedIn>
+              }
+              />
+            <Route
+              path="/writings/:uid/:writingDocID"
+              element={
+                <Writing />
               }
               />
             {/* <Route
