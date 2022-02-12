@@ -1,8 +1,8 @@
 import { motion } from "framer-motion"
-import { useContext, useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import MypageWriting from "../components/MypageWriting"
 import UserContext from "../context/user"
-import { getPoemArrayInfo, getUserByEmail, getUserWritings, getNovelArrayInfo, getScenarioArrayInfo, getUserByUID } from "../services/firebase"
+import { getPoemArrayInfo, getUserWritings, getNovelArrayInfo, getScenarioArrayInfo, getUserByUID } from "../services/firebase"
 import Compressor from "compressorjs";
 import { signOutAuth } from "../helpers/auth-OAuth2"
 import NewWritingModal from "../components/NewWritingModal"
@@ -13,7 +13,10 @@ import { getFirestoreNovel, getFirestorePoem, getFirestoreScenario, getFirestore
 import { userInfoAction } from "../redux"
 import { useParams } from "react-router-dom"
 
+import Calendar from "../components/Calendar"
+
 const Mypage = () => {
+
     // profile owner's uid
     const { uid } = useParams()
     
@@ -23,14 +26,13 @@ const Mypage = () => {
     const [userWritings, setUserWritings] = useState({} as getFirestoreUserWritings)
     const [onWritingCategory, setOnWritingCategory] = useState("TOTAL")
 
-    const xx = useRef(0)
     const [poems, setPoems] = useState<Array<getFirestorePoem>>([])
     const [novels, setNovels] = useState<Array<getFirestoreNovel>>([])
     const [scenarioes, setScenarioes] = useState<Array<getFirestoreScenario>>([])
     const [totalWritings, setTotalWritings] = useState<Array<getFirestoreScenario | getFirestoreNovel | getFirestorePoem>>([])
     const [profileOwnerInfo, setProfileOwnerInfo] = useState<getFirestoreUser>({} as getFirestoreUser)
-
     const dispatch = useDispatch()
+
     // header context userInfo
     const userInfo = useSelector((state: RootState) => state.setUserInfo.userInfo)
     const setUserInfo = (userInfo: getFirestoreUser) => {
@@ -38,13 +40,23 @@ const Mypage = () => {
     }
 
     useEffect(() => {
-        getUserByUID(uid as string).then((res: any) => {
-            const data = res.docs[0].data();
-            
-            setProfileOwnerInfo(data)
-            getUserWritings(data.uid).then((writings) => {setUserWritings(writings as getFirestoreUserWritings)})
-            setProfileImage(data.profileImg)
-        })
+        if (uid) {
+            getUserByUID(uid as string).then((res: any) => {
+                const data = res.docs[0].data();
+                
+                setProfileOwnerInfo(data)
+                getUserWritings(data.uid).then((writings) => {setUserWritings(writings as getFirestoreUserWritings)})
+                setProfileImage(data.profileImg)
+            })
+        } else {
+            getUserByUID(contextUser.uid).then((res: any) => {
+                const data = res.docs[0].data();
+                
+                setProfileOwnerInfo(data)
+                getUserWritings(data.uid).then((writings) => {setUserWritings(writings as getFirestoreUserWritings)})
+                setProfileImage(data.profileImg)
+            })
+        }
         getUserByUID(contextUser.uid).then((res: any) => {
             const data = res.docs[0].data()
             setUserInfo(data)
@@ -99,7 +111,7 @@ const Mypage = () => {
 
     return (
         <>
-        {profileOwnerInfo && profileImage ?
+        {profileOwnerInfo && profileImage  && userWritings ?
             <div className="relative w-full font-noto bg-gradient-to-b from-[#e4d0ca] to-transparent bg-opacity-30">
                 {newWritingModalOpen && <NewWritingModal setNewWritingModalOpen={setNewWritingModalOpen}/>}
                 <div className="flex w-full items-center justify-between px-20">
@@ -171,35 +183,8 @@ const Mypage = () => {
                         </div>
 
                         {/* Calendar */}
-                        <div className="w-2/3 my-10 grid grid-cols-3 gap-4">
-                            <div className="border border-black grid grid-cols-7 place-items-center">
-                                    {new Array(28).fill(0).map(() => {
-                                        xx.current += 1
-                                        return xx.current
-                                    }).map((data) => {
-                                        console.log(data);
-                                        
-                                        return(<div key={`${data}`} className="text-sm w-5 h-5 border border-black rounded-lg flex items-center justify-center">
-                                        
-                                        </div>)
-                                    })}
-                            </div>
-                            {/* <div className="border border-black grid grid-cols-7 place-items-center">
-                                {new Array(31).fill(0).map((data)=>(
-                                    <div key={`${data}2f`} >
-                                        0
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="border border-black grid grid-cols-7 place-items-center">
-                                {new Array(30).fill(0).map((data)=>(
-                                    <div key={`${data}3a`} >
-                                        0
-                                    </div>
-                                ))}
-                            </div> */}
-                        </div>
-                        
+                        <Calendar totalCommits={userWritings.totalCommits}/>
+
                         {/* On writing, Done */}
                         <div className="flex items-center flex-col mt-20 w-2/3">
                             <div className="w-full grid grid-cols-3 items-center mb-20">

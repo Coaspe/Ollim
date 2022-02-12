@@ -36,6 +36,14 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute user={user}>
+                  <Mypage />
+                </ProtectedRoute>
+              }
+            />
             
             <Route
               path="/community"

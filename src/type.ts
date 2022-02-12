@@ -19,7 +19,7 @@ export type getFirestoreUserWritings = {
     novelDocID: Array<string>
     poemDocID: Array<string>
     scenarioDocID: Array<string>
-    totalCommits: Array<number>
+    totalCommits: {[key:number] : string}
 }
 
 export type toObjectElements = {
