@@ -15,10 +15,11 @@ const MypageWriting: React.FC<props> = ({ data }) => {
     const [timer, setTimer] = useState<NodeJS.Timeout>()
     const [infoVisible, setInfoVisible] = useState(false)
     const navigator = useNavigate()
+    
     return (
         <motion.div 
             layout
-            onClick={()=>{navigator(`/writings/${data.userUID}/${data.id}`)}}            
+            onClick={()=>{navigator(`/writings/${data.userUID}/${data.genre}/${data.id}`)}}            
             onHoverStart={() => {
                 setTimer(setTimeout(() => { setHoverExpandDetail(true) }, 1000))
                 setInfoVisible(true)
@@ -31,7 +32,7 @@ const MypageWriting: React.FC<props> = ({ data }) => {
             className="relative w-full h-full">
                 <AnimateSharedLayout>
                 <motion.div key="container-before" layoutId="container" className="w-full h-full relative flex flex-col text-noto border border-logoBrown border-opacity-50 rounded-xl shadow-lg cursor-pointer py-5 px-3">  
-                            {infoVisible && <span className="absolute bg-black text-white top-1 right-1 text-xs rounded-lg px-1 py-1">기다려서 세부사항을 확인하기</span>}
+                            {infoVisible && <span className="absolute bg-gray-800 text-white top-1 right-1 text-xs rounded-lg px-2 py-1">기다려서 세부사항을 확인하기</span>}
                             <div  className="mb-3">
                                 <span className="text-xl font-black">{data.title}</span>
                                 <span className="text-sm text-gray-700 font-black ml-3">{gerneType[data.genre as genre]}</span>

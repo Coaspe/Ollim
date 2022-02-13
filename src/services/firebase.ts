@@ -106,6 +106,10 @@ export const addScenario = async (data: addNovelScenarioArg) => {
 export const getUserWritings = async (userUID: string) => {
   return (await getDoc(doc(firestore, "writings", userUID))).data()
 }
+export const getWritingInfo = async (writingDocID: string, genre: string) => {
+  return (await getDoc(doc(firestore, genre.toLowerCase(), writingDocID))).data()
+}
+
 export const addElements = (elements: toObjectElements) => {
   addDoc(collection(firestore, "test"), elements)
 }

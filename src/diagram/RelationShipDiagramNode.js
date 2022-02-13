@@ -11,7 +11,7 @@ export default memo(({ id, data, isConnectable }) => {
   const [click, setClick] = useState(false);
   const [labelToggle, setLabelToggle] = useState(false);
   const [labelState, setLabelState] = useState(data.label);
-  const [descState, setDescState] = useState(data.label);
+  const [descState, setDescState] = useState(data.desc);
   const inputRef = useRef();
   const [mouseEnter, setMouseEnter] = useState(false);
 

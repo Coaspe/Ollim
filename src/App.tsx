@@ -61,7 +61,7 @@ const App = () => {
               }
               />
             <Route
-              path="/writings/:uid/:writingDocID"
+              path="/writings/:uid/:genre/:writingDocID"
               element={
                 <Writing />
               }

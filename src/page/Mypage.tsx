@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { useContext, useEffect, useState } from "react"
+import { Profiler, useContext, useEffect, useState } from "react"
 import MypageWriting from "../components/MypageWriting"
 import UserContext from "../context/user"
 import { getPoemArrayInfo, getUserWritings, getNovelArrayInfo, getScenarioArrayInfo, getUserByUID } from "../services/firebase"
@@ -108,7 +108,13 @@ const Mypage = () => {
             },
         });
     };
-
+const logTimes = (id:any, phase:any, actualTime:any, baseTime:any, startTime:any, commitTime:any) => {
+  console.log(`${id}'s ${phase} phase:`);
+  console.log(`Actual time: ${actualTime}`);
+//   console.log(`Base time: ${baseTime}`);
+//   console.log(`Start time: ${startTime}`);
+//   console.log(`Commit time: ${commitTime}`);
+};
     return (
         <>
         {profileOwnerInfo && profileImage  && userWritings ?
@@ -183,7 +189,9 @@ const Mypage = () => {
                         </div>
 
                         {/* Calendar */}
-                        <Calendar totalCommits={userWritings.totalCommits}/>
+                        <Profiler id="calendar" onRender={logTimes}>
+                            <Calendar totalCommits={userWritings.totalCommits}/>
+                        </Profiler>
 
                         {/* On writing, Done */}
                         <div className="flex items-center flex-col mt-20 w-2/3">

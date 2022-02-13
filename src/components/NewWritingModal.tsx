@@ -193,7 +193,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                         <path d="M23 32.4l-8.7-8.7 1.4-1.4 7.3 7.3 11.3-11.3 1.4 1.4z"/>
                     </motion.svg>
                     </div>
-                    
+                
                 {/* Characters relationships diagram*/}
                 <span className="abosolute left-1/2 top-5 font-black text-2xl">인물관계도</span>
                 <CustomNodeFlow />
