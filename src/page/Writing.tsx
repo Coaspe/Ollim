@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion"
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
 import Editor from "../components/Editor"
 import UserContext from "../context/user"
@@ -25,7 +25,7 @@ const Writing = () => {
     const [table, setTable] = useState<tableType>("OVERVIEW")
     const [diagram, setDiagram] = useState<toObjectElements>({} as toObjectElements)
     const [openDiagram, setOpenDiagram] = useState(false)
-    
+    const [isFull, setIsFull] = useState(false)
     useEffect(() => {
         if (contextUser.email) {
             getUserByEmail(contextUser.email as string).then((res) => {
@@ -54,15 +54,7 @@ const Writing = () => {
             })
         }
     }, [writingDocID, genre])
-    useEffect(() => {
-        console.log(process.env.NODE_ENV);
-        
-        const serchNaver = (q: string) => {
-            axios.post('http://localhost:3001/searchWord', {q}).then((res: any)=>{console.log(res.data.channel.item);
-            })
-        };
-        serchNaver("나분")
-    },[])
+
     return (
     <div className="relative w-full bg-gradient-to-b from-[#e4d0ca] to-transparent bg-opacity-30">
         <div className="flex w-full font-noto items-center justify-between px-20">
@@ -128,9 +120,24 @@ const Writing = () => {
         {
             table === "WRITE" &&
             <div className="w-full h-screen mt-20 flex items-center justify-center pb-32">
-                <Editor textProps="" setOpenDiagram={setOpenDiagram}/>
+                        <Editor textProps="" setOpenDiagram={setOpenDiagram} isFull={isFull} setIsFull={setIsFull} />
             </div>
         }
+            {/* {pos[0] > -1 && searchVisible &&
+                <div style={{ top: pos[1], left: pos[0] }} className={`z-50 absolute select-none`}>
+                <svg x="0px" y="0px"
+                    viewBox="0 0 487.95 487.95"
+                    className="w-8 rounded-full bg-slate-300 px-2 py-2"
+                >
+                <g>
+                    <g>
+                        <path d="M481.8,453l-140-140.1c27.6-33.1,44.2-75.4,44.2-121.6C386,85.9,299.5,0.2,193.1,0.2S0,86,0,191.4s86.5,191.1,192.9,191.1
+                            c45.2,0,86.8-15.5,119.8-41.4l140.5,140.5c8.2,8.2,20.4,8.2,28.6,0C490,473.4,490,461.2,481.8,453z M41,191.4
+                            c0-82.8,68.2-150.1,151.9-150.1s151.9,67.3,151.9,150.1s-68.2,150.1-151.9,150.1S41,274.1,41,191.4z"/>
+                    </g>
+                </g>
+                </svg>
+            </div>} */}
     </div>)
 }
 
