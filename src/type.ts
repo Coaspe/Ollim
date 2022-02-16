@@ -1,7 +1,10 @@
 import { Elements } from "react-flow-renderer"
-export type scope = "PUBLIC" | "PRIVATE" | "FOLLOWERS"
+export type disclosure = "PUBLIC" | "PRIVATE" | "FOLLOWERS"
 export type page = "MAIN" | "DIAGRAM"
 export type genre = "SCENARIO" | "POEM" | "NOVEL"
+export type writingType = getFirestorePoem | getFirestoreNovel | getFirestoreScenario
+export type tableType = "OVERVIEW" | "WRITE" | "SETTING"
+export type gerneType = "NOVEL" | "POEM" | "SCENARIO"
 
 export type getFirestoreUser = {
     dateCreated: number
@@ -34,6 +37,7 @@ export type addNovelScenarioArg = {
   title: string
   userUID: string
   diagram: toObjectElements
+  disclosure: string
 }
 
 export type addPoemArg = {
@@ -41,6 +45,7 @@ export type addPoemArg = {
   title: string
   opening: string
   userUID: string
+  disclosure: string
 }
 
 export type getFirestorePoem = {

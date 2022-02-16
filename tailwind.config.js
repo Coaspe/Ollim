@@ -4,6 +4,10 @@ module.exports = {
     extend: {
       fontFamily: {
         noto: ["Noto Serif KR", "serif"],
+        noto_sans: ["Noto Sans KR", "sans-serif"],
+        Nanum_Gothic: ["Nanum Gothic", "sans-serif"],
+        Nanum_Myeongjo: ["Nanum Myeongjo", "serif"],
+        Song_Myung: ["Song Myung", "serif"],
       },
       colors: {
         logoBrown: "#905C4C",
@@ -13,5 +17,5 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/typography")],
 };

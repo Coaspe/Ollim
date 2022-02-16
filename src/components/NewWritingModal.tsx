@@ -6,7 +6,7 @@ import CustomNodeFlow from "../diagram/RelationShipDiagram";
 import { elementsAction } from "../redux";
 import { RootState } from "../redux/store";
 import { addPoem, addNovel, addScenario } from "../services/firebase";
-import { addNovelScenarioArg, addPoemArg, genre, page, scope } from "../type";
+import { addNovelScenarioArg, addPoemArg, genre, page, disclosure } from "../type";
 
 interface NewWritingProps {
     setNewWritingModalOpen:React.Dispatch<React.SetStateAction<boolean>>
@@ -19,7 +19,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
     const [title, setTitle] = useState("")
     const [titleError, setTitleError] = useState(false)
     const [synopsis, setSynopsis] = useState("")
-    const [scope, setScope] = useState<scope>("PUBLIC")
+    const [disclosure, setDisclosure] = useState<disclosure>("PUBLIC")
     const dispatch = useDispatch()
     const userInfo = useSelector((state: RootState) => state.setUserInfo.userInfo)
     const diagram = useSelector((state: RootState) => state.setDiagram.diagram)
@@ -87,6 +87,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                                 userUID: userInfo.uid,
                                 userEmail: userInfo.userEmail,
                                 title,
+                                disclosure,
                                 opening: synopsis
                             }
                             addPoem(data)
@@ -143,9 +144,9 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                         <div className="flex flex-col items-start w-1/2 h-full">
                             <span className="text-2xl font-black">공개 범위</span>
                             <div className="w-full flex items-center justify-between mt-5 py-2 px-3">
-                                <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${scope === "PUBLIC" && "bg-[#f5e1db]"}`} onClick={()=>{setScope("PUBLIC")}}>모두</button>
-                                <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${scope === "FOLLOWERS" && "bg-[#f5e1db]"}`} onClick={()=>{setScope("FOLLOWERS")}}>팔로워</button>
-                                <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${scope === "PRIVATE" && "bg-[#f5e1db]"}`} onClick={()=>{setScope("PRIVATE")}}>비공개</button>
+                                <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "PUBLIC" && "bg-[#f5e1db]"}`} onClick={()=>{setDisclosure("PUBLIC")}}>모두</button>
+                                <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "FOLLOWERS" && "bg-[#f5e1db]"}`} onClick={()=>{setDisclosure("FOLLOWERS")}}>팔로워</button>
+                                <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "PRIVATE" && "bg-[#f5e1db]"}`} onClick={()=>{setDisclosure("PRIVATE")}}>비공개</button>
                             </div>
                         </div>
                 </div>
@@ -183,6 +184,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                                 userUID: userInfo.uid,
                                 title,
                                 synopsis,
+                                disclosure,
                                 diagram
                             }
                             genrn === "NOVEL" ? addNovel(data) : addScenario(data)

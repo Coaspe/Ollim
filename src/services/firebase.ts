@@ -55,7 +55,6 @@ export const addPoem = async (data: addPoemArg) => {
     done: false,
     dateCreated: new Date().getTime(),
     genre: "POEM",
-    private: false
   });
   
   updateDoc(doc(firestore, "writings", data.userUID), {
@@ -74,7 +73,6 @@ export const addNovel = async (data: addNovelScenarioArg) => {
     done: false,
     dateCreated: new Date().getTime(),
     genre: "NOVEL",
-    private: false
   });
   updateDoc(doc(firestore, "writings", data.userUID), {
     novelDocID: arrayUnion(docRef.id)
@@ -91,7 +89,6 @@ export const addScenario = async (data: addNovelScenarioArg) => {
     done: false,
     dateCreated: new Date().getTime(),
     genre: "SCENARIO",
-    private: false
   });
   
   updateDoc(doc(firestore, "writings", data.userUID), {

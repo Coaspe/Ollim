@@ -1,17 +1,15 @@
 import { AnimatePresence, motion } from "framer-motion"
-import { useContext, useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
-import Editor from "../components/Editor"
 import UserContext from "../context/user"
 import CustomNodeFlow from "../diagram/RelationShipDiagram"
 import CustomNodeFlowRDOnly from "../diagram/RelationShipDiagramReadOnly"
 import { getUserByEmail, getUserByUID, getWritingInfo } from "../services/firebase"
-import { getFirestorePoem, getFirestoreNovel, getFirestoreScenario, getFirestoreUser, toObjectElements } from "../type"
-import axios from 'axios'
+import {writingType, tableType, gerneType, getFirestorePoem, disclosure, getFirestoreNovel, getFirestoreUser, toObjectElements } from "../type"
+import SlateEditor from "../SlateEditor/SlateEditor"
+
 const Writing = () => {
-    type writingType = getFirestorePoem | getFirestoreNovel | getFirestoreScenario
-    type tableType = "OVERVIEW" | "WRITE" | "SETTING"
-    type gerneType = "NOVEL" | "POEM" | "SCENARIO"
+
     const gerneMatching = {
         NOVEL: "소설",
         POEM: "시",
@@ -25,7 +23,8 @@ const Writing = () => {
     const [table, setTable] = useState<tableType>("OVERVIEW")
     const [diagram, setDiagram] = useState<toObjectElements>({} as toObjectElements)
     const [openDiagram, setOpenDiagram] = useState(false)
-    const [isFull, setIsFull] = useState(false)
+    const [disclosure, setDisclosure] = useState<disclosure>("PUBLIC")
+
     useEffect(() => {
         if (contextUser.email) {
             getUserByEmail(contextUser.email as string).then((res) => {
@@ -51,6 +50,7 @@ const Writing = () => {
                 } else {
                     setWritingInfo(res as getFirestorePoem)
                 }
+                setDisclosure(res.disclosure)
             })
         }
     }, [writingDocID, genre])
@@ -84,7 +84,6 @@ const Writing = () => {
             table === "OVERVIEW" &&
                 (genre === "poem" ?
                 (
-                <div>
                     <div className="w-full font-noto flex flex-col items-start px-20 mt-20">
                         {/* Synopsis div */}
                         <div className="flex flex-col w-2/3">
@@ -92,13 +91,12 @@ const Writing = () => {
                             <p className="px-3 py-3 border border-blue-400 w-full rounded-lg">{(writingInfo as getFirestoreNovel).synopsis}</p>
                         </div>
                     </div>
-                </div>
                 ) : (
                 diagram &&
-                <div>
                     <div className="w-full font-noto flex flex-col items-start px-20 mt-20">
                         {/* Synopsis div */}
-                        <div className="flex flex-col w-2/3">
+                            <div className="flex flex-col w-2/3">
+                                
                             <span className="text-2xl font-bold mb-10">시놉시스</span>
                             <p className="px-3 py-3 border border-blue-400 w-full rounded-lg">{(writingInfo as getFirestoreNovel).synopsis}</p>
                         </div>
@@ -108,7 +106,6 @@ const Writing = () => {
                             <CustomNodeFlowRDOnly diagram={diagram} />
                         </div>
                     </div>
-                </div>
                 ))
         }
         <AnimatePresence>
@@ -119,8 +116,32 @@ const Writing = () => {
         </AnimatePresence>
         {
             table === "WRITE" &&
-            <div className="w-full h-screen mt-20 flex items-center justify-center pb-32">
-                        <Editor textProps="" setOpenDiagram={setOpenDiagram} isFull={isFull} setIsFull={setIsFull} />
+            <div className="w-full h-screen mt-20 flex flex-col items-center justify-center pb-32">
+                <SlateEditor />
+            </div>
+        }
+        {
+            table === "SETTING" &&
+            <div className="w-full font-noto flex flex-col items-start px-20 mt-20">
+                {/* Synopsis div */}
+                    <div className="flex flex-col w-2/3">
+                    <span className="text-2xl font-bold mb-10">시놉시스</span>
+                    <p className="px-3 py-3 border border-blue-400 w-full rounded-lg">{(writingInfo as getFirestoreNovel).synopsis}</p>
+                </div>
+                {/* diagram div */}
+                <div className="flex flex-col w-2/3 my-20">
+                    <span className="text-2xl font-bold mb-10">인물 관계도</span>
+                    <CustomNodeFlowRDOnly diagram={diagram} />
+                </div>
+                        
+                <div className="flex flex-col items-start w-1/3 mb-20">
+                    <span className="text-2xl font-black">공개 범위</span>
+                    <div className="w-full flex items-center justify-between mt-5 py-2 px-3">
+                        <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "PUBLIC" && "bg-[#f5e1db]"}`} onClick={()=>{setDisclosure("PUBLIC")}}>모두</button>
+                        <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "FOLLOWERS" && "bg-[#f5e1db]"}`} onClick={()=>{setDisclosure("FOLLOWERS")}}>팔로워</button>
+                        <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "PRIVATE" && "bg-[#f5e1db]"}`} onClick={()=>{setDisclosure("PRIVATE")}}>비공개</button>
+                    </div>
+                </div>
             </div>
         }
             {/* {pos[0] > -1 && searchVisible &&
