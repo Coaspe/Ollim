@@ -56,7 +56,7 @@ const Writing = () => {
     }, [writingDocID, genre])
 
     return (
-    <div className="relative w-full bg-gradient-to-b from-[#e4d0ca] to-transparent bg-opacity-30">
+    <div className=" w-full bg-gradient-to-b from-[#e4d0ca] to-transparent bg-opacity-30">
         <div className="flex w-full font-noto items-center justify-between px-20">
             {/* logo */}
             <img className="h-28" src="/logo/Ollim-logos_transparent.png" alt="header logo" />
@@ -116,8 +116,9 @@ const Writing = () => {
         </AnimatePresence>
         {
             table === "WRITE" &&
-            <div className="w-full h-screen mt-20 flex flex-col items-center justify-center pb-32">
-                <SlateEditor />
+            <div className="w-full h-full mt-20 flex flex-col items-center justify-center pb-32">
+                <SlateEditor openDiagram={openDiagram} setOpenDiagram={setOpenDiagram}/>
+                {/* <DraftEditor /> */}
             </div>
         }
         {

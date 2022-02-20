@@ -196,7 +196,7 @@ const logTimes = (id:any, phase:any, actualTime:any, baseTime:any, startTime:any
                         {/* On writing, Done */}
                         <div className="flex items-center flex-col mt-20 w-2/3">
                             <div className="w-full grid grid-cols-3 items-center mb-20">
-                                <span className="text-2xl font-extrabold justify-center col-start-2 w-full text-center">작성중인 글</span>
+                                <span className="text-2xl font-bold justify-center col-start-2 w-full text-center">작성중인 글</span>
                                 <div className="grid grid-cols-4 col-start-3 gap-4 text-sm">
                                     <button className={`rounded-lg hover:bg-gray-300 ${onWritingCategory === "NOVEL" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("NOVEL")}}>소설</button>
                                     <button className={`rounded-lg hover:bg-gray-300 ${onWritingCategory === "POEM" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("POEM")}}>시</button>
@@ -213,7 +213,7 @@ const logTimes = (id:any, phase:any, actualTime:any, baseTime:any, startTime:any
                             </div>
                         </div>
                         <div className="flex items-center flex-col mt-20 w-2/3">
-                            <span className="text-2xl font-extrabold mb-20">완결된 글</span>
+                            <span className="text-2xl font-bold mb-20">완결된 글</span>
                             <motion.div layout className="flex items-center justify-between w-full gap-5">
                                 {totalWritings.map((data)=>(<MypageWriting key={data.dateCreated} data={data} />))}
                             </motion.div>

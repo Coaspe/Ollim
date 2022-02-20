@@ -1,4 +1,4 @@
-import React, { Ref, PropsWithChildren } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 import { cx, css } from "@emotion/css";
 
@@ -78,9 +78,10 @@ export const Icon = React.forwardRef(({ className, ...props }, ref) => {
       className={cx(
         "material-icons",
         className,
+        "hover:text-slate-400",
         css`
           font-size: 18px;
-          vertical-align: text-bottom;
+          vertical-align: middle;
         `
       )}
     />
@@ -135,11 +136,11 @@ export const Toolbar = React.forwardRef(({ className, ...props }, ref) => (
     className={cx(
       className,
       css`
-        position: relative;
-        padding: 1px 18px 17px;
-        margin: 0 -20px;
-        border-bottom: 2px solid #eee;
-        margin-bottom: 20px;
+        background-color: #eee;
+        padding: 12px 18px;
+        position: sticky;
+        top: 0%;
+        z-index: 100000;
       `
     )}
   />
