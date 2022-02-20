@@ -7,6 +7,7 @@ import CustomNodeFlowRDOnly from "../diagram/RelationShipDiagramReadOnly"
 import { getUserByEmail, getUserByUID, getWritingInfo } from "../services/firebase"
 import {writingType, tableType, gerneType, getFirestorePoem, disclosure, getFirestoreNovel, getFirestoreUser, toObjectElements } from "../type"
 import SlateEditor from "../SlateEditor/SlateEditor"
+import { cx, css } from "@emotion/css";
 
 const Writing = () => {
 
@@ -116,8 +117,20 @@ const Writing = () => {
         </AnimatePresence>
         {
             table === "WRITE" &&
-            <div className="w-full h-full mt-20 flex flex-col items-center justify-center pb-32">
-                <SlateEditor openDiagram={openDiagram} setOpenDiagram={setOpenDiagram}/>
+                <div
+                    className={cx(
+                        "w-full h-full mt-20 flex flex-col items-center justify-center pb-32 editor-container",
+                        css`
+                            :fullscreen {
+                                background-color: #fff;
+                                padding-bottom: 0;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                            }
+                        `
+                        )}>
+                        <SlateEditor openDiagram={openDiagram} setOpenDiagram={setOpenDiagram} writingInfo={writingInfo} writingDocID={writingDocID}/>
                 {/* <DraftEditor /> */}
             </div>
         }

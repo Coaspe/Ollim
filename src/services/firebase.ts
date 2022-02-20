@@ -144,3 +144,31 @@ export const getScenarioArrayInfo = (scenarioDocIDs: Array<string>) => {
   }
   ))
 }
+
+export const commit = async (value: {
+    type: string;
+    children: {
+        type: string;
+        text: string;
+        fontSize: number;
+        fontStyle: string;
+    }[];
+}[], writingDocID: string, genre: string, memo: string, userUID: string) => {
+  const date = new Date().getTime()
+  
+  let commits: any = (await getDoc(doc(firestore, genre.toLowerCase(), writingDocID))).data()
+  commits = commits.commits
+  commits[date] = { contents: value, memo }
+  
+  updateDoc(doc(firestore, genre.toLocaleLowerCase(), writingDocID), {
+  commits
+  }).catch((err)=>{console.log(err);
+  })
+  let totalCommits: any = (await getDoc(doc(firestore, "writings", userUID))).data()
+  totalCommits = totalCommits.totalCommits
+  totalCommits[date] = memo
+  updateDoc(doc(firestore, "writings", userUID), {
+    totalCommits
+  }).catch((err)=>{console.log(err);
+  })
+}

@@ -13,7 +13,7 @@ import { Button, Icon, Toolbar } from "./components";
 import { cx, css } from "@emotion/css";
 import blocks from "./block-list";
 import Paragraph from "./paragraph";
-
+import { commit } from "../services/firebase";
 const HOTKEYS = {
   "mod+b": "bold",
   "mod+i": "italic",
@@ -36,7 +36,12 @@ function clearTheSelection() {
   }
 }
 
-const SlateEditor = ({ openDiagram, setOpenDiagram }) => {
+const SlateEditor = ({
+  openDiagram,
+  setOpenDiagram,
+  writingInfo,
+  writingDocID,
+}) => {
   const [value, setValue] = useState(initialValue);
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
@@ -68,7 +73,17 @@ const SlateEditor = ({ openDiagram, setOpenDiagram }) => {
   };
 
   return (
-    <div className="border border-black">
+    <div
+      className={cx(
+        "border border-black z-50 relative editor-inner",
+        css`
+          width: 210mm;
+          height: 297mm;
+          overflow-y: scroll;
+          position: relative;
+        `
+      )}
+    >
       <Slate
         editor={editor}
         value={value}
@@ -88,44 +103,71 @@ const SlateEditor = ({ openDiagram, setOpenDiagram }) => {
           <DictButton selectedProp={selected} />
           <FontSize />
           <FontStyle />
-        </Toolbar>
-        <div
-          className={cx(
-            css`
-              width: 210mm;
-              height: 297mm;
-            `
-          )}
-        >
-          <Editable
-            className="w-full"
-            onMouseDown={clearTheSelection}
-            onMouseUp={(e) => {
-              let seleted = Editor.string(editor, editor.selection);
-              setSelected(seleted);
-            }}
-            onBlur={() => {
-              setSelected("");
-            }}
-            renderElement={renderElement}
-            renderLeaf={renderLeaf}
-            spellCheck
-            autoFocus
-            onKeyDown={(event) => {
-              for (const hotkey in HOTKEYS) {
-                if (isHotkey(hotkey, event)) {
-                  event.preventDefault();
-                  const mark = HOTKEYS[hotkey];
-                  if (mark === "diagram") {
-                    setOpenDiagram((origin) => !origin);
-                  } else {
-                    toggleMark(editor, mark);
-                  }
-                }
+          <span
+            onClick={() => {
+              const doc = document.querySelector(".editor-container");
+              if (doc) {
+                doc.requestFullscreen({ navigationUI: "show" }).catch((err) => {
+                  console.log(err);
+                });
               }
             }}
-          />
-        </div>
+            className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[20px] align-middle"
+          >
+            fullscreen
+          </span>
+          <span
+            onClick={() => {
+              commit(
+                value,
+                writingDocID,
+                writingInfo.genre,
+                "Commit",
+                writingInfo.userUID
+              );
+            }}
+            className="material-icons text-gray-300 cursor-pointer hover:text-slate-400 text-[20px] align-middle"
+          >
+            save
+          </span>
+        </Toolbar>
+        <Editable
+          className={cx(
+            "w-full",
+            css`
+              :fullscreen {
+                ::-webkit-scrollbar {
+                  width: 10px;
+                }
+              }
+            `
+          )}
+          onMouseDown={clearTheSelection}
+          onMouseUp={(e) => {
+            let seleted = Editor.string(editor, editor.selection);
+            setSelected(seleted);
+          }}
+          onBlur={() => {
+            setSelected("");
+          }}
+          renderElement={renderElement}
+          renderLeaf={renderLeaf}
+          spellCheck
+          autoFocus
+          onKeyDown={(event) => {
+            for (const hotkey in HOTKEYS) {
+              if (isHotkey(hotkey, event)) {
+                event.preventDefault();
+                const mark = HOTKEYS[hotkey];
+                if (mark === "diagram") {
+                  setOpenDiagram((origin) => !origin);
+                } else {
+                  toggleMark(editor, mark);
+                }
+              }
+            }
+          }}
+        />
       </Slate>
     </div>
   );
@@ -224,11 +266,6 @@ const FontSize = () => {
 
   return (
     <div className="relative group cursor-pointer z-40 hover:bg-gray-300">
-      {/* <button>
-          <span class="material-icons align-bottom px-1 text-[18px]">
-            format_size
-          </span>
-        </button> */}
       <span>{size[getFontSize(editor)]}</span>
       <div className="absolute flex flex-col pt-3 invisible group-hover:visible">
         <button
