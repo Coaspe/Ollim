@@ -108,17 +108,17 @@ const Mypage = () => {
             },
         });
     };
-const logTimes = (id:any, phase:any, actualTime:any, baseTime:any, startTime:any, commitTime:any) => {
-  console.log(`${id}'s ${phase} phase:`);
-  console.log(`Actual time: ${actualTime}`);
-//   console.log(`Base time: ${baseTime}`);
-//   console.log(`Start time: ${startTime}`);
-//   console.log(`Commit time: ${commitTime}`);
-};
+    const logTimes = (id:any, phase:any, actualTime:any, baseTime:any, startTime:any, commitTime:any) => {
+    // console.log(`${id}'s ${phase} phase:`);
+    // console.log(`Actual time: ${actualTime}`);
+    //   console.log(`Base time: ${baseTime}`);
+    //   console.log(`Start time: ${startTime}`);
+    //   console.log(`Commit time: ${commitTime}`);
+    };
     return (
         <>
         {profileOwnerInfo && profileImage  && userWritings ?
-            <div className="relative w-full font-noto bg-gradient-to-b from-[#e4d0ca] to-transparent bg-opacity-30">
+            <div className="relative w-full font-noto bg-[#e6d6d1] bg-opacity-30">
                 {newWritingModalOpen && <NewWritingModal setNewWritingModalOpen={setNewWritingModalOpen}/>}
                 <div className="flex w-full items-center justify-between px-20">
                     {/* logo */}
@@ -177,9 +177,6 @@ const logTimes = (id:any, phase:any, actualTime:any, baseTime:any, startTime:any
                             </div>
                         </div>
                         <div className="flex w-full items-center justify-center mt-10">
-                            {/* <motion.button whileHover={{ y:"-10%" }} className="mr-5 px-4 py-3 rounded-2xl bg-white shadow-md font-semibold">
-                                작품 추가
-                            </motion.button> */}
                             <motion.button onClick={()=>{setNewWritingModalOpen(true)}} whileHover={{ y:"-10%" }} className="mr-5 px-4 py-3 rounded-2xl bg-white shadow-md font-semibold">
                                 새 작품 쓰기
                             </motion.button>

@@ -1,6 +1,6 @@
 import { createAction, createReducer } from "@reduxjs/toolkit";
 import { getFirestoreUser, toObjectElements } from "../type";
-import { elementsState, setValuePayload, setElementsAction, setElementsPayload, setUserInfoPayload, userInfoState, setUserInfoAction, diagramState, setDiagramAction, setDiagramPayload, valueState, setValueAction } from "./type";
+import { elementsState, setElementsAction, setElementsPayload, setUserInfoPayload, userInfoState, setUserInfoAction, diagramState, setDiagramAction, setDiagramPayload } from "./type";
 
 export const elementsAction = {
     setElements: createAction<setElementsPayload>("SETELEMENTS"),
@@ -51,20 +51,4 @@ export const diagramReducer = {
 export const setDiagramReducer = createReducer(diagramInitialState, builder => {
     builder
         .addCase(diagramAction.setDiagram, diagramReducer.setDiagram)
-})
-
-export const valueAction = {
-    setValue: createAction<setValuePayload>("SETVALUE"),
-}
-const valueInitialState: valueState = {
-    value: [{type: "page", children:[]}] as any
-}
-export const valueReducer = {
-    setValue: (state: valueState, action: setValueAction) => {
-        state.value = action.payload.value
-    }
-}
-export const setValueReducer = createReducer(valueInitialState, builder => {
-    builder
-        .addCase(valueAction.setValue, valueReducer.setValue)
 })

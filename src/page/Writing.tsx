@@ -8,6 +8,7 @@ import { getUserByEmail, getUserByUID, getWritingInfo } from "../services/fireba
 import {writingType, tableType, gerneType, getFirestorePoem, disclosure, getFirestoreNovel, getFirestoreUser, toObjectElements } from "../type"
 import SlateEditor from "../SlateEditor/SlateEditor"
 import { cx, css } from "@emotion/css";
+import SlateEditorRDOnly from "../SlateEditor/SlateEditorRDOnly"
 
 const Writing = () => {
 
@@ -57,8 +58,8 @@ const Writing = () => {
     }, [writingDocID, genre])
 
     return (
-    <div className=" w-full bg-gradient-to-b from-[#e4d0ca] to-transparent bg-opacity-30">
-        <div className="flex w-full font-noto items-center justify-between px-20">
+    <div className=" w-full bg-[#e6d6d1] bg-opacity-30">
+        {table !== "WRITE" && <div className="flex w-full font-noto items-center justify-between px-20">
             {/* logo */}
             <img className="h-28" src="/logo/Ollim-logos_transparent.png" alt="header logo" />
             {contextUserInfo.profileImg && 
@@ -66,7 +67,7 @@ const Writing = () => {
                 <img className="rounded-full w-10" src={contextUserInfo.profileImg} alt="header profile" />
                 <span className="font-bold ml-3">{contextUserInfo.username}</span>
             </div>}
-        </div>
+        </div>}
         <div className="flex font-noto flex-col items-start px-20">
             <div className="flex items-center font-bold mb-10">
                 <span className="text" >{writingOwnerInfo.username}</span>
@@ -77,29 +78,33 @@ const Writing = () => {
             </div>
             <div className="flex items-center">
                 <button onClick={()=>{setTable("OVERVIEW")}}>개요</button>
-                <button onClick={()=>{setTable("WRITE")}} className="mx-5">작성</button>
-                <button onClick={()=>{setTable("SETTING")}} >설정</button>
+                <button onClick={()=>{setTable("BROWSE")}} className="ml-5" >열람</button>
+                { contextUser.uid === uid &&
+                <>
+                    <button onClick={()=>{setTable("WRITE")}} className="mx-5">작성</button>
+                    <button onClick={()=>{setTable("SETTING")}} >설정</button>
+                </>}
             </div>
         </div>
+        {/* Table OVERVIEW */}
         {
             table === "OVERVIEW" &&
-                (genre === "poem" ?
+                (genre?.toLocaleLowerCase() === "poem" ?
                 (
                     <div className="w-full font-noto flex flex-col items-start px-20 mt-20">
                         {/* Synopsis div */}
                         <div className="flex flex-col w-2/3">
                             <span className="text-2xl font-bold mb-10">여는 말</span>
-                            <p className="px-3 py-3 border border-blue-400 w-full rounded-lg">{(writingInfo as getFirestoreNovel).synopsis}</p>
+                            <p className="px-3 py-3 border border-blue-400 w-full h-72 overflow-y-scroll rounded-lg">{(writingInfo as getFirestorePoem).opening}</p>
                         </div>
                     </div>
                 ) : (
                 diagram &&
                     <div className="w-full font-noto flex flex-col items-start px-20 mt-20">
                         {/* Synopsis div */}
-                            <div className="flex flex-col w-2/3">
-                                
+                        <div className="flex flex-col w-2/3">
                             <span className="text-2xl font-bold mb-10">시놉시스</span>
-                            <p className="px-3 py-3 border border-blue-400 w-full rounded-lg">{(writingInfo as getFirestoreNovel).synopsis}</p>
+                            <p className="px-3 py-3 border border-blue-400 w-full rounded-lg h-72 overflow-y-scroll">{(writingInfo as getFirestoreNovel).synopsis}</p>
                         </div>
                         {/* diagram div */}
                         <div className="flex flex-col w-2/3 my-20">
@@ -109,20 +114,15 @@ const Writing = () => {
                     </div>
                 ))
         }
-        <AnimatePresence>
-                {openDiagram && 
-                <motion.div animate={{ y: ["100%", "0%"] }} exit={{ y: ["0%", "100%"] }} transition={{ y: { duration: 0.3 } }} className="z-50 bottom-0 fixed w-full h-1/3 bg-white">
-                    <CustomNodeFlow />
-                </motion.div>}
-        </AnimatePresence>
+        {/* Table WRITE */}
         {
             table === "WRITE" &&
                 <div
                     className={cx(
-                        "w-full h-full mt-20 flex flex-col items-center justify-center pb-32 editor-container",
+                        "w-full h-full mt-10 flex flex-col items-center justify-center pb-32 editor-container",
                         css`
                             :fullscreen {
-                                background-color: #fff;
+                                background-color: #e6ddda;
                                 padding-bottom: 0;
                                 display: flex;
                                 align-items: center;
@@ -130,10 +130,29 @@ const Writing = () => {
                             }
                         `
                         )}>
-                        <SlateEditor openDiagram={openDiagram} setOpenDiagram={setOpenDiagram} writingInfo={writingInfo} writingDocID={writingDocID}/>
-                {/* <DraftEditor /> */}
-            </div>
+                        <SlateEditor openDiagram={openDiagram} setOpenDiagram={setOpenDiagram} writingDocID={writingDocID} genre={writingInfo.genre}/>
+                </div>
         }
+        {/* Table BROWSE */}
+        {
+            table === "BROWSE" && 
+                <div
+                    className={cx(
+                        "w-full h-full mt-10 flex flex-col items-center justify-center pb-32 editor-container",
+                        css`
+                            :fullscreen {
+                                background-color: #e6ddda;
+                                padding-bottom: 0;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                            }
+                        `
+                        )}>
+                        <SlateEditorRDOnly openDiagram={openDiagram} setOpenDiagram={setOpenDiagram} writingDocID={writingDocID} genre={writingInfo.genre}/>
+                </div>
+        }
+        {/* Table SETTING */}
         {
             table === "SETTING" &&
             <div className="w-full font-noto flex flex-col items-start px-20 mt-20">
@@ -158,6 +177,12 @@ const Writing = () => {
                 </div>
             </div>
         }
+        <AnimatePresence>
+                {openDiagram && 
+                <motion.div animate={{ y: ["100%", "0%"] }} exit={{ y: ["0%", "100%"] }} transition={{ y: { duration: 0.3 } }} className="z-50 bottom-0 fixed w-full h-1/3 bg-white">
+                    <CustomNodeFlow />
+                </motion.div>}
+        </AnimatePresence>
             {/* {pos[0] > -1 && searchVisible &&
                 <div style={{ top: pos[1], left: pos[0] }} className={`z-50 absolute select-none`}>
                 <svg x="0px" y="0px"

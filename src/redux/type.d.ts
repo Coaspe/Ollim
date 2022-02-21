@@ -34,14 +34,5 @@ interface setDiagramAction {
     payload: setDiagramPayload
 }
 
-interface valueState {
-    value: any;
-}
-interface setValuePayload {
-    value: any
-}
-interface setValueAction {
-    payload: any
-}
 
 

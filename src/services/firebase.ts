@@ -9,7 +9,8 @@ import {
   collection,
   query,
   where,
-  getDocs
+  getDocs,
+  deleteDoc
 } from "firebase/firestore";
 import { addNovelScenarioArg, addPoemArg, toObjectElements } from "../type";
 
@@ -156,14 +157,13 @@ export const commit = async (value: {
 }[], writingDocID: string, genre: string, memo: string, userUID: string) => {
   const date = new Date().getTime()
   
-  let commits: any = (await getDoc(doc(firestore, genre.toLowerCase(), writingDocID))).data()
-  commits = commits.commits
-  commits[date] = { contents: value, memo }
-  
+  let tmp: any = {}
+  tmp[date] = value
   updateDoc(doc(firestore, genre.toLocaleLowerCase(), writingDocID), {
-  commits
+  commits: arrayUnion(tmp)
   }).catch((err)=>{console.log(err);
   })
+
   let totalCommits: any = (await getDoc(doc(firestore, "writings", userUID))).data()
   totalCommits = totalCommits.totalCommits
   totalCommits[date] = memo
@@ -171,4 +171,38 @@ export const commit = async (value: {
     totalCommits
   }).catch((err)=>{console.log(err);
   })
+
+}
+
+export const deleteTempSave = (tempSaveDocID: string, writingDocID: string, genre: string) => {
+  deleteDoc(doc(firestore, "tempSave", tempSaveDocID))
+  updateDoc(doc(firestore, genre.toLocaleLowerCase(), writingDocID), {
+    tempSave: ""
+  })
+}
+
+export const temporarySave = async (contents: {
+    type: string;
+    children: {
+        type: string;
+        text: string;
+        fontSize: number;
+        fontStyle: string;
+    }[];
+}, userUID: string, writingDocID: string, genre: string) => {
+  const date = new Date().getTime()
+   const tempSaveDocID = (await addDoc(collection(firestore, "tempSave"), {
+     date,
+     contents,
+     userUID,
+     writingDocID
+   })).id
+  
+   updateDoc(doc(firestore, genre.toLocaleLowerCase(), writingDocID), {
+  tempSave: tempSaveDocID
+  })
+}
+
+export const getTemporarySave = async (tempSaveDocID: string) => {
+  return (await getDoc(doc(firestore, "tempSave", tempSaveDocID))).data()
 }

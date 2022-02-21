@@ -3,7 +3,7 @@ export type disclosure = "PUBLIC" | "PRIVATE" | "FOLLOWERS"
 export type page = "MAIN" | "DIAGRAM"
 export type genre = "SCENARIO" | "POEM" | "NOVEL"
 export type writingType = getFirestorePoem | getFirestoreNovel | getFirestoreScenario
-export type tableType = "OVERVIEW" | "WRITE" | "SETTING"
+export type tableType = "OVERVIEW" | "WRITE" | "SETTING" |"BROWSE"
 export type gerneType = "NOVEL" | "POEM" | "SCENARIO"
 
 export type getFirestoreUser = {
@@ -49,43 +49,46 @@ export type addPoemArg = {
 }
 
 export type getFirestorePoem = {
-  commits: { [key: number]: { contents: string, memo: string } }
+  commits: [{ [key: number]: { contents: string, memo: string } } ]
   dateCreated: number
   done: boolean
   killingVerser: Array<string>
   opening: string
-  tempSave: Array<string>
+  tempSave: string
   title: string
   userEmail: string
   userUID: string
   genre: string
   id: string
+  disclosure: disclosure
 }
 export type getFirestoreNovel = {
-  commits: { [key: number]: { contents: string, memo: string } }
+  commits: [{ [key: number]: { contents: string, memo: string } } ]
   dateCreated: number
   diagram: toObjectElements
   done: boolean
   killingVerser: Array<string>
   synopsis: string
-  tempSave: Array<string>
+  tempSave: string
   title: string
   userEmail: string
   userUID: string
   genre: string
   id: string
+  disclosure: disclosure
 }
 export type getFirestoreScenario = {
-  commits: { [key: number]: { contents: string, memo: string } }
+  commits: [{ [key: number]: { contents: string, memo: string } } ]
   dateCreated: number
   diagram: toObjectElements
   done: boolean
   killingVerser: Array<string>
   synopsis: string
-  tempSave: Array<string>
+  tempSave: string
   title: string
   userEmail: string
   userUID: string
   genre: string
   id: string
+  disclosure: disclosure
 }

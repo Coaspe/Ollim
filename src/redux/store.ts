@@ -1,12 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { setDiagramReducer, setElementReducer, setUserInfoReducer, setValueReducer } from '.'
+import { setDiagramReducer, setElementReducer, setUserInfoReducer } from '.'
 
 export const store = configureStore({
     reducer: {
     setElements: setElementReducer,
     setUserInfo: setUserInfoReducer,
     setDiagram: setDiagramReducer,
-    setValue: setValueReducer
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
 })
