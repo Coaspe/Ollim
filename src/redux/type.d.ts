@@ -1,5 +1,5 @@
 import { Elements } from "react-flow-renderer";
-import { getFirestoreUser, toObjectElements } from "../type";
+import { alarmType, getFirestoreUser, toObjectElements } from "../type";
 
 interface elementsState {
     elements: Elements;
@@ -34,5 +34,23 @@ interface setDiagramAction {
     payload: setDiagramPayload
 }
 
+interface alarmState {
+    alarm: [string, alarmType, boolean];
+}
+interface setAlarmPayload {
+    alarm: [string, alarmType, boolean]
+}
+interface setAlarmAction {
+    payload: setAlarmPayload
+}
 
+interface alarmTimerState {
+    timer: NodeJS.Timeout | null
+}
+interface setAlarmTimerPayload {
+    timer: NodeJS.Timeout | null
+}
+interface setAlarmTimerAction {
+    payload: setAlarmTimerPayload
+}
 

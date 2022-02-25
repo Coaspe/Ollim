@@ -1,6 +1,6 @@
 import { createAction, createReducer } from "@reduxjs/toolkit";
 import { getFirestoreUser, toObjectElements } from "../type";
-import { elementsState, setElementsAction, setElementsPayload, setUserInfoPayload, userInfoState, setUserInfoAction, diagramState, setDiagramAction, setDiagramPayload } from "./type";
+import { elementsState, setElementsAction, setElementsPayload, setUserInfoPayload, userInfoState, setUserInfoAction, diagramState, setDiagramAction, setDiagramPayload, alarmState, setAlarmPayload, setAlarmAction, setAlarmTimerPayload, alarmTimerState, setAlarmTimerAction } from "./type";
 
 export const elementsAction = {
     setElements: createAction<setElementsPayload>("SETELEMENTS"),
@@ -51,4 +51,38 @@ export const diagramReducer = {
 export const setDiagramReducer = createReducer(diagramInitialState, builder => {
     builder
         .addCase(diagramAction.setDiagram, diagramReducer.setDiagram)
+})
+
+
+export const alarmAction = {
+    setAlarm: createAction<setAlarmPayload>("SETALARM"),
+}
+const alarmInitialState: alarmState = {
+    alarm: ["", "success", false]
+}
+export const alarmReducer = {
+    setAlarm: (state: alarmState, action: setAlarmAction) => {
+        state.alarm = action.payload.alarm
+    }
+}
+export const setAlarmReducer = createReducer(alarmInitialState, builder => {
+    builder
+        .addCase(alarmAction.setAlarm, alarmReducer.setAlarm)
+})
+
+
+export const alarmTimerAction = {
+    setAlarmTimer: createAction<setAlarmTimerPayload>("SETALARMTIMER"),
+}
+const alarmTimerInitialState: alarmTimerState = {
+    timer : null
+}
+export const alarmTimerReducer = {
+    setAlarmTimer: (state: alarmTimerState, action: setAlarmTimerAction) => {
+        state.timer = action.payload.timer
+    }
+}
+export const setAlarmTimerReducer = createReducer(alarmTimerInitialState, builder => {
+    builder
+        .addCase(alarmTimerAction.setAlarmTimer, alarmTimerReducer.setAlarmTimer)
 })

@@ -9,14 +9,11 @@ import ReactFlow, {
 } from 'react-flow-renderer';
 import { useDispatch, useSelector } from 'react-redux';
 import ColorSelectorNode from './RelationShipDiagramNode';
-import { diagramAction, elementsAction } from '../redux';
+import { alarmAction, alarmTimerAction, diagramAction, elementsAction } from '../redux';
 import { RootState } from '../redux/store';
 import ButtonEdge from './ButtonEdge';
-import { toObjectElements } from '../type';
-
-const onNodeDragStop = (event:any, node:any) => console.log('drag stop', node);
-const onElementClick = (event:any, element:any) => console.log('click', element);
-
+import { toObjectElements, alarmType } from '../type';
+import axios from 'axios';
 const initBgColor = '#faf6f5';
 const edgeTypes = {
   buttonedge: ButtonEdge,
@@ -26,21 +23,36 @@ const snapGrid = [20, 20];
 const nodeTypes = {
   selectorNode: ColorSelectorNode,
 };
-
-const CustomNodeFlow = () => {
+interface props {
+  isWritingPage?: boolean
+  writingDocID?: string
+  genre?: string
+}
+const CustomNodeFlow: React.FC<props> = ({ isWritingPage, writingDocID, genre }) => {
   const [reactflowInstance, setReactflowInstance] = useState<any>(null);
-  const pos = useRef([0, 0])
+  // for prevent unchanged save
+  const isInitialMount = useRef(0)
+  const pos = useRef([10, 10])
   const [bgColor, setBgColor] = useState<any>(initBgColor);
   const dispatch = useDispatch()
+
   const elements: Elements<any> = useSelector((state: RootState) => state.setElements.elements)
   const setElements = useCallback((elements: Elements<any>) => {
-      dispatch(elementsAction.setElements({elements: elements}))
+    dispatch(elementsAction.setElements({elements: elements}))
   }, [dispatch])
+  const setAlarm = (alarm: [string, alarmType, boolean]) => {
+    dispatch(alarmAction.setAlarm({alarm}))
+  }
 
+  const diagram = useSelector((state: RootState) =>(state.setDiagram.diagram))
   const setDiagram = useCallback((diagram: toObjectElements) => {
-      dispatch(diagramAction.setDiagram({diagram}))
+    dispatch(diagramAction.setDiagram({diagram}))
   }, [dispatch])
 
+  const timer = useSelector((state: RootState) =>(state.setAlarmTimer.timer))
+  const setAlarmTimer = (timer: NodeJS.Timeout | null) => {
+    dispatch(alarmTimerAction.setAlarmTimer({timer}))
+  }
   const onLoad = useCallback(
     (rfi) => {
       if (!reactflowInstance) {
@@ -71,18 +83,30 @@ const CustomNodeFlow = () => {
         [...addEdge({ ...params, type: 'buttonedge', data: { label: "" } }, elements)]
       )
   }
-  
+  const onNodeDragStop = (event: any, node: any) => {
+    let elementsTmp = diagram.elements.slice()
+    elementsTmp[(parseInt(node.id) - 1)] = node
+    // let diagramTmp = Object.assign({}, diagram)
+    // diagramTmp["elements"] = elementsTmp
+    setElements(elementsTmp)
+};
+const onElementClick = (event:any, element:any) => console.log('click', element);
   // Fit view on mounted
   useEffect(() => {
-    if (reactflowInstance && elements.length > 0) {
+    if (reactflowInstance && elements && elements.length > 0) {
       reactflowInstance.fitView();
     }
   }, [reactflowInstance]);
 
   useEffect(() => {
-    reactflowInstance && setDiagram(reactflowInstance.toObject());
+    if (reactflowInstance) {
+      setDiagram(reactflowInstance.toObject());
+    }
+    if (isInitialMount.current < 2) {
+      isInitialMount.current += 1
+    }
   }, [elements])
-  
+
   return (
     <ReactFlow
       elements={elements}
@@ -110,10 +134,49 @@ const CustomNodeFlow = () => {
         }}
       />
       <Controls>
+        {/* Add node button */}
         <ControlButton onClick={(e) => {
           addNode()
         }}>
           ⬜
+        </ControlButton>
+        {/* Save Button */}
+        <ControlButton
+          onClick={() => {
+            // If wrinting page
+            if (isWritingPage) {
+              // If diagram changed
+              if (isInitialMount.current === 2) {
+                // Edit firestore diagram info
+                axios.post("http://localhost:3001/editDiagram", {
+                  diagram: JSON.stringify(diagram),
+                  genre,
+                  writingDocID,
+                }).then((res) => {
+                  timer && clearTimeout(timer)
+                  setAlarm(res.data)
+                  isInitialMount.current = 0
+                  const dum = setTimeout(() => {
+                    setAlarm(["", "success", false]);
+                    setAlarmTimer(null)
+                  }, 2000);
+                  setAlarmTimer(dum)
+                })
+                // If not changed Alarm "there is no changed"
+              } else {
+                timer && clearTimeout(timer)
+                setAlarm(["인물 관계도의 변경이 없습니다", "info", true])
+                const dum = setTimeout(() => {
+                  setAlarm(["", "success", false]);
+                  setAlarmTimer(null)
+                }, 2000);
+                setAlarmTimer(dum)
+              }
+            }
+          }}>
+          <span className="material-icons">
+            save
+          </span>
         </ControlButton>
       </Controls>
       <Background color="#aaa" gap={16} />

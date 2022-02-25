@@ -140,7 +140,7 @@ export const Toolbar = React.forwardRef(({ className, ...props }, ref) => (
         padding: 12px 18px;
         position: sticky;
         top: 0%;
-        z-index: 100000;
+        z-index: 1000;
       `
     )}
   />

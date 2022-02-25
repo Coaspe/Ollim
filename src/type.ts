@@ -5,7 +5,7 @@ export type genre = "SCENARIO" | "POEM" | "NOVEL"
 export type writingType = getFirestorePoem | getFirestoreNovel | getFirestoreScenario
 export type tableType = "OVERVIEW" | "WRITE" | "SETTING" |"BROWSE"
 export type gerneType = "NOVEL" | "POEM" | "SCENARIO"
-
+export type alarmType = "error" | "warning" | "info" | "success"
 export type getFirestoreUser = {
     dateCreated: number
     followers: Array<string>
@@ -29,6 +29,7 @@ export type toObjectElements = {
   elements: Elements,
   position: [number, number],
   zoom: number,
+  changed?: boolean
 }
 
 export type addNovelScenarioArg = {
@@ -54,7 +55,7 @@ export type getFirestorePoem = {
   done: boolean
   killingVerser: Array<string>
   opening: string
-  tempSave: string
+  tempSave: {contents: contentType[], date:number}
   title: string
   userEmail: string
   userUID: string
@@ -69,7 +70,7 @@ export type getFirestoreNovel = {
   done: boolean
   killingVerser: Array<string>
   synopsis: string
-  tempSave: string
+  tempSave: {contents: contentType[], date:number}
   title: string
   userEmail: string
   userUID: string
@@ -84,11 +85,20 @@ export type getFirestoreScenario = {
   done: boolean
   killingVerser: Array<string>
   synopsis: string
-  tempSave: string
+  tempSave: {contents: contentType[], date:number}
   title: string
   userEmail: string
   userUID: string
   genre: string
   id: string
   disclosure: disclosure
+}
+export type contentType = {
+    type: string;
+    children: {
+        type: string;
+        text: string;
+        fontSize: number;
+        fontStyle: string;
+    }[];
 }

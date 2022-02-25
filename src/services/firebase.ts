@@ -145,64 +145,63 @@ export const getScenarioArrayInfo = (scenarioDocIDs: Array<string>) => {
   }
   ))
 }
-
-export const commit = async (value: {
-    type: string;
-    children: {
-        type: string;
-        text: string;
-        fontSize: number;
-        fontStyle: string;
-    }[];
-}[], writingDocID: string, genre: string, memo: string, userUID: string) => {
-  const date = new Date().getTime()
+export const getDiagram = (writingDocID: string) => {
+  return getDoc(doc(firestore, "diagram", writingDocID))
+}
+// export const commit = async (value: {
+//     type: string;
+//     children: {
+//         type: string;
+//         text: string;
+//         fontSize: number;
+//         fontStyle: string;
+//     }[];
+// }[], writingDocID: string, genre: string, memo: string, userUID: string) => {
+//   const date = new Date().getTime()
   
-  let tmp: any = {}
-  tmp[date] = value
-  updateDoc(doc(firestore, genre.toLocaleLowerCase(), writingDocID), {
-  commits: arrayUnion(tmp)
-  }).catch((err)=>{console.log(err);
-  })
+//   let tmp: any = {}
+//   tmp[date] = value
+//   tmp[memo] = memo
+//   updateDoc(doc(firestore, genre.toLocaleLowerCase(), writingDocID), {
+//   commits: arrayUnion(tmp)
+//   }).catch((err)=>{console.log(err);
+//   })
 
-  let totalCommits: any = (await getDoc(doc(firestore, "writings", userUID))).data()
-  totalCommits = totalCommits.totalCommits
-  totalCommits[date] = memo
-  updateDoc(doc(firestore, "writings", userUID), {
-    totalCommits
-  }).catch((err)=>{console.log(err);
-  })
+//   let totalCommits: any = (await getDoc(doc(firestore, "writings", userUID))).data()
+//   totalCommits = totalCommits.totalCommits
+//   totalCommits[date] = memo
+//   updateDoc(doc(firestore, "writings", userUID), {
+//     totalCommits
+//   }).catch((err)=>{console.log(err);
+//   })
 
-}
+// }
 
-export const deleteTempSave = (tempSaveDocID: string, writingDocID: string, genre: string) => {
-  deleteDoc(doc(firestore, "tempSave", tempSaveDocID))
-  updateDoc(doc(firestore, genre.toLocaleLowerCase(), writingDocID), {
-    tempSave: ""
-  })
-}
+// export const deleteTempSave = (tempSaveDocID: string, writingDocID: string, genre: string) => {
+//   deleteDoc(doc(firestore, "tempSave", tempSaveDocID))
+//   updateDoc(doc(firestore, genre.toLocaleLowerCase(), writingDocID), {
+//     tempSave: ""
+//   })
+// }
 
-export const temporarySave = async (contents: {
-    type: string;
-    children: {
-        type: string;
-        text: string;
-        fontSize: number;
-        fontStyle: string;
-    }[];
-}, userUID: string, writingDocID: string, genre: string) => {
-  const date = new Date().getTime()
-   const tempSaveDocID = (await addDoc(collection(firestore, "tempSave"), {
-     date,
-     contents,
-     userUID,
-     writingDocID
-   })).id
+// export const temporarySave = async (contents: {
+//     type: string;
+//     children: {
+//         type: string;
+//         text: string;
+//         fontSize: number;
+//         fontStyle: string;
+//     }[];
+// }, userUID: string, writingDocID: string, genre: string) => {
+//   const date = new Date().getTime()
+//    const tempSaveDocID = (await addDoc(collection(firestore, "tempSave"), {
+//      date,
+//      contents,
+//      userUID,
+//      writingDocID
+//    })).id
   
-   updateDoc(doc(firestore, genre.toLocaleLowerCase(), writingDocID), {
-  tempSave: tempSaveDocID
-  })
-}
-
-export const getTemporarySave = async (tempSaveDocID: string) => {
-  return (await getDoc(doc(firestore, "tempSave", tempSaveDocID))).data()
-}
+//    updateDoc(doc(firestore, genre.toLocaleLowerCase(), writingDocID), {
+//   tempSave: tempSaveDocID
+//   })
+// }

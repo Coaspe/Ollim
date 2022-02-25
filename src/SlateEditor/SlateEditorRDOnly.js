@@ -7,7 +7,6 @@ import Paragraph from "./paragraph";
 import { getWritingInfo } from "../services/firebase";
 import { motion } from "framer-motion";
 import { Leaf } from "./utils";
-import moment from "moment";
 
 const SlateEditorRDOnly = ({
   openDiagram,
@@ -23,6 +22,7 @@ const SlateEditorRDOnly = ({
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const [writingInfo, setWritingInfo] = useState({});
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
   const renderElement = ({ element, attributes, children }) => {
     const elementKey = ReactEditor.findKey(editor, element);
@@ -55,8 +55,13 @@ const SlateEditorRDOnly = ({
       // get lastest commit
       const keys = Object.keys(writingInfo.commits);
       const lastestCommit = writingInfo.commits[keys[keys.length - 1]];
-      setValue(lastestCommit[Object.keys(lastestCommit)[0]]);
-      setSelectedKey(Object.keys(lastestCommit)[0]);
+      const lastestCommitKey = Object.keys(lastestCommit);
+      const lastDate =
+        "memo" !== lastestCommitKey[0]
+          ? lastestCommitKey[0]
+          : lastestCommitKey[1];
+      setValue(lastestCommit[lastDate]);
+      setSelectedKey(lastDate);
       setLoading(true);
       setContentLoading(true);
     }
@@ -68,28 +73,50 @@ const SlateEditorRDOnly = ({
 
   return (
     <>
-      {writingInfo && writingInfo.commits && (
-        <div className="flex items-center justify-center">
-          {writingInfo.commits.map((data) => {
-            const key = Object.keys(data)[0];
-            const date = new Date(parseInt(key)).toLocaleString();
-            return (
-              <button
-                key={key}
-                onClick={() => {
-                  if (selectedKey !== key) {
-                    setContentLoading(false);
-                    setSelectedKey(key);
-                    setValue(Object.values(data)[0]);
-                  }
-                }}
-                className="mr-5"
-              >
-                {date}
-              </button>
-            );
-          })}
-        </div>
+      {openModal && (
+        <motion.div
+          animate={{
+            backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],
+          }}
+          transition={{ duration: 0.2 }}
+          className="fixed w-full h-full z-[10000] items-center justify-center top-0 left-0 flex"
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpenModal(false);
+          }}
+        >
+          {writingInfo && writingInfo.commits && (
+            <div className="flex flex-col items-start justify-center bg-white">
+              {writingInfo.commits.map((data) => {
+                const tmpData = Object.keys(data);
+                const key = "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
+                const date = new Date(parseInt(key)).toLocaleString();
+                return (
+                  <div
+                    key={key}
+                    className={`w-full cursor-pointer flex items-center justify-start ${
+                      selectedKey === key && "bg-slate-500"
+                    } hover:bg-slate-400`}
+                  >
+                    <button
+                      onClick={() => {
+                        if (selectedKey !== key) {
+                          setContentLoading(false);
+                          setSelectedKey(key);
+                          setValue(data[key]);
+                        }
+                      }}
+                      className="mr-5"
+                    >
+                      {date}
+                    </button>
+                    <span>{data.memo}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </motion.div>
       )}
       {loading ? (
         <div
@@ -140,32 +167,14 @@ const SlateEditorRDOnly = ({
                 >
                   {isFullScreen ? "fullscreen_exit" : "fullscreen"}
                 </span>
-                <div className="relative flex flex-col">
-                  <div className="absolute -top-30">
-                    {writingInfo.commits.map((data) => {
-                      const key = Object.keys(data)[0];
-                      const date = new Date(parseInt(key)).toLocaleString();
-                      return (
-                        <button
-                          key={key}
-                          onClick={() => {
-                            if (selectedKey !== key) {
-                              setContentLoading(false);
-                              setSelectedKey(key);
-                              setValue(Object.values(data)[0]);
-                            }
-                          }}
-                          className="mr-5 bg-white"
-                        >
-                          {date}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <span class="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[50px] align-middle bg-white rounded-full inline-block px-2 py-2 ml-5">
-                    update
-                  </span>
-                </div>
+                <span
+                  onClick={() => {
+                    setOpenModal(true);
+                  }}
+                  className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[50px] align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
+                >
+                  update
+                </span>
               </motion.div>
             </Slate>
           )}

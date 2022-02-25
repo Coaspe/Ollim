@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { setDiagramReducer, setElementReducer, setUserInfoReducer } from '.'
+import { setAlarmReducer, setAlarmTimerReducer, setDiagramReducer, setElementReducer, setUserInfoReducer } from '.'
 
 export const store = configureStore({
     reducer: {
     setElements: setElementReducer,
     setUserInfo: setUserInfoReducer,
     setDiagram: setDiagramReducer,
+    setAlarm: setAlarmReducer,
+    setAlarmTimer: setAlarmTimerReducer
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
 })

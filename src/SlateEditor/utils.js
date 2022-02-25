@@ -100,13 +100,13 @@ export const FontSize = () => {
   return (
     <div className="relative group cursor-pointer z-40 font-noto">
       <span>{size[getFontSize(editor)]}</span>
-      <div className="absolute flex flex-col pt-3 invisible group-hover:visible">
+      <div className="absolute flex flex-col pt-3 invisible group-hover:visible bg-[#eee]">
         <button
           onMouseDown={(e) => {
             e.preventDefault();
             fontSizeMark(editor, e.target.value);
           }}
-          className="text-[13.3px] bg-white w-14 hover:bg-gray-300 py-1"
+          className="text-[13.3px] w-14 hover:bg-gray-300 py-1"
           value={13.3}
         >
           10pt
@@ -116,7 +116,7 @@ export const FontSize = () => {
             e.preventDefault();
             fontSizeMark(editor, e.target.value);
           }}
-          className="text-[14.7px] bg-white w-14 hover:bg-gray-300 py-1"
+          className="text-[14.7px] w-14 hover:bg-gray-300 py-1"
           value={14.7}
         >
           11pt
@@ -126,7 +126,7 @@ export const FontSize = () => {
             e.preventDefault();
             fontSizeMark(editor, e.target.value);
           }}
-          className="text-[16px] bg-white w-14 hover:bg-gray-300 py-1"
+          className="text-[16px] w-14 hover:bg-gray-300 py-1"
           value={16}
         >
           12pt
@@ -136,7 +136,7 @@ export const FontSize = () => {
             e.preventDefault();
             fontSizeMark(editor, e.target.value);
           }}
-          className="text-[17.3px] bg-white w-14 hover:bg-gray-300 py-1"
+          className="text-[17.3px] w-14 hover:bg-gray-300 py-1"
           value={17.3}
         >
           13pt
@@ -146,7 +146,7 @@ export const FontSize = () => {
             e.preventDefault();
             fontSizeMark(editor, e.target.value);
           }}
-          className="text-[18.7px] bg-white w-14 hover:bg-gray-300 py-1"
+          className="text-[18.7px] w-14 hover:bg-gray-300 py-1"
           value={18.7}
         >
           14pt
@@ -156,7 +156,7 @@ export const FontSize = () => {
             e.preventDefault();
             fontSizeMark(editor, e.target.value);
           }}
-          className="text-[20px] bg-white w-14 hover:bg-gray-300 py-1"
+          className="text-[20px] w-14 hover:bg-gray-300 py-1"
           value={20}
         >
           15pt
@@ -190,20 +190,15 @@ export const FontStyle = () => {
   return (
     <>
       <div className="relative group cursor-pointer z-40 align-bottom">
-        {/* <button>
-          <span class="material-icons align-bottom px-1 text-[18px]">
-            format_size
-          </span>
-        </button> */}
         <span className={`${getFontStyle(editor)}`}>
           {fontStlyeObject[getFontStyle(editor)]}
         </span>
-        <div className="absolute flex flex-col pt-3 invisible group-hover:visible">
+        <div className="absolute flex flex-col pt-3 invisible group-hover:visible bg-[#eee]">
           <button
             onMouseDown={(e) => {
               handleFontStyleButtonClick(e);
             }}
-            className="font-noto bg-white w-20 hover:bg-gray-300 py-1"
+            className="font-noto w-20 hover:bg-gray-300 py-1"
             value="font-noto"
           >
             본명조
@@ -212,7 +207,7 @@ export const FontStyle = () => {
             onMouseDown={(e) => {
               handleFontStyleButtonClick(e);
             }}
-            className="font-serif bg-white w-20 hover:bg-gray-300 py-1"
+            className="font-serif w-20 hover:bg-gray-300 py-1"
             value="font-serif"
           >
             고딕
@@ -221,7 +216,7 @@ export const FontStyle = () => {
             onMouseDown={(e) => {
               handleFontStyleButtonClick(e);
             }}
-            className="font-noto_sans bg-white w-20 hover:bg-gray-300 py-1"
+            className="font-noto_sans w-20 hover:bg-gray-300 py-1"
             value="font-noto_sans"
           >
             본고딕
@@ -230,7 +225,7 @@ export const FontStyle = () => {
             onMouseDown={(e) => {
               handleFontStyleButtonClick(e);
             }}
-            className="font-Nanum_Gothic bg-white w-20 hover:bg-gray-300 py-1"
+            className="font-Nanum_Gothic w-20 hover:bg-gray-300 py-1"
             value="font-Nanum_Gothic"
           >
             나눔고딕
@@ -239,7 +234,7 @@ export const FontStyle = () => {
             onMouseDown={(e) => {
               handleFontStyleButtonClick(e);
             }}
-            className="font-Song_Myung bg-white w-20 hover:bg-gray-300 py-1"
+            className="font-Song_Myung w-20 hover:bg-gray-300 py-1"
             value="font-Song_Myung"
           >
             송명체
@@ -248,7 +243,7 @@ export const FontStyle = () => {
             onMouseDown={(e) => {
               handleFontStyleButtonClick(e);
             }}
-            className="font-Nanum_Myeongjo bg-white w-20 hover:bg-gray-300 py-1"
+            className="font-Nanum_Myeongjo w-20 hover:bg-gray-300 py-1"
             value="font-Nanum_Myeongjo"
           >
             나눔명조

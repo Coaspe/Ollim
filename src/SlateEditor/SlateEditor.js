@@ -6,14 +6,10 @@ import { withHistory } from "slate-history";
 import { Toolbar } from "./components";
 import { cx, css } from "@emotion/css";
 import Paragraph from "./paragraph";
-import {
-  commit,
-  getTemporarySave,
-  getWritingInfo,
-  temporarySave,
-  deleteTempSave,
-} from "../services/firebase";
-import { motion } from "framer-motion";
+import { alarmAction } from "../redux";
+import { getWritingInfo } from "../services/firebase";
+import { motion, AnimatePresence } from "framer-motion";
+import CustomNodeFlow from "../diagram/RelationShipDiagram";
 import {
   Leaf,
   toggleMark,
@@ -24,6 +20,8 @@ import {
   initialValue,
   MarkButton,
 } from "./utils";
+import axios from "axios";
+import { useDispatch } from "react-redux";
 
 const HOTKEYS = {
   "mod+b": "bold",
@@ -33,22 +31,8 @@ const HOTKEYS = {
   "mod+s": "tempSave",
 };
 
-// function clearTheSelection() {
-//   if (window.getSelection) {
-//     if (window.getSelection().empty) {
-//       // Chrome
-//       window.getSelection().empty();
-//     } else if (window.getSelection().removeAllRanges) {
-//       // Firefox
-//       window.getSelection().removeAllRanges();
-//     }
-//   } else if (document.selection) {
-//     // IE?
-//     document.selection.empty();
-//   }
-// }
-
 const SlateEditor = ({ openDiagram, setOpenDiagram, writingDocID, genre }) => {
+  const dispatch = useDispatch();
   const [value, setValue] = useState(initialValue);
   const [loading, setLoading] = useState(false);
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
@@ -75,25 +59,65 @@ const SlateEditor = ({ openDiagram, setOpenDiagram, writingDocID, genre }) => {
       />
     );
   };
+  const setAlarm = (alarm) => {
+    dispatch(alarmAction.setAlarm({ alarm }));
+  };
+  const handleRequestTempSave = () => {
+    axios
+      .post("http://localhost:3001/temporarySave", {
+        contents: JSON.stringify(value),
+        writingDocID,
+        genre: writingInfo.genre,
+      })
+      .then((res) => {
+        setAlarm(res.data);
+        setTimeout(() => {
+          setAlarm(["", "success", false]);
+        }, 2000);
+      });
+  };
 
+  const handleRequestCommit = () => {
+    axios
+      .post("http://localhost:3001/commit", {
+        contents: JSON.stringify(value),
+        writingDocID,
+        userUID: writingInfo.userUID,
+        memo: "memoemoem",
+        genre: writingInfo.genre,
+        title: writingInfo.title,
+      })
+      .then((res) => {
+        setAlarm(res.data);
+        setTimeout(() => {
+          setAlarm(["", "success", false]);
+        }, 2000);
+      });
+  };
   useEffect(() => {
     getWritingInfo(writingDocID, genre).then((res) => {
       setWritingInfo(res);
     });
+    return () => {
+      setOpenDiagram(false);
+    };
   }, []);
 
   useEffect(() => {
-    if (writingInfo.tempSave) {
-      // get temporary save first
-      getTemporarySave(writingInfo.tempSave).then((res) => {
-        setValue(res.contents);
-        setLoading(true);
-      });
-    } else if (writingInfo.commits) {
-      // get lastest commit
-      const keys = Object.keys(writingInfo.commits);
-      const lastestCommit = writingInfo.commits[keys[keys.length - 1]];
-      setValue(lastestCommit[Object.keys(lastestCommit)[0]]);
+    // Check is writingInfo empty
+    if (Object.keys(writingInfo).length !== 0) {
+      // Check has temporary save
+      if (Object.keys(writingInfo.tempSave).length !== 0) {
+        // get temporary save first
+        setValue(writingInfo.tempSave.contents);
+      } else if (Object.keys(writingInfo.commits).length !== 0) {
+        // get lastest commit
+        const lastestCommit =
+          writingInfo.commits[writingInfo.commits.length - 1];
+        let key = Object.keys(lastestCommit);
+        key = key[0] === "memo" ? key[1] : key[0];
+        setValue(lastestCommit[key]);
+      }
       setLoading(true);
     }
   }, [writingInfo]);
@@ -153,7 +177,6 @@ const SlateEditor = ({ openDiagram, setOpenDiagram, writingDocID, genre }) => {
                   padding-top: 20px;
                 `
               )}
-              // onMouseDown={clearTheSelection}
               onMouseUp={(e) => {
                 let seleted = Editor.string(editor, editor.selection);
                 setSelected(seleted);
@@ -173,12 +196,7 @@ const SlateEditor = ({ openDiagram, setOpenDiagram, writingDocID, genre }) => {
                     if (mark === "diagram") {
                       setOpenDiagram((origin) => !origin);
                     } else if (mark === "tempSave") {
-                      temporarySave(
-                        value,
-                        writingInfo.userUID,
-                        writingDocID,
-                        writingInfo.genre
-                      );
+                      handleRequestTempSave();
                     } else {
                       toggleMark(editor, mark);
                     }
@@ -186,39 +204,22 @@ const SlateEditor = ({ openDiagram, setOpenDiagram, writingDocID, genre }) => {
                 }
               }}
             />
-            <div className="fixed bottom-[5%] right-[5%] font-noto">
+            <div className="fixed bottom-[3%] right-[2%] font-noto">
               <motion.button
                 whileHover={{ y: "-10%" }}
                 onClick={() => {
-                  temporarySave(
-                    value,
-                    writingInfo.userUID,
-                    writingDocID,
-                    writingInfo.genre
-                  );
+                  handleRequestTempSave();
                 }}
-                className="w-20 h-10 bg-white text-sm rounded-xl mr-5"
+                className="w-28 h-10 text-sm rounded-2xl mr-5 border-2 border-blue-400 text-blue-400 bg-transparent"
               >
                 임시 저장
               </motion.button>
               <motion.button
                 whileHover={{ y: "-10%" }}
                 onClick={() => {
-                  commit(
-                    value,
-                    writingDocID,
-                    writingInfo.genre,
-                    writingInfo.title,
-                    writingInfo.userUID
-                  );
-                  // Delete temporary save
-                  deleteTempSave(
-                    writingInfo.tempSave,
-                    writingDocID,
-                    writingInfo.genre
-                  );
+                  handleRequestCommit();
                 }}
-                className="w-20 h-10 bg-white text-sm rounded-xl"
+                className="w-28 h-10 text-sm rounded-2xl border-2 border-blue-400 text-blue-400 bg-transparent"
               >
                 제출
               </motion.button>
@@ -234,6 +235,12 @@ const SlateEditor = ({ openDiagram, setOpenDiagram, writingDocID, genre }) => {
           />
         </div>
       )}
+      <AnimatePresence>
+            {openDiagram && 
+            <motion.div animate={{ y: ["100%", "0%"] }} exit={{ y: ["0%", "100%"] }} transition={{ y: { duration: 0.3 } }} className="z-50 bottom-0 fixed w-full h-1/3 bg-white">
+                <CustomNodeFlow writingDocID={writingDocID} genre={writingInfo.genre} isWritingPage={true} />
+            </motion.div>}
+      </AnimatePresence>
     </>
   );
 };

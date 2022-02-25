@@ -1,14 +1,18 @@
 import { AnimatePresence, motion } from "framer-motion"
-import { useContext, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import UserContext from "../context/user"
-import CustomNodeFlow from "../diagram/RelationShipDiagram"
 import CustomNodeFlowRDOnly from "../diagram/RelationShipDiagramReadOnly"
-import { getUserByEmail, getUserByUID, getWritingInfo } from "../services/firebase"
-import {writingType, tableType, gerneType, getFirestorePoem, disclosure, getFirestoreNovel, getFirestoreUser, toObjectElements } from "../type"
+import { getDiagram, getUserByEmail, getUserByUID, getWritingInfo } from "../services/firebase"
+import {writingType, tableType, gerneType, getFirestorePoem, disclosure, getFirestoreNovel, getFirestoreUser, toObjectElements, alarmType } from "../type"
 import SlateEditor from "../SlateEditor/SlateEditor"
 import { cx, css } from "@emotion/css";
 import SlateEditorRDOnly from "../SlateEditor/SlateEditorRDOnly"
+import { useDispatch, useSelector } from "react-redux"
+import { alarmAction, diagramAction, elementsAction } from "../redux"
+import { RootState } from "../redux/store"
+import { Alert } from "@mui/material"
+import { Elements } from "react-flow-renderer"
 
 const Writing = () => {
 
@@ -17,16 +21,39 @@ const Writing = () => {
         POEM: "시",
         SCENARIO: "시나리오"
     }
+
+    // User Info Variables
     const { uid, genre, writingDocID } = useParams()
     const { user: contextUser } = useContext(UserContext)
     const [ contextUserInfo, setContextUserInfo ] = useState<getFirestoreUser>({} as getFirestoreUser)
     const [writingOwnerInfo, setWritingOwnerInfo] = useState<getFirestoreUser>({} as getFirestoreUser)
     const [writingInfo, setWritingInfo] = useState<writingType>({} as writingType)
-    const [table, setTable] = useState<tableType>("OVERVIEW")
-    const [diagram, setDiagram] = useState<toObjectElements>({} as toObjectElements)
-    const [openDiagram, setOpenDiagram] = useState(false)
-    const [disclosure, setDisclosure] = useState<disclosure>("PUBLIC")
 
+    // Table State 
+    const [table, setTable] = useState<tableType>("OVERVIEW")
+    // Disclosure State
+    const [disclosure, setDisclosure] = useState<disclosure>("PUBLIC")
+    // Synopsis State
+    const [synopsis, setSynopsis] = useState<string>("")
+    const dispatch = useDispatch()
+
+    //  Diagram variables
+    const diagram = useSelector((state: RootState) =>(state.setDiagram.diagram))
+    const setDiagram = useCallback((diagram: toObjectElements) => {
+        dispatch(diagramAction.setDiagram({diagram}))
+    }, [dispatch])
+    const [openDiagram, setOpenDiagram] = useState(false)
+
+    // Diagram's elements State
+    const setElements = useCallback((elements: Elements<any>) => {
+        dispatch(elementsAction.setElements({elements: elements}))
+    }, [dispatch])
+
+    // alarm state
+    // alarm[0] : alarm message, alarm[1] : alarm type, alarm[2] : alarm on, off
+    const alarm = useSelector((state: RootState) => state.setAlarm.alarm)
+
+    // useEffect to get context user's information
     useEffect(() => {
         if (contextUser.email) {
             getUserByEmail(contextUser.email as string).then((res) => {
@@ -35,6 +62,7 @@ const Writing = () => {
         }
     }, [contextUser.email])
 
+    // useEffect to get writing's owner's information
     useEffect(() => {
         if (uid) {
             getUserByUID(uid).then((res) => {
@@ -49,16 +77,47 @@ const Writing = () => {
                 if (res.gerne !== "poem") {
                     setWritingInfo(res as getFirestoreNovel)
                     setDiagram(res.diagram as toObjectElements)
+                    setElements(res.diagram.elements)
+                    setSynopsis(res.synopsis)
                 } else {
                     setWritingInfo(res as getFirestorePoem)
+                    setSynopsis(res.opening)
                 }
                 setDisclosure(res.disclosure)
             })
         }
     }, [writingDocID, genre])
 
+    const alertVariants = {
+        initial: {
+            opacity: 0,
+            y:-10
+        },
+        animate: {
+            opacity: 1,
+            y:0
+        },
+        exit: {
+            opacity: 0,
+            y:-10
+        }
+    }
     return (
-    <div className=" w-full bg-[#e6d6d1] bg-opacity-30">
+        <>
+        { Object.keys(writingInfo).length > 0 && <div className=" w-full bg-[#e6d6d1] bg-opacity-30 relative writing-container">
+        <AnimatePresence>
+            {
+                alarm[2] &&
+                <motion.div
+                variants={alertVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="fixed w-1/2 top-5 translate-x-1/2 left-1/4 z-[2000]">
+                    <Alert severity={alarm[1]}>{alarm[0]}</Alert>
+                </motion.div>
+            }
+        </AnimatePresence>
         {table !== "WRITE" && <div className="flex w-full font-noto items-center justify-between px-20">
             {/* logo */}
             <img className="h-28" src="/logo/Ollim-logos_transparent.png" alt="header logo" />
@@ -76,13 +135,13 @@ const Writing = () => {
                 <span className="text-xl mx-1" >- </span>
                 <span className="text-2xl ">{writingInfo.title}</span>
             </div>
-            <div className="flex items-center">
-                <button onClick={()=>{setTable("OVERVIEW")}}>개요</button>
-                <button onClick={()=>{setTable("BROWSE")}} className="ml-5" >열람</button>
+            <div className="flex items-center text-[0.75rem] text-blue-400">
+                <button className={`border border-blue-400 px-3 py-1 rounded-xl ${table === "OVERVIEW" && "bg-blue-50"} hover:bg-blue-100`} onClick={()=>{setTable("OVERVIEW")}}>개요</button>
+                <button onClick={()=>{setTable("BROWSE")}} className={`ml-5 border border-blue-400 px-3 py-1 rounded-xl ${table === "BROWSE" && "bg-blue-50"} hover:bg-blue-100`} >열람</button>
                 { contextUser.uid === uid &&
                 <>
-                    <button onClick={()=>{setTable("WRITE")}} className="mx-5">작성</button>
-                    <button onClick={()=>{setTable("SETTING")}} >설정</button>
+                    <button onClick={()=>{setTable("WRITE")}} className={`mx-5 border border-blue-400 px-3 py-1 rounded-xl ${table === "WRITE" && "bg-blue-50"} hover:bg-blue-100`}>작성</button>
+                    <button onClick={()=>{setTable("SETTING")}} className={`border border-blue-400 px-3 py-1 rounded-xl ${table === "SETTING" && "bg-blue-50"} hover:bg-blue-100`}>설정</button>
                 </>}
             </div>
         </div>
@@ -116,7 +175,7 @@ const Writing = () => {
         }
         {/* Table WRITE */}
         {
-            table === "WRITE" &&
+            table === "WRITE" && uid === contextUser.uid &&
                 <div
                     className={cx(
                         "w-full h-full mt-10 flex flex-col items-center justify-center pb-32 editor-container",
@@ -154,12 +213,16 @@ const Writing = () => {
         }
         {/* Table SETTING */}
         {
-            table === "SETTING" &&
+            table === "SETTING" && uid === contextUser.uid &&
             <div className="w-full font-noto flex flex-col items-start px-20 mt-20">
                 {/* Synopsis div */}
                     <div className="flex flex-col w-2/3">
                     <span className="text-2xl font-bold mb-10">시놉시스</span>
-                    <p className="px-3 py-3 border border-blue-400 w-full rounded-lg">{(writingInfo as getFirestoreNovel).synopsis}</p>
+                    <textarea 
+                    onChange={(e)=>{setSynopsis(e.target.value)}} 
+                    className="resize-none px-3 py-3 border border-blue-400 w-full rounded-lg h-72  bg-transparent focus:outline-none">
+                        {synopsis}
+                    </textarea>
                 </div>
                 {/* diagram div */}
                 <div className="flex flex-col w-2/3 my-20">
@@ -177,12 +240,6 @@ const Writing = () => {
                 </div>
             </div>
         }
-        <AnimatePresence>
-                {openDiagram && 
-                <motion.div animate={{ y: ["100%", "0%"] }} exit={{ y: ["0%", "100%"] }} transition={{ y: { duration: 0.3 } }} className="z-50 bottom-0 fixed w-full h-1/3 bg-white">
-                    <CustomNodeFlow />
-                </motion.div>}
-        </AnimatePresence>
             {/* {pos[0] > -1 && searchVisible &&
                 <div style={{ top: pos[1], left: pos[0] }} className={`z-50 absolute select-none`}>
                 <svg x="0px" y="0px"
@@ -198,7 +255,8 @@ const Writing = () => {
                 </g>
                 </svg>
             </div>} */}
-    </div>)
+        </div>}
+    </>)
 }
 
 export default Writing
