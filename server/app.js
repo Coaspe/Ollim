@@ -20,7 +20,17 @@ app.use((req, res, next) => {
 });
 
 const axios = require("axios");
-const { temporarySave, commit, editDiagram } = require("./firebaseAdmin");
+const {
+  temporarySave,
+  commit,
+  editDiagram,
+  updateSynopsis,
+  updateDisclosure,
+  addPoem,
+  addNovel,
+  addScenario,
+  deleteWriting,
+} = require("./firebaseAdmin");
 
 app.post("/searchWord", async (req, res) => {
   const result = await axios.get("https://opendict.korean.go.kr/api/search", {
@@ -84,7 +94,106 @@ app.post("/editDiagram", async (req, res) => {
       res.end();
     });
 });
-//port
+
+app.post("/updateSynopsis", async (req, res) => {
+  updateSynopsis(req.body.genre, req.body.writingDocID, req.body.synopsis)
+    .then(() => {
+      res.send(JSON.stringify(["변경을 저장했습니다.", "success", true]));
+      res.end();
+    })
+    .catch(() => {
+      res.send(JSON.stringify(["저장을 실해했습니다.", "error", true]));
+      res.end();
+    });
+});
+
+app.post("/updateDisclosure", async (req, res) => {
+  updateDisclosure(req.body.genre, req.body.writingDocID, req.body.disclosure)
+    .then(() => {
+      res.send(JSON.stringify(["변경을 저장했습니다.", "success", true]));
+      res.end();
+    })
+    .catch(() => {
+      res.send(JSON.stringify(["저장을 실해했습니다.", "error", true]));
+      res.end();
+    });
+});
+
+app.post("/addPoem", async (req, res) => {
+  const data = JSON.parse(req.body.data);
+  addPoem(data)
+    .then(() => {
+      res.send(
+        JSON.stringify([
+          `${data.title} 저장을 성공하였습니다.`,
+          "success",
+          true,
+        ])
+      );
+      res.end();
+    })
+    .catch(() => {
+      res.send(
+        JSON.stringify([`${data.title} 저장을 실패하였습니다.`, "error", true])
+      );
+      res.end();
+    });
+});
+
+app.post("/addNovel", async (req, res) => {
+  console.log(JSON.parse(req.body.data));
+  const data = JSON.parse(req.body.data);
+  addNovel(data)
+    .then(() => {
+      res.send(
+        JSON.stringify([
+          `${data.title} 저장을 성공하였습니다.`,
+          "success",
+          true,
+        ])
+      );
+      res.end();
+    })
+    .catch(() => {
+      res.send(
+        JSON.stringify([`${data.title} 저장을 실패하였습니다.`, "error", true])
+      );
+      res.end();
+    });
+});
+
+app.post("/addScenario", async (req, res) => {
+  const data = JSON.parse(req.body.data);
+  addScenario(data)
+    .then(() => {
+      res.send(
+        JSON.stringify([
+          `${data.title} 저장을 성공하였습니다.`,
+          "success",
+          true,
+        ])
+      );
+      res.end();
+    })
+    .catch(() => {
+      res.send(
+        JSON.stringify([`${data.title} 저장을 실패하였습니다.`, "error", true])
+      );
+      res.end();
+    });
+});
+
+app.post("/deleteWriting", async (req, res) => {
+  deleteWriting(req.body.writingDocID, req.body.genre)
+    .then(() => {
+      res.send(JSON.stringify(["삭제를 성공하였습니다.", "success", true]));
+      res.end();
+    })
+    .catch(() => {
+      res.send(JSON.stringify(["삭제를 실패하였습니다.", "error", true]));
+      res.end();
+    });
+});
 app.listen(port, () => {
   console.log("Express server on port 3001!");
 });

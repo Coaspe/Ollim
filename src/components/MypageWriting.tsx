@@ -31,7 +31,7 @@ const MypageWriting: React.FC<props> = ({ data }) => {
             }} 
             className="relative w-full h-full">
                 <AnimateSharedLayout>
-                <motion.div key="container-before" layoutId="container" className="w-full h-full relative flex flex-col text-noto border border-logoBrown border-opacity-50 rounded-xl shadow-lg cursor-pointer py-5 px-3">  
+                    <motion.div key="container-before" layoutId="container" className="w-full h-full relative flex flex-col text-noto border border-logoBrown border-opacity-50 rounded-xl shadow-lg cursor-pointer py-5 px-3 z-0">  
                             {infoVisible && <span className="absolute bg-gray-800 text-white top-1 right-1 text-xs rounded-lg px-2 py-1">기다려서 세부사항을 확인하기</span>}
                             <div  className="mb-3">
                                 <span className="text-xl font-black">{data.title}</span>
@@ -41,15 +41,24 @@ const MypageWriting: React.FC<props> = ({ data }) => {
                             <span className="italic">사람 이름이 엄준식?</span>
                         </motion.div>
                     <AnimatePresence>
-
-                        {hoverExpandDetail &&
-                        <motion.div key="container-after" layoutId="container" className="w-full h-72 absolute left-0 -top-[76px] flex flex-col justify-center items-center border border-logoBrown border-opacity-50 rounded-xl shadow-lg py-5 px-3 z-10">
-                            <motion.span className="italic" initial={{ opacity: 0 }} animate={{ opacity: 1 }} >그가 아직도 살아있다고...? {<br />}</motion.span>
+                        {hoverExpandDetail && data.killingVerse &&
+                        <motion.div key="container-after" layoutId="container" className="w-full h-72 absolute left-0 -top-[76px] flex flex-col justify-center items-center bg-white border border-logoBrown border-opacity-50 rounded-xl shadow-lg py-5 px-3 z-10">
+                            {data.killingVerse.map((verse: string, index) => (
+                                <motion.span
+                                    className="font-bold italic"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: index * 0.5 }}>
+                                    {verse}
+                                </motion.span>
+                            ))}
+                            {/* <motion.span className="italic" initial={{ opacity: 0 }} animate={{ opacity: 1 }} >그가 아직도 살아있다고...? {<br />}</motion.span>
                             <motion.span className="text-red-500 font-bold italic" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{delay: 0.5}}>엄준식은... 살아있다...!!! {<br />}</motion.span>
                             <motion.span className="italic"initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{delay: 1}}>그럴 리 없어...없다고!!!</motion.span>
                             <motion.span className="italic"initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{delay: 1}}>그럴 리 없어...없다고!!!</motion.span>
-                            <motion.span className="italic"initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{delay: 1}}>그럴 리 없어...없다고!!!</motion.span>
-                        </motion.div>}
+                            <motion.span className="italic"initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{delay: 1}}>그럴 리 없어...없다고!!!</motion.span> */}
+                        </motion.div>
+                    }
                     </AnimatePresence>
                 </AnimateSharedLayout>
             </motion.div>

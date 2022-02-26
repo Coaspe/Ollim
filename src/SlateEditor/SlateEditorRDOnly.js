@@ -51,17 +51,20 @@ const SlateEditorRDOnly = ({
   }, []);
 
   useEffect(() => {
-    if (writingInfo.commits) {
-      // get lastest commit
-      const keys = Object.keys(writingInfo.commits);
-      const lastestCommit = writingInfo.commits[keys[keys.length - 1]];
-      const lastestCommitKey = Object.keys(lastestCommit);
-      const lastDate =
-        "memo" !== lastestCommitKey[0]
-          ? lastestCommitKey[0]
-          : lastestCommitKey[1];
-      setValue(lastestCommit[lastDate]);
-      setSelectedKey(lastDate);
+    if (Object.keys(writingInfo).length !== 0) {
+      if (writingInfo.commits.length !== 0) {
+        console.log(writingInfo);
+        // Get lastest commit
+        const keys = Object.keys(writingInfo.commits);
+        const lastestCommit = writingInfo.commits[keys[keys.length - 1]];
+        const lastestCommitKey = Object.keys(lastestCommit);
+        const lastDate =
+          "memo" !== lastestCommitKey[0]
+            ? lastestCommitKey[0]
+            : lastestCommitKey[1];
+        setValue(lastestCommit[lastDate]);
+        setSelectedKey(lastDate);
+      }
       setLoading(true);
       setContentLoading(true);
     }
@@ -169,7 +172,9 @@ const SlateEditorRDOnly = ({
                 </span>
                 <span
                   onClick={() => {
-                    setOpenModal(true);
+                    if (writingInfo.commits.length !== 0) {
+                      setOpenModal(true);
+                    }
                   }}
                   className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[50px] align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
                 >

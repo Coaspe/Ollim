@@ -24,14 +24,14 @@ const nodeTypes = {
   selectorNode: ColorSelectorNode,
 };
 interface props {
-  isWritingPage?: boolean
   writingDocID?: string
   genre?: string
+  isInitialMount?: React.MutableRefObject<number>
 }
-const CustomNodeFlow: React.FC<props> = ({ isWritingPage, writingDocID, genre }) => {
+const DiagramWrite: React.FC<props> = ({ writingDocID, genre, isInitialMount }) => {
   const [reactflowInstance, setReactflowInstance] = useState<any>(null);
-  // for prevent unchanged save
-  const isInitialMount = useRef(0)
+
+  // For prevent unchanged save
   const pos = useRef([10, 10])
   const [bgColor, setBgColor] = useState<any>(initBgColor);
   const dispatch = useDispatch()
@@ -102,7 +102,7 @@ const onElementClick = (event:any, element:any) => console.log('click', element)
     if (reactflowInstance) {
       setDiagram(reactflowInstance.toObject());
     }
-    if (isInitialMount.current < 2) {
+    if (isInitialMount && isInitialMount.current < 2) {
       isInitialMount.current += 1
     }
   }, [elements])
@@ -143,10 +143,8 @@ const onElementClick = (event:any, element:any) => console.log('click', element)
         {/* Save Button */}
         <ControlButton
           onClick={() => {
-            // If wrinting page
-            if (isWritingPage) {
               // If diagram changed
-              if (isInitialMount.current === 2) {
+              if (isInitialMount && isInitialMount.current === 2) {
                 // Edit firestore diagram info
                 axios.post("http://localhost:3001/editDiagram", {
                   diagram: JSON.stringify(diagram),
@@ -172,7 +170,6 @@ const onElementClick = (event:any, element:any) => console.log('click', element)
                 }, 2000);
                 setAlarmTimer(dum)
               }
-            }
           }}>
           <span className="material-icons">
             save
@@ -184,4 +181,4 @@ const onElementClick = (event:any, element:any) => console.log('click', element)
   );
 };
 
-export default CustomNodeFlow;
+export default DiagramWrite;

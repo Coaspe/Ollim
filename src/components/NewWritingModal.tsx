@@ -1,12 +1,12 @@
+import axios from "axios";
 import { motion } from "framer-motion"
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { Elements } from "react-flow-renderer";
 import { useDispatch, useSelector } from "react-redux";
-import CustomNodeFlow from "../diagram/RelationShipDiagram";
-import { elementsAction } from "../redux";
+import DiagramNewWritings from "../diagram/RelationShipDiagramNewWritings";
+import { alarmAction } from "../redux";
 import { RootState } from "../redux/store";
-import { addPoem, addNovel, addScenario } from "../services/firebase";
-import { addNovelScenarioArg, addPoemArg, genre, page, disclosure } from "../type";
+import { addNovelScenarioArg, addPoemArg, genre, page, disclosure, alarmType, toObjectElements } from "../type";
 
 interface NewWritingProps {
     setNewWritingModalOpen:React.Dispatch<React.SetStateAction<boolean>>
@@ -21,11 +21,10 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
     const [synopsis, setSynopsis] = useState("")
     const [disclosure, setDisclosure] = useState<disclosure>("PUBLIC")
     const dispatch = useDispatch()
+    const [elements, setElements] = useState<Elements<any>>([])
+    const [diagram, setDiagram] = useState<toObjectElements>({} as toObjectElements)
+
     const userInfo = useSelector((state: RootState) => state.setUserInfo.userInfo)
-    const diagram = useSelector((state: RootState) => state.setDiagram.diagram)
-    const setElements = useCallback((elements: Elements<any>) => {
-      dispatch(elementsAction.setElements({elements: elements}))
-    }, [dispatch])
 
     useEffect(() => {
         document.body.style.overflow = "hidden"
@@ -40,6 +39,17 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
     }
     const handleTitleError = () => {
         titleError && setTitleError(false)
+    }
+    const setAlarm = (alarm: [string, alarmType, boolean]) => {
+        dispatch(alarmAction.setAlarm({alarm}))
+    }
+    const handleAddWriting = (data: addNovelScenarioArg | addPoemArg, genre: string) => {
+        axios.post(`http://localhost:3001/add${genre}`, { data: JSON.stringify(data) }).then((res) => {
+            console.log(res);
+            
+            setAlarm(res.data)
+            setTimeout(()=>{setAlarm(["","success",false])},3000)
+        })
     }
     return (
         <motion.div onClick={() => {setNewWritingModalOpen(false)}} className="font-noto flex items-center justify-center z-20 fixed w-full h-full" animate={{ backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"] }} transition={{ duration: 0.2, ease: "easeIn" }}>
@@ -88,9 +98,9 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                                 userEmail: userInfo.userEmail,
                                 title,
                                 disclosure,
-                                opening: synopsis
+                                synopsis
                             }
-                            addPoem(data)
+                            handleAddWriting(data, "Poem")
                             setNewWritingModalOpen(false)
                         }
                     }}
@@ -187,7 +197,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                                 disclosure,
                                 diagram
                             }
-                            genrn === "NOVEL" ? addNovel(data) : addScenario(data)
+                            genrn === "NOVEL" ? handleAddWriting(data, "Novel") : handleAddWriting(data, "Scenario")
                             setNewWritingModalOpen(false)
                         }}
                          viewBox="0 0 50 50">
@@ -198,7 +208,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                 
                 {/* Characters relationships diagram*/}
                 <span className="abosolute left-1/2 top-5 font-black text-2xl">인물관계도</span>
-                <CustomNodeFlow />
+                <DiagramNewWritings elements={elements} setElements={setElements} diagram={diagram} setDiagram={setDiagram} />
             </div>}
             
             {/* {page === 3 &&} */}

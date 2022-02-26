@@ -1,18 +1,18 @@
 import { firebase, firestore, rtDBRef } from "../lib/firebase";
 import {
-  updateDoc,
+
   doc,
   getDoc,
   setDoc,
-  arrayUnion,
+
   addDoc,
   collection,
   query,
   where,
   getDocs,
-  deleteDoc
+
 } from "firebase/firestore";
-import { addNovelScenarioArg, addPoemArg, toObjectElements } from "../type";
+import { toObjectElements } from "../type";
 
 export const singInWithGoogleInfoToFB = (info: any) => {
   setDoc(doc(firestore, "writings", info.user.uid), {
@@ -46,59 +46,6 @@ export const getUserByUID = async (uid: string) => {
 }
 export const getUserByEmail = async (email: string) => {
   return getDoc(doc(firestore, "users", email))
-}
-
-export const addPoem = async (data: addPoemArg) => {
-  const docRef = await addDoc(collection(firestore, "poem"), {
-    ...data,
-    killingVerse: [],
-    tempSave: [],
-    done: false,
-    dateCreated: new Date().getTime(),
-    genre: "POEM",
-  });
-  
-  updateDoc(doc(firestore, "writings", data.userUID), {
-    poemDocID: arrayUnion(docRef.id)
-  })
-
-  updateDoc(doc(firestore, "users", data.userEmail), {
-    writingsDocID: arrayUnion(docRef.id)
-  })
-}
-export const addNovel = async (data: addNovelScenarioArg) => {
-  const docRef = await addDoc(collection(firestore, "novel"), {
-    ...data,
-    killingVerse: [],
-    tempSave: [],
-    done: false,
-    dateCreated: new Date().getTime(),
-    genre: "NOVEL",
-  });
-  updateDoc(doc(firestore, "writings", data.userUID), {
-    novelDocID: arrayUnion(docRef.id)
-  })
-  updateDoc(doc(firestore, "users", data.userEmail), {
-    writingsDocID: arrayUnion(docRef.id)
-  })
-}
-export const addScenario = async (data: addNovelScenarioArg) => {
-  const docRef = await addDoc(collection(firestore, "scenario"), {
-    ...data,
-    killingVerse: [],
-    tempSave: [],
-    done: false,
-    dateCreated: new Date().getTime(),
-    genre: "SCENARIO",
-  });
-  
-  updateDoc(doc(firestore, "writings", data.userUID), {
-    scenarioDocID: arrayUnion(docRef.id)
-  })
-
-  updateDoc(doc(firestore, "users", data.userEmail), {
-    writingsDocID: arrayUnion(docRef.id)
-  })
 }
 
 export const getUserWritings = async (userUID: string) => {
@@ -148,60 +95,3 @@ export const getScenarioArrayInfo = (scenarioDocIDs: Array<string>) => {
 export const getDiagram = (writingDocID: string) => {
   return getDoc(doc(firestore, "diagram", writingDocID))
 }
-// export const commit = async (value: {
-//     type: string;
-//     children: {
-//         type: string;
-//         text: string;
-//         fontSize: number;
-//         fontStyle: string;
-//     }[];
-// }[], writingDocID: string, genre: string, memo: string, userUID: string) => {
-//   const date = new Date().getTime()
-  
-//   let tmp: any = {}
-//   tmp[date] = value
-//   tmp[memo] = memo
-//   updateDoc(doc(firestore, genre.toLocaleLowerCase(), writingDocID), {
-//   commits: arrayUnion(tmp)
-//   }).catch((err)=>{console.log(err);
-//   })
-
-//   let totalCommits: any = (await getDoc(doc(firestore, "writings", userUID))).data()
-//   totalCommits = totalCommits.totalCommits
-//   totalCommits[date] = memo
-//   updateDoc(doc(firestore, "writings", userUID), {
-//     totalCommits
-//   }).catch((err)=>{console.log(err);
-//   })
-
-// }
-
-// export const deleteTempSave = (tempSaveDocID: string, writingDocID: string, genre: string) => {
-//   deleteDoc(doc(firestore, "tempSave", tempSaveDocID))
-//   updateDoc(doc(firestore, genre.toLocaleLowerCase(), writingDocID), {
-//     tempSave: ""
-//   })
-// }
-
-// export const temporarySave = async (contents: {
-//     type: string;
-//     children: {
-//         type: string;
-//         text: string;
-//         fontSize: number;
-//         fontStyle: string;
-//     }[];
-// }, userUID: string, writingDocID: string, genre: string) => {
-//   const date = new Date().getTime()
-//    const tempSaveDocID = (await addDoc(collection(firestore, "tempSave"), {
-//      date,
-//      contents,
-//      userUID,
-//      writingDocID
-//    })).id
-  
-//    updateDoc(doc(firestore, genre.toLocaleLowerCase(), writingDocID), {
-//   tempSave: tempSaveDocID
-//   })
-// }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import isHotkey from "is-hotkey";
 import { Editable, withReact, Slate, ReactEditor } from "slate-react";
 import { Editor, createEditor } from "slate";
@@ -9,7 +9,7 @@ import Paragraph from "./paragraph";
 import { alarmAction } from "../redux";
 import { getWritingInfo } from "../services/firebase";
 import { motion, AnimatePresence } from "framer-motion";
-import CustomNodeFlow from "../diagram/RelationShipDiagram";
+import DiagramWrite from "../diagram/RelationShipDiagram";
 import {
   Leaf,
   toggleMark,
@@ -17,7 +17,6 @@ import {
   FontStyle,
   SvgButton,
   DictButton,
-  initialValue,
   MarkButton,
 } from "./utils";
 import axios from "axios";
@@ -31,15 +30,42 @@ const HOTKEYS = {
   "mod+s": "tempSave",
 };
 
-const SlateEditor = ({ openDiagram, setOpenDiagram, writingDocID, genre }) => {
+const SlateEditor = ({
+  openDiagram,
+  setOpenDiagram,
+  writingDocID,
+  genre,
+  value,
+  setValue,
+}) => {
   const dispatch = useDispatch();
-  const [value, setValue] = useState(initialValue);
+
+  const isInitialMount = useRef(0);
+
+  // Writing Info loading state
   const [loading, setLoading] = useState(false);
+
+  // Render Slate leaf nodes
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+
+  // Selected words to search for dictionary
   const [selected, setSelected] = useState("");
+
+  // Overall Writing Information
   const [writingInfo, setWritingInfo] = useState({});
+
+  // Is Full Screen?
   const [isFullScreen, setIsFullScreen] = useState(false);
+
+  // Variables to loading commit
+  const [openModal, setOpenModal] = useState(false);
+  // Whether commit contents loading completed
+  const [contentLoading, setContentLoading] = useState(true);
+  // Selected commit key
+  const [selectedKey, setSelectedKey] = useState("");
+
+  // Render Slate element
   const renderElement = ({ element, attributes, children }) => {
     const elementKey = ReactEditor.findKey(editor, element);
     let target = 0;
@@ -59,9 +85,13 @@ const SlateEditor = ({ openDiagram, setOpenDiagram, writingDocID, genre }) => {
       />
     );
   };
+
+  // Alarm dispatch fucntion
   const setAlarm = (alarm) => {
     dispatch(alarmAction.setAlarm({ alarm }));
   };
+
+  // Save fuctions
   const handleRequestTempSave = () => {
     axios
       .post("http://localhost:3001/temporarySave", {
@@ -76,7 +106,6 @@ const SlateEditor = ({ openDiagram, setOpenDiagram, writingDocID, genre }) => {
         }, 2000);
       });
   };
-
   const handleRequestCommit = () => {
     axios
       .post("http://localhost:3001/commit", {
@@ -94,6 +123,8 @@ const SlateEditor = ({ openDiagram, setOpenDiagram, writingDocID, genre }) => {
         }, 2000);
       });
   };
+
+  // useEffect to get writing information
   useEffect(() => {
     getWritingInfo(writingDocID, genre).then((res) => {
       setWritingInfo(res);
@@ -108,22 +139,87 @@ const SlateEditor = ({ openDiagram, setOpenDiagram, writingDocID, genre }) => {
     if (Object.keys(writingInfo).length !== 0) {
       // Check has temporary save
       if (Object.keys(writingInfo.tempSave).length !== 0) {
-        // get temporary save first
-        setValue(writingInfo.tempSave.contents);
-      } else if (Object.keys(writingInfo.commits).length !== 0) {
-        // get lastest commit
-        const lastestCommit =
-          writingInfo.commits[writingInfo.commits.length - 1];
-        let key = Object.keys(lastestCommit);
-        key = key[0] === "memo" ? key[1] : key[0];
-        setValue(lastestCommit[key]);
+        // get temporary save
+        let date = new Date(writingInfo.tempSave.date);
+
+        // Ask if user is going to load temporary save
+        let getTmpSave = window.confirm(
+          `${
+            "[" +
+            date.getFullYear() +
+            "년 " +
+            (date.getMonth() + 1) +
+            "월 " +
+            date.getDate() +
+            "일 " +
+            date.getHours() +
+            ":" +
+            date.getMinutes() +
+            ":" +
+            date.getSeconds() +
+            "]"
+          } 에 임시저장한 글이 있습니다. 불러오시겠습니까?`
+        );
+        getTmpSave && setValue(writingInfo.tempSave.contents);
       }
       setLoading(true);
     }
   }, [writingInfo]);
 
+  // If value changed (ex. selected commit changed)
+  // If value changed is caused by typing something, there is no change with contentLoading
+  useEffect(() => {
+    value.length > 0 && setContentLoading(true);
+  }, [value]);
+
   return (
     <>
+      {openModal && (
+        <motion.div
+          animate={{
+            backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],
+          }}
+          transition={{ duration: 0.2 }}
+          className="fixed w-full h-full z-[10000] items-center justify-center top-0 left-0 flex"
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpenModal(false);
+          }}
+        >
+          {writingInfo && writingInfo.commits && (
+            <div className="flex flex-col items-start justify-center bg-white">
+              {writingInfo.commits.map((data) => {
+                const tmpData = Object.keys(data);
+                const key = "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
+                const date = new Date(parseInt(key)).toLocaleString();
+                return (
+                  <div
+                    key={key}
+                    className={`w-full cursor-pointer flex items-center justify-start ${
+                      selectedKey === key && "bg-slate-500"
+                    } hover:bg-slate-400`}
+                  >
+                    <button
+                      onClick={() => {
+                        // if (selectedKey !== key) {
+                        setContentLoading(false);
+                        setSelectedKey(key);
+                        setValue(data[key]);
+                        // }
+                      }}
+                      className="mr-5"
+                    >
+                      {date}
+                    </button>
+                    <span>{data.memo}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </motion.div>
+      )}
+
       {loading ? (
         <div
           className={cx(
@@ -135,98 +231,120 @@ const SlateEditor = ({ openDiagram, setOpenDiagram, writingDocID, genre }) => {
             `
           )}
         >
-          <Slate
-            editor={editor}
-            value={value}
-            onChange={(value) => {
-              setValue(value);
-            }}
-          >
-            <Toolbar>
-              <MarkButton format="bold" icon="format_bold" />
-              <MarkButton format="italic" icon="format_italic" />
-              <MarkButton format="underline" icon="format_underlined" />
-              {genre !== "poem" && (
-                <SvgButton
-                  openDiagram={openDiagram}
-                  setOpenDiagram={setOpenDiagram}
-                />
-              )}
-              <DictButton selectedProp={selected} />
-              <FontSize />
-              <FontStyle />
-              <span
-                onClick={() => {
-                  const doc = document.querySelector(".editor-container");
-                  if (doc) {
-                    document.fullscreenElement
-                      ? document.exitFullscreen()
-                      : doc.requestFullscreen({ navigationUI: "show" });
-                    setIsFullScreen(!document.fullscreenElement);
-                  }
+          {contentLoading && (
+            <Slate
+              editor={editor}
+              value={value}
+              onChange={(value) => {
+                setValue(value);
+              }}
+            >
+              <Toolbar>
+                <MarkButton format="bold" icon="format_bold" />
+                <MarkButton format="italic" icon="format_italic" />
+                <MarkButton format="underline" icon="format_underlined" />
+                {genre !== "poem" && (
+                  <SvgButton
+                    openDiagram={openDiagram}
+                    setOpenDiagram={setOpenDiagram}
+                  />
+                )}
+                <DictButton selectedProp={selected} />
+                <FontSize />
+                <FontStyle />
+                <span
+                  onClick={() => {
+                    const doc = document.querySelector(".editor-container");
+                    if (doc) {
+                      document.fullscreenElement
+                        ? document.exitFullscreen()
+                        : doc.requestFullscreen({ navigationUI: "show" });
+                      setIsFullScreen(!document.fullscreenElement);
+                    }
+                  }}
+                  className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[20px] align-middle"
+                >
+                  {isFullScreen ? "fullscreen_exit" : "fullscreen"}
+                </span>
+              </Toolbar>
+              <Editable
+                className={cx(
+                  "w-full",
+                  css`
+                    padding-top: 20px;
+                  `
+                )}
+                onMouseUp={(e) => {
+                  let seleted = Editor.string(editor, editor.selection);
+                  setSelected(seleted);
                 }}
-                className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[20px] align-middle"
-              >
-                {isFullScreen ? "fullscreen_exit" : "fullscreen"}
-              </span>
-            </Toolbar>
-            <Editable
-              className={cx(
-                "w-full",
-                css`
-                  padding-top: 20px;
-                `
-              )}
-              onMouseUp={(e) => {
-                let seleted = Editor.string(editor, editor.selection);
-                setSelected(seleted);
-              }}
-              onBlur={() => {
-                setSelected("");
-              }}
-              renderElement={renderElement}
-              renderLeaf={renderLeaf}
-              spellCheck="false"
-              autoFocus
-              onKeyDown={(event) => {
-                for (const hotkey in HOTKEYS) {
-                  if (isHotkey(hotkey, event)) {
-                    event.preventDefault();
-                    const mark = HOTKEYS[hotkey];
-                    if (mark === "diagram") {
-                      setOpenDiagram((origin) => !origin);
-                    } else if (mark === "tempSave") {
-                      handleRequestTempSave();
-                    } else {
-                      toggleMark(editor, mark);
+                onBlur={() => {
+                  setSelected("");
+                }}
+                renderElement={renderElement}
+                renderLeaf={renderLeaf}
+                spellCheck="false"
+                autoFocus
+                onKeyDown={(event) => {
+                  for (const hotkey in HOTKEYS) {
+                    if (isHotkey(hotkey, event)) {
+                      event.preventDefault();
+                      const mark = HOTKEYS[hotkey];
+                      if (mark === "diagram") {
+                        setOpenDiagram((origin) => !origin);
+                      } else if (mark === "tempSave") {
+                        handleRequestTempSave();
+                      } else {
+                        toggleMark(editor, mark);
+                      }
                     }
                   }
-                }
-              }}
-            />
-            <div className="fixed bottom-[3%] right-[2%] font-noto">
-              <motion.button
-                whileHover={{ y: "-10%" }}
-                onClick={() => {
-                  handleRequestTempSave();
                 }}
-                className="w-28 h-10 text-sm rounded-2xl mr-5 border-2 border-blue-400 text-blue-400 bg-transparent"
-              >
-                임시 저장
-              </motion.button>
-              <motion.button
+              />
+
+              {/* Save Div */}
+              <div className="fixed bottom-[3%] right-[2%] font-noto">
+                <motion.button
+                  whileHover={{ y: "-10%" }}
+                  onClick={() => {
+                    handleRequestTempSave();
+                  }}
+                  className="w-28 h-10 text-sm rounded-2xl mr-5 border-2 border-blue-400 text-blue-400 bg-transparent"
+                >
+                  임시 저장
+                </motion.button>
+                <motion.button
+                  whileHover={{ y: "-10%" }}
+                  onClick={() => {
+                    handleRequestCommit();
+                  }}
+                  className="w-28 h-10 text-sm rounded-2xl border-2 border-blue-400 text-blue-400 bg-transparent"
+                >
+                  제출
+                </motion.button>
+              </div>
+
+              {/* Commit load Div */}
+              <motion.div
                 whileHover={{ y: "-10%" }}
-                onClick={() => {
-                  handleRequestCommit();
-                }}
-                className="w-28 h-10 text-sm rounded-2xl border-2 border-blue-400 text-blue-400 bg-transparent"
+                className="fixed bottom-[5%] left-[5%] font-noto flex"
               >
-                제출
-              </motion.button>
-            </div>
-          </Slate>
+                <span
+                  onClick={() => {
+                    if (writingInfo.commits.length !== 0) {
+                      setOpenModal(true);
+                    }
+                  }}
+                  className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[50px] align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
+                >
+                  update
+                </span>
+              </motion.div>
+            </Slate>
+          )}
         </div>
       ) : (
+        // Loading Div
         <div className="w-full h-full top-0 left-0 fixed flex items-center justify-center bg-[#e6d6d1]">
           <img
             src="/logo/Ollim-logos_black.png"
@@ -235,11 +353,23 @@ const SlateEditor = ({ openDiagram, setOpenDiagram, writingDocID, genre }) => {
           />
         </div>
       )}
+
+      {/* Diagram Div */}
       <AnimatePresence>
-            {openDiagram && 
-            <motion.div animate={{ y: ["100%", "0%"] }} exit={{ y: ["0%", "100%"] }} transition={{ y: { duration: 0.3 } }} className="z-50 bottom-0 fixed w-full h-1/3 bg-white">
-                <CustomNodeFlow writingDocID={writingDocID} genre={writingInfo.genre} isWritingPage={true} />
-            </motion.div>}
+        {openDiagram && (
+          <motion.div
+            animate={{ y: ["100%", "0%"] }}
+            exit={{ y: ["0%", "100%"] }}
+            transition={{ y: { duration: 0.3 } }}
+            className="z-50 bottom-0 fixed w-full h-1/3 bg-white"
+          >
+            <DiagramWrite
+              isInitialMount={isInitialMount}
+              writingDocID={writingDocID}
+              genre={writingInfo.genre}
+            />
+          </motion.div>
+        )}
       </AnimatePresence>
     </>
   );

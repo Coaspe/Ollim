@@ -1,4 +1,4 @@
-import { motion } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import { Profiler, useContext, useEffect, useState } from "react"
 import MypageWriting from "../components/MypageWriting"
 import UserContext from "../context/user"
@@ -14,27 +14,36 @@ import { userInfoAction } from "../redux"
 import { useParams } from "react-router-dom"
 
 import Calendar from "../components/Calendar"
+import { Alert } from "@mui/material"
 
 const Mypage = () => {
 
     // profile owner's uid
     const { uid } = useParams()
+    // profile ownser's firestore information
+    const [profileOwnerInfo, setProfileOwnerInfo] = useState<getFirestoreUser>({} as getFirestoreUser)
     
+    // context user
     const { user: contextUser } = useContext(UserContext)
+
     const [profileImage, setProfileImage] = useState("")
-    const [newWritingModalOpen, setNewWritingModalOpen] = useState(false)
     const [userWritings, setUserWritings] = useState({} as getFirestoreUserWritings)
+    // new Writing modal state
+    const [newWritingModalOpen, setNewWritingModalOpen] = useState(false)
+    // category state
     const [onWritingCategory, setOnWritingCategory] = useState("TOTAL")
 
+    // Profile owner's poems list
     const [poems, setPoems] = useState<Array<getFirestorePoem>>([])
+    // Profile owner's novels list
     const [novels, setNovels] = useState<Array<getFirestoreNovel>>([])
+    // Profile owner's scenarioes list
     const [scenarioes, setScenarioes] = useState<Array<getFirestoreScenario>>([])
+    // Profile owner's total writings list
     const [totalWritings, setTotalWritings] = useState<Array<getFirestoreScenario | getFirestoreNovel | getFirestorePoem>>([])
-    const [profileOwnerInfo, setProfileOwnerInfo] = useState<getFirestoreUser>({} as getFirestoreUser)
     const dispatch = useDispatch()
 
     // header context userInfo
-    const userInfo = useSelector((state: RootState) => state.setUserInfo.userInfo)
     const setUserInfo = (userInfo: getFirestoreUser) => {
         dispatch(userInfoAction.setUserInfo({userInfo}))
     }
@@ -57,6 +66,8 @@ const Mypage = () => {
                 setProfileImage(data.profileImg)
             })
         }
+
+        // get context user's information
         getUserByUID(contextUser.uid).then((res: any) => {
             const data = res.docs[0].data()
             setUserInfo(data)
@@ -64,6 +75,7 @@ const Mypage = () => {
     }, [])
 
     useEffect(() => {
+        // get Writings informations from firestore
         const getWritings = async () => {
             const poems = await getPoemArrayInfo(userWritings.poemDocID)
             const novel = await getNovelArrayInfo(userWritings.novelDocID)
@@ -74,7 +86,7 @@ const Mypage = () => {
             setScenarioes((scenario as Array<getFirestoreScenario>).sort((a, b) => (b.dateCreated - a.dateCreated)))
             setTotalWritings(Array.prototype.concat(poems, novel, scenario).sort((a, b) => (b.dateCreated - a.dateCreated)))
         }
-        if (userWritings.poemDocID && userWritings.novelDocID && userWritings.scenarioDocID) {
+        if (Object.keys(userWritings).length !== 0) {
             getWritings()
         }
     }, [userWritings])
@@ -115,10 +127,41 @@ const Mypage = () => {
     //   console.log(`Start time: ${startTime}`);
     //   console.log(`Commit time: ${commitTime}`);
     };
+    const alarm = useSelector((state: RootState) => state.setAlarm.alarm)
+    const alertVariants = {
+        initial: {
+            opacity: 0,
+            y:-10
+        },
+        animate: {
+            opacity: 1,
+            y:0
+        },
+        exit: {
+            opacity: 0,
+            y:-10
+        }
+    }
+
     return (
         <>
+        <AnimatePresence>
+            {
+                alarm[2] &&
+                <motion.div
+                variants={alertVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="fixed w-1/2 top-5 translate-x-1/2 left-1/4 z-[2000]">
+                    <Alert severity={alarm[1]}>{alarm[0]}</Alert>
+                </motion.div>
+            }
+        </AnimatePresence>
+        
         {profileOwnerInfo && profileImage  && userWritings ?
             <div className="relative w-full font-noto bg-[#e6d6d1] bg-opacity-30">
+                {/* New Writing Modal */}
                 {newWritingModalOpen && <NewWritingModal setNewWritingModalOpen={setNewWritingModalOpen}/>}
                 <div className="flex w-full items-center justify-between px-20">
                     {/* logo */}
@@ -195,10 +238,10 @@ const Mypage = () => {
                             <div className="w-full grid grid-cols-3 items-center mb-20">
                                 <span className="text-2xl font-bold justify-center col-start-2 w-full text-center">작성중인 글</span>
                                 <div className="grid grid-cols-4 col-start-3 gap-4 text-sm">
-                                    <button className={`rounded-lg hover:bg-gray-300 ${onWritingCategory === "NOVEL" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("NOVEL")}}>소설</button>
-                                    <button className={`rounded-lg hover:bg-gray-300 ${onWritingCategory === "POEM" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("POEM")}}>시</button>
-                                    <button className={`rounded-lg hover:bg-gray-300 ${onWritingCategory === "SCENARIO" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("SCENARIO")}}>시나리오</button>
-                                    <button className={`rounded-lg hover:bg-gray-300 ${onWritingCategory === "TOTAL" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("TOTAL")}}>전체</button>
+                                    <button className={`rounded-xl hover:bg-gray-300 py-1 ${onWritingCategory === "NOVEL" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("NOVEL")}}>소설</button>
+                                    <button className={`rounded-xl hover:bg-gray-300 py-1 ${onWritingCategory === "POEM" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("POEM")}}>시</button>
+                                    <button className={`rounded-xl hover:bg-gray-300 py-1 ${onWritingCategory === "SCENARIO" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("SCENARIO")}}>시나리오</button>
+                                    <button className={`rounded-xl hover:bg-gray-300 py-1 ${onWritingCategory === "TOTAL" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("TOTAL")}}>전체</button>
                                 </div>
                             </div>
                             
@@ -209,16 +252,17 @@ const Mypage = () => {
                                 {onWritingCategory === "TOTAL" && totalWritings.map((data) => (<MypageWriting key={data.dateCreated} data={data} />))}
                             </div>
                         </div>
-                        <div className="flex items-center flex-col mt-20 w-2/3">
-                            <span className="text-2xl font-bold mb-20">완결된 글</span>
-                            <motion.div layout className="flex items-center justify-between w-full gap-5">
+                        <motion.div layout className="flex items-center flex-col my-20 w-2/3">
+                            <div className="w-full grid grid-cols-3 items-center mb-20">
+                                <span className="text-2xl font-bold justify-center col-start-2 w-full text-center">완결된 글</span>
+                            </div>
+                            <motion.div className="grid grid-cols-3 items-center justify-between w-full gap-5">
                                 {totalWritings.map((data)=>(<MypageWriting key={data.dateCreated} data={data} />))}
                             </motion.div>
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
                 
-                {/* <Editor text={text} setText={setText}  /> */}
                 <div className="w-full h-1/3">
                     <CustomNodeFlow />
                 </div>

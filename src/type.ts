@@ -6,6 +6,7 @@ export type writingType = getFirestorePoem | getFirestoreNovel | getFirestoreSce
 export type tableType = "OVERVIEW" | "WRITE" | "SETTING" |"BROWSE"
 export type gerneType = "NOVEL" | "POEM" | "SCENARIO"
 export type alarmType = "error" | "warning" | "info" | "success"
+
 export type getFirestoreUser = {
     dateCreated: number
     followers: Array<string>
@@ -44,7 +45,7 @@ export type addNovelScenarioArg = {
 export type addPoemArg = {
   userEmail: string
   title: string
-  opening: string
+  synopsis: string
   userUID: string
   disclosure: string
 }
@@ -53,8 +54,8 @@ export type getFirestorePoem = {
   commits: [{ [key: number]: { contents: string, memo: string } } ]
   dateCreated: number
   done: boolean
-  killingVerser: Array<string>
-  opening: string
+  killingVerse: Array<string>
+  synopsis: string
   tempSave: {contents: contentType[], date:number}
   title: string
   userEmail: string
@@ -68,7 +69,7 @@ export type getFirestoreNovel = {
   dateCreated: number
   diagram: toObjectElements
   done: boolean
-  killingVerser: Array<string>
+  killingVerse: Array<string>
   synopsis: string
   tempSave: {contents: contentType[], date:number}
   title: string
@@ -83,7 +84,7 @@ export type getFirestoreScenario = {
   dateCreated: number
   diagram: toObjectElements
   done: boolean
-  killingVerser: Array<string>
+  killingVerse: Array<string>
   synopsis: string
   tempSave: {contents: contentType[], date:number}
   title: string
