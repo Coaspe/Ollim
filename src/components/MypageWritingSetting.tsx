@@ -1,11 +1,12 @@
 import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion"
 import { memo, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { genre, getFirestoreNovel, getFirestorePoem, getFirestoreScenario } from "../type"
+import { genre } from "../type"
 interface props {
-    data: getFirestoreNovel | getFirestorePoem | getFirestoreScenario
+    title: string
+    genre: genre
+    killingVerse: string[]
 }
-const MypageWriting: React.FC<props> = ({ data }) => {
+const MypageWritingSetting: React.FC<props> = ({ title, genre, killingVerse }) => {
     const gerneType = {
         SCENARIO: "시나리오",
         POEM: "시",
@@ -14,12 +15,10 @@ const MypageWriting: React.FC<props> = ({ data }) => {
     const [hoverExpandDetail, setHoverExpandDetail] = useState(false)
     const [timer, setTimer] = useState<NodeJS.Timeout>()
     const [infoVisible, setInfoVisible] = useState(false)
-    const navigator = useNavigate()
     
     return (
         <motion.div 
             layout
-            onClick={()=>{navigator(`/writings/${data.userUID}/${data.genre}/${data.id}`)}}            
             onHoverStart={() => {
                 setTimer(setTimeout(() => { setHoverExpandDetail(true) }, 1000))
                 setInfoVisible(true)
@@ -34,16 +33,16 @@ const MypageWriting: React.FC<props> = ({ data }) => {
                     <motion.div key="container-before" layoutId="container" className="w-full h-full relative flex flex-col text-noto border border-logoBrown border-opacity-50 rounded-xl shadow-lg cursor-pointer py-5 px-3 z-0">  
                             {infoVisible && <span className="absolute bg-gray-800 text-white top-1 right-1 text-xs rounded-lg px-2 py-1">기다려서 세부사항을 확인하기</span>}
                             <div  className="mb-3">
-                                <span className="text-xl font-black">{data.title}</span>
-                                <span className="text-sm text-gray-700 font-black ml-3">{gerneType[data.genre as genre]}</span>
+                                <span className="text-xl font-black">{title}</span>
+                                <span className="text-sm text-gray-700 font-black ml-3">{gerneType[genre]}</span>
                             </div>
                             <span className="text-sm text-gray-400 mb-3 font-semibold">석주가 담배 오지게 피는 소설입니다.</span>
                             <span className="italic">사람 이름이 엄준식?</span>
                         </motion.div>
                     <AnimatePresence>
-                        {hoverExpandDetail && data.killingVerse &&
+                        {hoverExpandDetail && killingVerse &&
                         <motion.div key="container-after" layoutId="container" className="w-full h-72 absolute left-0 -top-[76px] flex flex-col justify-center items-center bg-white border border-logoBrown border-opacity-50 rounded-xl shadow-lg py-5 px-3 z-10">
-                            {data.killingVerse.map((verse: string, index) => (
+                            {killingVerse.map((verse, index) => (
                                 <motion.span
                                     className="font-bold italic"
                                     initial={{ opacity: 0 }}
@@ -60,4 +59,4 @@ const MypageWriting: React.FC<props> = ({ data }) => {
     )
 }
 
-export default memo(MypageWriting)
+export default memo(MypageWritingSetting)

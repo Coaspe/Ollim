@@ -3,15 +3,16 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { alarmAction } from "../redux";
-import { alarmType, writingType, disclosure } from "../type";
-import { motion } from 'framer-motion'
+import { alarmType, writingType, disclosure, genre } from "../type";
+import { motion, AnimatePresence } from 'framer-motion'
+import MypageWriting from "./MypageWriting";
+import MypageWritingSetting from "./MypageWritingSetting";
 
 interface props {
     writingInfo: writingType
     synopsis: string
     setSynopsis: React.Dispatch<React.SetStateAction<string>>
     writingDocID: string
-    somethingChanged: React.MutableRefObject<boolean>
     disclosure: string
     setDisclosure: React.Dispatch<React.SetStateAction<disclosure>>
     killingVerse: string[]
@@ -23,7 +24,6 @@ const WritingSetting: React.FC<props> = ({
     synopsis,
     setSynopsis, 
     writingDocID, 
-    somethingChanged, 
     disclosure, 
     setDisclosure,
     killingVerse,
@@ -38,6 +38,24 @@ const WritingSetting: React.FC<props> = ({
     const setAlarm = (alarm: [string, alarmType, boolean]) => {
         dispatch(alarmAction.setAlarm({alarm}))
     }
+    const [newVerse, setNewVerse] = useState("")
+    const variants = {
+        initial: {
+            opacity: 0
+        },
+        animate: {
+            opacity: 1,
+            transition: {
+                duration: 0.1
+            }
+        },
+        exit: {
+            opacity: 0,
+            transition: {
+                duration: 0.1
+            }
+        }
+    }
 
     return (
             <div className="w-full font-noto flex flex-col items-start px-20 mt-20">
@@ -48,13 +66,12 @@ const WritingSetting: React.FC<props> = ({
                         <button 
                         onClick={()=>{
                             if (writingInfo.synopsis !== synopsis ) {
-                                axios.post("http://localhost:3001/updateSynopsis", { genre:writingInfo.genre, writingDocID, synopsis })
+                                axios.post("http://localhost:3001/updateSynopsis", { genre: writingInfo.genre, writingDocID, synopsis })
                                     .then((res) => {
                                         setAlarm(res.data)
                                         setTimeout(() => {
                                         setAlarm(["", "success", false]);
                                         }, 2000);
-                                        somethingChanged.current = !somethingChanged.current
                                 })
                             }
                         }}
@@ -69,9 +86,72 @@ const WritingSetting: React.FC<props> = ({
                 </div>
                 
                 {/* Killing verse */}
-                <div>
-                    
+                <div className="flex flex-col w-full my-20">
+                    <div className="flex items-center mb-10">
+                        <span className="text-2xl font-bold mr-10">표지</span>
+                        <button 
+                        onClick={()=>{
+                            if (writingInfo.killingVerse !== killingVerse) {
+                                console.log(writingInfo.genre);
+                                
+                                axios.post("http://localhost:3001/updateKillingVerse", { genre: writingInfo.genre, writingDocID, killingVerse: JSON.stringify(killingVerse) })
+                                    .then((res) => {
+                                        setAlarm(res.data)
+                                        setTimeout(() => {
+                                        setAlarm(["", "success", false]);
+                                        }, 2000);
+                                    }).catch((error) => {
+                                    console.log(error);
+                                })
+                            }
+                        }}
+                        className="border border-blue-400 px-3 py-1 rounded-xl text-[0.75rem] text-blue-400 hover:bg-blue-100">저장</button>
+                    </div>
+                    <div className="flex items-center w-full">
+                        <div className="grid w-1/4">
+                            <MypageWritingSetting title={writingInfo.title} genre={writingInfo.genre as genre} killingVerse={killingVerse} /> 
+                        </div>
+                            
+                        <div className="border-l-[3px] h-36 mx-10"></div>
+                        <div className="flex flex-col justify-between w-1/3 h-72 border-2 rounded-xl px-10 py-2">
+                            <AnimatePresence>
+                                <motion.div layout className="flex flex-col gap-2">
+                                    {killingVerse.map((verse, index) => (
+                                        <motion.div layout key={`${verse}+${index}`} variants={variants} initial="initial" animate="animate" exit="exit" className="flex items-center justify-between">
+                                            <span>{verse}</span>
+                                            <span onClick={() => {
+                                                setKillingVerse((origin) => {
+                                                    let tmp = origin.slice()
+                                                    tmp.splice(index, 1)
+                                                    return tmp
+                                                })
+                                            }} className="material-icons text-red-400 rounded-full cursor-pointer hover:bg-red-100">
+                                            highlight_off
+                                            </span>
+                                        </motion.div>
+                                    ))}
+                                </motion.div>
+                            </AnimatePresence>
+                            
+                            {/* New verse div */}
+                            <div key="new verse" className="flex items-center justify-between">
+                                <input spellCheck={false} className="border px-2 py-1 rounded-lg bg-transparent focus:outline-none" onChange={(e) => { setNewVerse(e.target.value) }} type="text" value={newVerse} />
+                                <span onClick={() => {
+                                    setKillingVerse((origin) => {
+                                        let tmp = origin.slice()
+                                        tmp.push(newVerse)
+                                        return tmp
+                                    })
+                                    setNewVerse("")
+                                    }}
+                                    className="material-icons text-green-400 rounded-full cursor-pointer hover:bg-green-100" >
+                                    add_circle_outline
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                
                 {/* Disclosure div */}
                 <div className="flex flex-col items-start w-1/3 my-20">
                     <div className="flex items-center">
@@ -85,7 +165,6 @@ const WritingSetting: React.FC<props> = ({
                                         setTimeout(() => {
                                         setAlarm(["", "success", false]);
                                         }, 2000);
-                                        somethingChanged.current = !somethingChanged.current
                                     })
                             }
                         }}

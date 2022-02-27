@@ -21,6 +21,7 @@ import {
 } from "./utils";
 import axios from "axios";
 import { useDispatch } from "react-redux";
+import { Tooltip } from "@mui/material";
 
 const HOTKEYS = {
   "mod+b": "bold",
@@ -37,11 +38,13 @@ const SlateEditor = ({
   genre,
   value,
   setValue,
+  memo,
+  setMemo,
 }) => {
   const dispatch = useDispatch();
 
   const isInitialMount = useRef(0);
-
+  const isInitMemo = useRef(memo);
   // Writing Info loading state
   const [loading, setLoading] = useState(false);
 
@@ -58,8 +61,10 @@ const SlateEditor = ({
   // Is Full Screen?
   const [isFullScreen, setIsFullScreen] = useState(false);
 
-  // Variables to loading commit
+  // Diagram open state
   const [openModal, setOpenModal] = useState(false);
+  // Memo open state
+  const [openMemo, setOpenMemo] = useState(false);
   // Whether commit contents loading completed
   const [contentLoading, setContentLoading] = useState(true);
   // Selected commit key
@@ -172,6 +177,17 @@ const SlateEditor = ({
     value.length > 0 && setContentLoading(true);
   }, [value]);
 
+  const memoVariants = {
+    initial: {
+      x: "100%",
+    },
+    animate: {
+      x: "0%",
+    },
+    exit: {
+      x: "100%",
+    },
+  };
   return (
     <>
       {openModal && (
@@ -221,57 +237,85 @@ const SlateEditor = ({
       )}
 
       {loading ? (
-        <div
-          className={cx(
-            "border-2 border-blue-300 z-50 editor-inner",
-            css`
-              width: 210mm;
-              height: 297mm;
-              overflow-y: scroll;
-            `
-          )}
+        <Slate
+          editor={editor}
+          value={value}
+          onChange={(value) => {
+            setValue(value);
+          }}
         >
+          {/* Tools */}
+          <Toolbar>
+            <MarkButton format="bold" icon="format_bold" />
+            <MarkButton format="italic" icon="format_italic" />
+            <MarkButton format="underline" icon="format_underlined" />
+            <FontSize />
+            <FontStyle />
+
+            {/* Diagram */}
+            {genre !== "poem" && (
+              <SvgButton
+                openDiagram={openDiagram}
+                setOpenDiagram={setOpenDiagram}
+              />
+            )}
+            <DictButton selectedProp={selected} />
+            {/* Full Screen */}
+            <Tooltip placement="top" title="전체 화면" arrow>
+              <span
+                onClick={() => {
+                  const doc = document.querySelector(".editor-container");
+                  if (doc) {
+                    document.fullscreenElement
+                      ? document.exitFullscreen()
+                      : doc.requestFullscreen({ navigationUI: "show" });
+                    setIsFullScreen(!document.fullscreenElement);
+                  }
+                }}
+                className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[20px] align-middle"
+              >
+                {isFullScreen ? "fullscreen_exit" : "fullscreen"}
+              </span>
+            </Tooltip>
+            {/* Memo */}
+            <Tooltip placement="top" title="메모" arrow>
+              <span
+                onClick={() => {
+                  if (openMemo && isInitMemo.current !== memo) {
+                    axios.post("http://localhost:3001/updateMemo", {
+                      genre: writingInfo.genre,
+                      writingDocID,
+                      memo,
+                    });
+                  }
+                  setOpenMemo((origin) => !origin);
+                }}
+                className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[20px] align-middle"
+              >
+                storage
+              </span>
+            </Tooltip>
+          </Toolbar>
+
           {contentLoading && (
-            <Slate
-              editor={editor}
-              value={value}
-              onChange={(value) => {
-                setValue(value);
-              }}
+            <div
+              className={cx(
+                "border-2 border-blue-300 z-50 editor-inner",
+                css`
+                  width: 210mm;
+                  height: 297mm;
+                  overflow-y: scroll;
+                `
+              )}
             >
-              <Toolbar>
-                <MarkButton format="bold" icon="format_bold" />
-                <MarkButton format="italic" icon="format_italic" />
-                <MarkButton format="underline" icon="format_underlined" />
-                {genre !== "poem" && (
-                  <SvgButton
-                    openDiagram={openDiagram}
-                    setOpenDiagram={setOpenDiagram}
-                  />
-                )}
-                <DictButton selectedProp={selected} />
-                <FontSize />
-                <FontStyle />
-                <span
-                  onClick={() => {
-                    const doc = document.querySelector(".editor-container");
-                    if (doc) {
-                      document.fullscreenElement
-                        ? document.exitFullscreen()
-                        : doc.requestFullscreen({ navigationUI: "show" });
-                      setIsFullScreen(!document.fullscreenElement);
-                    }
-                  }}
-                  className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[20px] align-middle"
-                >
-                  {isFullScreen ? "fullscreen_exit" : "fullscreen"}
-                </span>
-              </Toolbar>
               <Editable
                 className={cx(
                   "w-full",
                   css`
                     padding-top: 20px;
+                    p {
+                      cursor: text;
+                    }
                   `
                 )}
                 onMouseUp={(e) => {
@@ -301,48 +345,48 @@ const SlateEditor = ({
                   }
                 }}
               />
-
-              {/* Save Div */}
-              <div className="fixed bottom-[3%] right-[2%] font-noto">
-                <motion.button
-                  whileHover={{ y: "-10%" }}
-                  onClick={() => {
-                    handleRequestTempSave();
-                  }}
-                  className="w-28 h-10 text-sm rounded-2xl mr-5 border-2 border-blue-400 text-blue-400 bg-transparent"
-                >
-                  임시 저장
-                </motion.button>
-                <motion.button
-                  whileHover={{ y: "-10%" }}
-                  onClick={() => {
-                    handleRequestCommit();
-                  }}
-                  className="w-28 h-10 text-sm rounded-2xl border-2 border-blue-400 text-blue-400 bg-transparent"
-                >
-                  제출
-                </motion.button>
-              </div>
-
-              {/* Commit load Div */}
-              <motion.div
-                whileHover={{ y: "-10%" }}
-                className="fixed bottom-[5%] left-[5%] font-noto flex"
-              >
-                <span
-                  onClick={() => {
-                    if (writingInfo.commits.length !== 0) {
-                      setOpenModal(true);
-                    }
-                  }}
-                  className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[50px] align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
-                >
-                  update
-                </span>
-              </motion.div>
-            </Slate>
+            </div>
           )}
-        </div>
+
+          {/* Save Div */}
+          <div className="fixed bottom-[3%] right-[2%] font-noto">
+            <motion.button
+              whileHover={{ y: "-10%" }}
+              onClick={() => {
+                handleRequestTempSave();
+              }}
+              className="w-28 h-10 text-sm rounded-2xl mr-5 border-2 border-blue-400 text-blue-400 bg-transparent"
+            >
+              임시 저장
+            </motion.button>
+            <motion.button
+              whileHover={{ y: "-10%" }}
+              onClick={() => {
+                handleRequestCommit();
+              }}
+              className="w-28 h-10 text-sm rounded-2xl border-2 border-blue-400 text-blue-400 bg-transparent"
+            >
+              제출
+            </motion.button>
+          </div>
+
+          {/* Commit load Div */}
+          <motion.div
+            whileHover={{ y: "-10%" }}
+            className="fixed bottom-[5%] left-[5%] font-noto flex"
+          >
+            <span
+              onClick={() => {
+                if (writingInfo.commits.length !== 0) {
+                  setOpenModal(true);
+                }
+              }}
+              className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[50px] align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
+            >
+              update
+            </span>
+          </motion.div>
+        </Slate>
       ) : (
         // Loading Div
         <div className="w-full h-full top-0 left-0 fixed flex items-center justify-center bg-[#e6d6d1]">
@@ -354,7 +398,7 @@ const SlateEditor = ({
         </div>
       )}
 
-      {/* Diagram Div */}
+      {/* Diagram div */}
       <AnimatePresence>
         {openDiagram && (
           <motion.div
@@ -368,6 +412,30 @@ const SlateEditor = ({
               writingDocID={writingDocID}
               genre={writingInfo.genre}
             />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Memo div */}
+      <AnimatePresence>
+        {openMemo && (
+          <motion.div
+            variants={memoVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="fixed w-60 h-96 right-0 top-1/3 z-[51]"
+          >
+            <textarea
+              spellCheck={false}
+              value={memo}
+              onChange={(e) => {
+                setMemo(e.target.value);
+              }}
+              className="px-3 py-3 resize-none overflow-y-scroll w-full h-full font-noto focus:outline-none"
+            >
+              {memo}
+            </textarea>
           </motion.div>
         )}
       </AnimatePresence>

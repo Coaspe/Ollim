@@ -1,6 +1,7 @@
 import { useSlate } from "slate-react";
 import { Editor, Transforms, Text } from "slate";
 import { Button, Icon } from "./components";
+import { Tooltip } from "@mui/material";
 
 export const Leaf = ({ attributes, children, leaf }) => {
   if (leaf.bold) {
@@ -45,7 +46,11 @@ export const isMarkActive = (editor, format) => {
 
 export const MarkButton = ({ format, icon }) => {
   const editor = useSlate();
-
+  const formatMatch = {
+    bold: "굵은 글씨",
+    italic: "기울이기",
+    underline: "밑줄긋기",
+  };
   return (
     <Button
       active={isMarkActive(editor, format)}
@@ -54,7 +59,9 @@ export const MarkButton = ({ format, icon }) => {
         toggleMark(editor, format);
       }}
     >
-      <Icon>{icon}</Icon>
+      <Tooltip placement="top" title={formatMatch[format]} arrow>
+        <Icon>{icon}</Icon>
+      </Tooltip>
     </Button>
   );
 };
@@ -256,57 +263,61 @@ export const FontStyle = () => {
 
 export const SvgButton = ({ openDiagram, setOpenDiagram }) => {
   return (
-    <svg
-      x="0px"
-      y="0px"
-      viewBox="0 0 60 60"
-      onClick={() => {
-        setOpenDiagram((origin) => !origin);
-      }}
-      className={`w-[18px] cursor-pointer hover:fill-slate-400`}
-      fill={`${openDiagram ? "black" : "#ccc"}`}
-    >
-      <path
-        d="M53,41V29H31V19h7V3H22v16h7v10H7v12H0v16h16V41H9V31h20v10h-7v16h16V41h-7V31h20v10h-7v16h16V41H53z M24,5h12v12H24V5z
-	      M14,55H2V43h12V55z M36,55H24V43h12V55z M58,55H46V43h12V55z"
-      />
-    </svg>
+    <Tooltip placement="top" title="인물 관계도" arrow>
+      <svg
+        x="0px"
+        y="0px"
+        viewBox="0 0 60 60"
+        onClick={() => {
+          setOpenDiagram((origin) => !origin);
+        }}
+        className={`w-[18px] cursor-pointer hover:fill-slate-400`}
+        fill={`${openDiagram ? "black" : "#ccc"}`}
+      >
+        <path
+          d="M53,41V29H31V19h7V3H22v16h7v10H7v12H0v16h16V41H9V31h20v10h-7v16h16V41h-7V31h20v10h-7v16h16V41H53z M24,5h12v12H24V5z
+          M14,55H2V43h12V55z M36,55H24V43h12V55z M58,55H46V43h12V55z"
+        />
+      </svg>
+    </Tooltip>
   );
 };
 
 export const DictButton = ({ selectedProp }) => {
   const editor = useSlate();
   return (
-    <svg
-      onMouseDown={(e) => {
-        // To keep focus on selected word
-        e.preventDefault();
-      }}
-      onClick={(e) => {
-        // seleted text
-        const seleted = Editor.string(editor, editor.selection);
-        seleted
-          ? window.open(
-              `https://opendict.korean.go.kr/small/searchResult?query=${seleted.toString()}`,
-              "_blank",
-              "width=450,height=600"
-            )
-          : window.open(
-              "https://opendict.korean.go.kr/small/main",
-              "_blank",
-              "width=450,height=600"
-            );
-      }}
-      className={`w-[18px] cursor-pointer fill-[#ccc] ${
-        selectedProp && "fill-slate-400"
-      } hover:fill-slate-400`}
-      viewBox="0 0 24 24"
-    >
-      <path
-        d="M18,2 C19.3807,2 20.5,3.11929 20.5,4.5 L20.5,4.5 L20.5,18.75 C20.5,19.1642 20.1642,19.5 19.75,19.5 L19.75,19.5 L5.5,19.5 C5.5,20.0523 5.94772,20.5 6.5,20.5 L6.5,20.5 L19.75,20.5 C20.1642,20.5 20.5,20.8358 20.5,21.25 C20.5,21.6642 20.1642,22 19.75,22 L19.75,22 L6.5,22 C5.11929,22 4,20.8807 4,19.5 L4,19.5 L4,4.5 C4,3.11929 5.11929,2 6.5,2 L6.5,2 Z M16,5 L8,5 C7.44772,5 7,5.44772 7,6 L7,7 C7,7.55228 7.44772,8 8,8 L16,8 C16.5523,8 17,7.55228 17,7 L17,6 C17,5.44772 16.5523,5 16,5 Z"
-        id="🎨-Color"
-      ></path>
-    </svg>
+    <Tooltip placement="top" title="사전 검색" arrow>
+      <svg
+        onMouseDown={(e) => {
+          // To keep focus on selected word
+          e.preventDefault();
+        }}
+        onClick={(e) => {
+          // seleted text
+          const seleted = Editor.string(editor, editor.selection);
+          seleted
+            ? window.open(
+                `https://opendict.korean.go.kr/small/searchResult?query=${seleted.toString()}`,
+                "_blank",
+                "width=450,height=600"
+              )
+            : window.open(
+                "https://opendict.korean.go.kr/small/main",
+                "_blank",
+                "width=450,height=600"
+              );
+        }}
+        className={`w-[18px] cursor-pointer fill-[#ccc] ${
+          selectedProp && "fill-slate-400"
+        } hover:fill-slate-400`}
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M18,2 C19.3807,2 20.5,3.11929 20.5,4.5 L20.5,4.5 L20.5,18.75 C20.5,19.1642 20.1642,19.5 19.75,19.5 L19.75,19.5 L5.5,19.5 C5.5,20.0523 5.94772,20.5 6.5,20.5 L6.5,20.5 L19.75,20.5 C20.1642,20.5 20.5,20.8358 20.5,21.25 C20.5,21.6642 20.1642,22 19.75,22 L19.75,22 L6.5,22 C5.11929,22 4,20.8807 4,19.5 L4,19.5 L4,4.5 C4,3.11929 5.11929,2 6.5,2 L6.5,2 Z M16,5 L8,5 C7.44772,5 7,5.44772 7,6 L7,7 C7,7.55228 7.44772,8 8,8 L16,8 C16.5523,8 17,7.55228 17,7 L17,6 C17,5.44772 16.5523,5 16,5 Z"
+          id="🎨-Color"
+        ></path>
+      </svg>
+    </Tooltip>
   );
 };
 

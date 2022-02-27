@@ -21,6 +21,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
     const [synopsis, setSynopsis] = useState("")
     const [disclosure, setDisclosure] = useState<disclosure>("PUBLIC")
     const dispatch = useDispatch()
+
     const [elements, setElements] = useState<Elements<any>>([])
     const [diagram, setDiagram] = useState<toObjectElements>({} as toObjectElements)
 
@@ -45,8 +46,6 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
     }
     const handleAddWriting = (data: addNovelScenarioArg | addPoemArg, genre: string) => {
         axios.post(`http://localhost:3001/add${genre}`, { data: JSON.stringify(data) }).then((res) => {
-            console.log(res);
-            
             setAlarm(res.data)
             setTimeout(()=>{setAlarm(["","success",false])},3000)
         })
@@ -113,7 +112,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                 {/* Genrn div */}
                 <div className="flex flex-col items-start justify-between w-3/4">
                     <div className="flex items-center">
-                        <span className="text-2xl font-black">장르</span>
+                        <span className="text-2xl font-bold">장르</span>
                         {genrnError && <motion.span className="text-sm ml-2 font-bold text-red-400" animate={{ opacity: [0, 1] }} transition={{ duration: 0.1 }}>장르를 선택해주세요!</motion.span>}
                     </div>
                     <div className="flex items-center justify-between mt-5 w-1/2">
@@ -139,7 +138,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                 <div className="mt-10 flex w-3/4 items-center">
                     <div className="flex flex-col items-start w-1/2 h-full">
                         <div className="flex items-center">
-                            <span className="text-2xl font-black">제목</span>
+                            <span className="text-2xl font-bold">제목</span>
                             {titleError && <motion.span className="text-sm ml-2 font-bold text-red-400" animate={{ opacity: [0, 1] }} transition={{ duration: 0.1 }}>제목을 입력해주세요!</motion.span>}
                         </div>
                         <input className="text-lg font-md border-2 border-[#e4d0ca] py-2 px-3 mt-5 rounded-xl w-full placeholder:italic"
@@ -152,7 +151,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                             }} />
                         </div>
                         <div className="flex flex-col items-start w-1/2 h-full">
-                            <span className="text-2xl font-black">공개 범위</span>
+                            <span className="text-2xl font-bold">공개 범위</span>
                             <div className="w-full flex items-center justify-between mt-5 py-2 px-3">
                                 <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "PUBLIC" && "bg-[#f5e1db]"}`} onClick={()=>{setDisclosure("PUBLIC")}}>모두</button>
                                 <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "FOLLOWERS" && "bg-[#f5e1db]"}`} onClick={()=>{setDisclosure("FOLLOWERS")}}>팔로워</button>
@@ -163,7 +162,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
 
                 {/* Opening article div */}
                 <div className="mt-10 flex flex-col items-start w-3/4">
-                    <span className="text-2xl font-black">{genrn === 'POEM' ? "여는 말" : "시놉시스"}</span>
+                    <span className="text-2xl font-bold">{genrn === 'POEM' ? "여는 말" : "시놉시스"}</span>
                     <textarea className="resize-none border-2 border-[#e4d0ca] py-2 px-3 mt-5 rounded-xl h-28 w-full italic" placeholder={genrn === 'POEM' ? "전시될 여는말을 서술해주세요." : "전시될 시놉시스를 간략하게 서술해주세요."} value={synopsis} spellCheck="false" onChange={(e) => { setSynopsis(e.target.value) }} />
                 </div>
             </div>}
@@ -195,7 +194,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                                 title,
                                 synopsis,
                                 disclosure,
-                                diagram
+                                diagram: Object.keys(diagram).length === 0 ? {elements:[], position:[0,0], zoom:1.5} : diagram
                             }
                             genrn === "NOVEL" ? handleAddWriting(data, "Novel") : handleAddWriting(data, "Scenario")
                             setNewWritingModalOpen(false)
@@ -207,7 +206,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                     </div>
                 
                 {/* Characters relationships diagram*/}
-                <span className="abosolute left-1/2 top-5 font-black text-2xl">인물관계도</span>
+                <span className="abosolute left-1/2 top-5 font-bold text-2xl">인물관계도</span>
                 <DiagramNewWritings elements={elements} setElements={setElements} diagram={diagram} setDiagram={setDiagram} />
             </div>}
             

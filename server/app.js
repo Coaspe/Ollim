@@ -19,7 +19,6 @@ app.use((req, res, next) => {
   next();
 });
 
-const axios = require("axios");
 const {
   temporarySave,
   commit,
@@ -30,23 +29,11 @@ const {
   addNovel,
   addScenario,
   deleteWriting,
+  updateKillingVerse,
+  updateMemo,
 } = require("./firebaseAdmin");
 
-app.post("/searchWord", async (req, res) => {
-  const result = await axios.get("https://opendict.korean.go.kr/api/search", {
-    httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-    params: {
-      key: process.env.OPENDICT_KEY,
-      q: req.body.q,
-      req_type: "json",
-      num: 10,
-    },
-  });
-  res.send(result.data);
-  res.end();
-});
-
-app.post("/temporarySave", async (req, res) => {
+app.post("/temporarySave", (req, res) => {
   temporarySave(
     JSON.parse(req.body.contents),
     req.body.writingDocID,
@@ -62,7 +49,7 @@ app.post("/temporarySave", async (req, res) => {
     });
 });
 
-app.post("/commit", async (req, res) => {
+app.post("/commit", (req, res) => {
   commit(
     JSON.parse(req.body.contents),
     req.body.writingDocID,
@@ -79,7 +66,7 @@ app.post("/commit", async (req, res) => {
       res.end();
     });
 });
-app.post("/editDiagram", async (req, res) => {
+app.post("/editDiagram", (req, res) => {
   editDiagram(
     JSON.parse(req.body.diagram),
     req.body.writingDocID,
@@ -95,7 +82,7 @@ app.post("/editDiagram", async (req, res) => {
     });
 });
 
-app.post("/updateSynopsis", async (req, res) => {
+app.post("/updateSynopsis", (req, res) => {
   updateSynopsis(req.body.genre, req.body.writingDocID, req.body.synopsis)
     .then(() => {
       res.send(JSON.stringify(["변경을 저장했습니다.", "success", true]));
@@ -107,7 +94,7 @@ app.post("/updateSynopsis", async (req, res) => {
     });
 });
 
-app.post("/updateDisclosure", async (req, res) => {
+app.post("/updateDisclosure", (req, res) => {
   updateDisclosure(req.body.genre, req.body.writingDocID, req.body.disclosure)
     .then(() => {
       res.send(JSON.stringify(["변경을 저장했습니다.", "success", true]));
@@ -119,7 +106,7 @@ app.post("/updateDisclosure", async (req, res) => {
     });
 });
 
-app.post("/addPoem", async (req, res) => {
+app.post("/addPoem", (req, res) => {
   const data = JSON.parse(req.body.data);
   addPoem(data)
     .then(() => {
@@ -140,8 +127,7 @@ app.post("/addPoem", async (req, res) => {
     });
 });
 
-app.post("/addNovel", async (req, res) => {
-  console.log(JSON.parse(req.body.data));
+app.post("/addNovel", (req, res) => {
   const data = JSON.parse(req.body.data);
   addNovel(data)
     .then(() => {
@@ -162,7 +148,7 @@ app.post("/addNovel", async (req, res) => {
     });
 });
 
-app.post("/addScenario", async (req, res) => {
+app.post("/addScenario", (req, res) => {
   const data = JSON.parse(req.body.data);
   addScenario(data)
     .then(() => {
@@ -183,7 +169,7 @@ app.post("/addScenario", async (req, res) => {
     });
 });
 
-app.post("/deleteWriting", async (req, res) => {
+app.post("/deleteWriting", (req, res) => {
   deleteWriting(req.body.writingDocID, req.body.genre)
     .then(() => {
       res.send(JSON.stringify(["삭제를 성공하였습니다.", "success", true]));
@@ -194,6 +180,39 @@ app.post("/deleteWriting", async (req, res) => {
       res.end();
     });
 });
+
+app.post("/updateKillingVerse", (req, res) => {
+  updateKillingVerse(
+    req.body.genre,
+    req.body.writingDocID,
+    JSON.parse(req.body.killingVerse)
+  )
+    .then(() => {
+      res.send(JSON.stringify(["변경을 성공하였습니다.", "success", true]));
+      res.end();
+    })
+    .catch(() => {
+      res.send(JSON.stringify(["변경을 실패하였습니다.", "error", true]));
+      res.end();
+    });
+});
+
+app.post("/updateMemo", (req, res) => {
+  updateMemo(
+    req.body.genre,
+    req.body.writingDocID,
+    req.body.memo
+  )
+    .then(() => {
+      res.send(JSON.stringify(["변경을 성공하였습니다.", "success", true]));
+      res.end();
+    })
+    .catch(() => {
+      res.send(JSON.stringify(["변경을 실패하였습니다.", "error", true]));
+      res.end();
+    });
+});
+
 app.listen(port, () => {
   console.log("Express server on port 3001!");
 });

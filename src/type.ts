@@ -63,6 +63,7 @@ export type getFirestorePoem = {
   genre: string
   id: string
   disclosure: disclosure
+  memo: string
 }
 export type getFirestoreNovel = {
   commits: [{ [key: number]: { contents: string, memo: string } } ]
@@ -78,6 +79,7 @@ export type getFirestoreNovel = {
   genre: string
   id: string
   disclosure: disclosure
+  memo: string
 }
 export type getFirestoreScenario = {
   commits: [{ [key: number]: { contents: string, memo: string } } ]
@@ -93,6 +95,7 @@ export type getFirestoreScenario = {
   genre: string
   id: string
   disclosure: disclosure
+  memo: string
 }
 export type contentType = {
     type: string;

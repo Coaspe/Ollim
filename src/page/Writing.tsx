@@ -31,9 +31,6 @@ const Writing = () => {
     const [writingOwnerInfo, setWritingOwnerInfo] = useState<getFirestoreUser>({} as getFirestoreUser)
     const [writingInfo, setWritingInfo] = useState<writingType>({} as writingType)
 
-    // Something in setting table changed, get firestore information again 
-    const somethingChanged = useRef(true)
-
     // Editor value
     const [value, setValue] = useState(initialValue);
     // Table State 
@@ -44,6 +41,8 @@ const Writing = () => {
     const [synopsis, setSynopsis] = useState<string>("")
     // KillingVerse State
     const [killingVerse, setKillingVerse] = useState<string[]>([])
+    // Memo State
+    const [memo, setMemo] = useState("")
 
     const dispatch = useDispatch()
 
@@ -102,9 +101,10 @@ const Writing = () => {
                 setKillingVerse(res.killingVerse)
                 setSynopsis(res.synopsis)
                 setDisclosure(res.disclosure)
+                setMemo(res.memo)
             })
         }
-    }, [somethingChanged.current, table])
+    }, [table])
 
     const alertVariants = {
         initial: {
@@ -124,6 +124,8 @@ const Writing = () => {
         <>
         { Object.keys(writingInfo).length > 0 && 
         <div className=" w-full bg-[#e6d6d1] bg-opacity-30 relative writing-container">
+
+            {/* Alarm */}
             <AnimatePresence>
                 {
                     alarm[2] &&
@@ -155,7 +157,9 @@ const Writing = () => {
                 <div className="flex flex-col items-start justify-center font-bold mb-10">
                     <span className="mb-5" >{writingOwnerInfo.username}</span>
                     <div className="flex items-center justify-center">
-                        <span className="text-2xl ">{writingInfo.title} · {gerneMatching[writingInfo.genre as gerneType]}</span>
+                        <span className="text-2xl">{writingInfo.title}
+                        <span className="text-lg mx-2">·</span>
+                        <span className="text-lg">{gerneMatching[writingInfo.genre as gerneType]}</span></span>
                     </div>
                 </div>
                 <div className="flex items-center text-[0.75rem] text-blue-400">
@@ -168,6 +172,7 @@ const Writing = () => {
                     </>}
                 </div>
             </div>
+            
             {/* Table OVERVIEW */}
             {
                 table === "OVERVIEW" &&
@@ -177,7 +182,7 @@ const Writing = () => {
                             {/* Synopsis div */}
                             <div className="flex flex-col w-2/3">
                                 <span className="text-2xl font-bold mb-10">여는 말</span>
-                                <p className="px-3 py-3 border border-blue-400 w-full h-72 overflow-y-scroll rounded-lg">{writingInfo.synopsis}</p>
+                                <p className="px-3 py-3 border border-blue-400 w-full h-72 overflow-y-scroll">{writingInfo.synopsis}</p>
                             </div>
                         </div>
                     ) : (
@@ -196,6 +201,7 @@ const Writing = () => {
                         </div>
                     ))
             }
+            
             {/* Table WRITE */}
             {
                 table === "WRITE" && uid === contextUser.uid &&
@@ -212,9 +218,10 @@ const Writing = () => {
                             }
                         `
                         )}>
-                            <SlateEditor openDiagram={openDiagram} setOpenDiagram={setOpenDiagram} writingDocID={writingDocID} genre={writingInfo.genre} value={value} setValue={setValue}/>
+                            <SlateEditor memo={memo} setMemo={setMemo} openDiagram={openDiagram} setOpenDiagram={setOpenDiagram} writingDocID={writingDocID} genre={writingInfo.genre} value={value} setValue={setValue}/>
                     </div>
             }
+            
             {/* Table BROWSE */}
             {
                 table === "BROWSE" && 
@@ -234,13 +241,13 @@ const Writing = () => {
                             <SlateEditorRDOnly openDiagram={openDiagram} setOpenDiagram={setOpenDiagram} writingDocID={writingDocID} genre={writingInfo.genre}/>
                     </div>
             }
+            
             {/* Table SETTING */}
             {writingDocID && table === "SETTING" && writingInfo.userUID === contextUser.uid && 
             <WritingSetting
                 writingInfo={writingInfo}
                 synopsis={synopsis}
                 setSynopsis={setSynopsis}
-                somethingChanged={somethingChanged}
                 killingVerse={killingVerse}
                 setKillingVerse={setKillingVerse}
                 disclosure={disclosure}

@@ -112,6 +112,7 @@ export const Menu = React.forwardRef(({ className, ...props }, ref) => (
     className={cx(
       className,
       css`
+        position: sticky;
         & > * {
           display: inline-block;
         }
@@ -136,10 +137,11 @@ export const Toolbar = React.forwardRef(({ className, ...props }, ref) => (
     className={cx(
       className,
       css`
+        width: 210mm;
         background-color: #eee;
         padding: 12px 18px;
         position: sticky;
-        top: 0%;
+        top: 0;
         z-index: 1000;
       `
     )}

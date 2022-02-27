@@ -103,8 +103,7 @@ exports.addPoem = async (data) => {
 exports.addNovel = async (data) => {
   const batch = firestore.batch();
   const docRef = await firestore.collection("novel").add({});
-  console.log(data);
-  console.log(docRef.id);
+
   batch.set(firestore.collection("novel").doc(docRef.id), {
     ...data,
     killingVerse: [],
@@ -211,4 +210,18 @@ exports.deleteWriting = async (writingDocID, genre) => {
   batch.delete(genreRef);
 
   return batch.commit();
+};
+
+exports.updateKillingVerse = (genre, writingDocID, killingVerse) => {
+  return firestore
+    .collection(genre.toLocaleLowerCase())
+    .doc(writingDocID)
+    .update({ killingVerse });
+};
+
+exports.updateMemo = (genre, writingDocID, memo) => {
+  return firestore
+    .collection(genre.toLocaleLowerCase())
+    .doc(writingDocID)
+    .update({ memo });
 };

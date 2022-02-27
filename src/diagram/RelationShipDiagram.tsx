@@ -77,6 +77,8 @@ const DiagramWrite: React.FC<props> = ({ writingDocID, genre, isInitialMount }) 
     pos.current[0] += 10
     pos.current[1] += 10
     setElements([...elements, addedNode])
+    console.log(elements);
+    
   }
   const onConnect = (params: any) => {
       setElements(
@@ -89,7 +91,7 @@ const DiagramWrite: React.FC<props> = ({ writingDocID, genre, isInitialMount }) 
     // let diagramTmp = Object.assign({}, diagram)
     // diagramTmp["elements"] = elementsTmp
     setElements(elementsTmp)
-};
+  };
 const onElementClick = (event:any, element:any) => console.log('click', element);
   // Fit view on mounted
   useEffect(() => {
@@ -160,7 +162,7 @@ const onElementClick = (event:any, element:any) => console.log('click', element)
                   }, 2000);
                   setAlarmTimer(dum)
                 })
-                // If not changed Alarm "there is no changed"
+                // If nothing has changed, Alarm "there is no changed"
               } else {
                 timer && clearTimeout(timer)
                 setAlarm(["인물 관계도의 변경이 없습니다", "info", true])
