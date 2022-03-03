@@ -1,15 +1,53 @@
-const { getFirestore, FieldValue } = require("firebase-admin/firestore");
+import { storageRef } from "./lib.js";
+import { initializeApp, cert } from "firebase-admin/app";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { getStorage } from "firebase-admin/storage";
 
-var admin = require("firebase-admin");
-var serviceAccount = require("C:/ollim-df732-firebase-adminsdk-uwq7f-aa5570d83e.json");
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+// Init
+initializeApp({
+  credential: cert("C:/ollim-df732-firebase-adminsdk-uwq7f-aa5570d83e.json"),
+  storageBucket: "gs://ollim-df732.appspot.com",
   databaseURL: "https://ollim-df732-default-rtdb.firebaseio.com",
 });
+
+// Storage bucket
+const bucket = getStorage().bucket("gs://ollim-df732.appspot.com");
+
+// Firestore
 const firestore = getFirestore();
 
-exports.commit = async (value, writingDocID, genre, memo, userUID) => {
+export const updateProfileImage = async (userUID, userEmail, profileImg) => {
+  let newFileName = `${Date.now()}_${userUID}`;
+  let fileUpload = bucket.file(`${userUID}/profileImg/${newFileName}`);
+  const result = await new Promise((resolve, reject) => {
+    const blobStream = fileUpload.createWriteStream({
+      metadata: {
+        contentType: profileImg.mimetype,
+      },
+    });
+
+    blobStream.on("error", (error) => {
+      reject(error);
+    });
+
+    blobStream.on("finish", () => {
+      resolve(newFileName);
+    });
+
+    blobStream.end(profileImg.buffer);
+  });
+  if (result === newFileName) {
+    const token = await storageRef
+      .child(`${userUID}/profileImg/${newFileName}`)
+      .getDownloadURL();
+
+    firestore.collection("users").doc(userEmail).update({
+      profileImg: token,
+    });
+  }
+};
+
+export const commit = async (value, writingDocID, genre, memo, userUID) => {
   const date = new Date().getTime();
   const batch = firestore.batch();
 
@@ -43,7 +81,7 @@ exports.commit = async (value, writingDocID, genre, memo, userUID) => {
   return batch.commit();
 };
 
-exports.temporarySave = async (contents, writingDocID, genre) => {
+export const temporarySave = async (contents, writingDocID, genre) => {
   const date = new Date().getTime();
 
   // update temporary save docID of writing
@@ -53,28 +91,28 @@ exports.temporarySave = async (contents, writingDocID, genre) => {
     .update({ tempSave: { contents, date } });
 };
 
-exports.editDiagram = (diagram, writingDocID, genre) => {
+export const editDiagram = (diagram, writingDocID, genre) => {
   return firestore
     .collection(genre.toLocaleLowerCase())
     .doc(writingDocID)
     .update({ diagram });
 };
 
-exports.updateSynopsis = (genre, writingDocID, synopsis) => {
+export const updateSynopsis = (genre, writingDocID, synopsis) => {
   return firestore
     .collection(genre.toLocaleLowerCase())
     .doc(writingDocID)
     .update({ synopsis });
 };
 
-exports.updateDisclosure = (genre, writingDocID, disclosure) => {
+export const updateDisclosure = (genre, writingDocID, disclosure) => {
   return firestore
     .collection(genre.toLocaleLowerCase())
     .doc(writingDocID)
     .update({ disclosure });
 };
 
-exports.addPoem = async (data) => {
+export const addPoem = async (data) => {
   const batch = firestore.batch();
   const docRef = await firestore.collection("poem").add();
 
@@ -100,7 +138,7 @@ exports.addPoem = async (data) => {
 
   return batch.commit();
 };
-exports.addNovel = async (data) => {
+export const addNovel = async (data) => {
   const batch = firestore.batch();
   const docRef = await firestore.collection("novel").add({});
 
@@ -126,7 +164,7 @@ exports.addNovel = async (data) => {
 
   return batch.commit();
 };
-exports.addScenario = async (data) => {
+export const addScenario = async (data) => {
   const batch = firestore.batch();
   const docRef = await firestore.collection("scenario").add();
 
@@ -153,7 +191,7 @@ exports.addScenario = async (data) => {
   return batch.commit();
 };
 
-exports.deleteWriting = async (writingDocID, genre) => {
+export const deleteWriting = async (writingDocID, genre) => {
   // Get writingInfo
   const writingInfo = (
     await firestore
@@ -212,16 +250,23 @@ exports.deleteWriting = async (writingDocID, genre) => {
   return batch.commit();
 };
 
-exports.updateKillingVerse = (genre, writingDocID, killingVerse) => {
+export const updateKillingVerse = (genre, writingDocID, killingVerse) => {
   return firestore
     .collection(genre.toLocaleLowerCase())
     .doc(writingDocID)
     .update({ killingVerse });
 };
 
-exports.updateMemo = (genre, writingDocID, memo) => {
+export const updateMemo = (genre, writingDocID, memo) => {
   return firestore
     .collection(genre.toLocaleLowerCase())
     .doc(writingDocID)
     .update({ memo });
+};
+
+export const updateCover = (genre, writingDocID, cover) => {
+  return firestore
+    .collection(genre.toLocaleLowerCase())
+    .doc(writingDocID)
+    .update({ cover });
 };

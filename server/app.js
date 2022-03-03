@@ -1,10 +1,25 @@
-const express = require("express"); //express 모듈 가져오기.
+import express from "express";
+import "dotenv/config";
+import multer from "multer";
+import {
+  temporarySave,
+  commit,
+  editDiagram,
+  updateSynopsis,
+  updateDisclosure,
+  addPoem,
+  addNovel,
+  addScenario,
+  deleteWriting,
+  updateKillingVerse,
+  updateMemo,
+  updateCover,
+  updateProfileImage,
+} from "./firebaseAdmin.js";
+
 const app = express(); //Express 객체 생성
 const port = 3001; //변수 'port' 선언
-const https = require("https");
-const dotenv = require("dotenv");
 
-dotenv.config();
 app.use(express.json());
 
 // json request body를 받기 위해 사용한다. application/x-www-form-urlencoded
@@ -19,19 +34,9 @@ app.use((req, res, next) => {
   next();
 });
 
-const {
-  temporarySave,
-  commit,
-  editDiagram,
-  updateSynopsis,
-  updateDisclosure,
-  addPoem,
-  addNovel,
-  addScenario,
-  deleteWriting,
-  updateKillingVerse,
-  updateMemo,
-} = require("./firebaseAdmin");
+const upload = multer({
+  storage: multer.memoryStorage(),
+});
 
 app.post("/temporarySave", (req, res) => {
   temporarySave(
@@ -198,11 +203,7 @@ app.post("/updateKillingVerse", (req, res) => {
 });
 
 app.post("/updateMemo", (req, res) => {
-  updateMemo(
-    req.body.genre,
-    req.body.writingDocID,
-    req.body.memo
-  )
+  updateMemo(req.body.genre, req.body.writingDocID, req.body.memo)
     .then(() => {
       res.send(JSON.stringify(["변경을 성공하였습니다.", "success", true]));
       res.end();
@@ -212,7 +213,29 @@ app.post("/updateMemo", (req, res) => {
       res.end();
     });
 });
-
+app.post("/updateMemo", (req, res) => {
+  updateCover(req.body.genre, req.body.writingDocID, JSON.parse(req.body.cover))
+    .then(() => {
+      res.send(JSON.stringify(["변경을 성공하였습니다.", "success", true]));
+      res.end();
+    })
+    .catch(() => {
+      res.send(JSON.stringify(["변경을 실패하였습니다.", "error", true]));
+      res.end();
+    });
+});
+app.post("/updateProfileImage", upload.single("file"), (req, res) => {
+  try {
+    updateProfileImage(req.body.userUID, req.body.userEmail, req.file);
+    res.send(
+      JSON.stringify(["프로필 사진 변경을 성공하였습니다.", "success", true])
+    );
+    res.end();
+  } catch (res) {
+    res.send(JSON.stringify(["변경을 실패하였습니다.", "error", true]));
+    res.end();
+  }
+});
 app.listen(port, () => {
   console.log("Express server on port 3001!");
 });

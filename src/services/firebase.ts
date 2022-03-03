@@ -1,10 +1,8 @@
 import { firebase, firestore, rtDBRef } from "../lib/firebase";
 import {
-
   doc,
   getDoc,
   setDoc,
-
   addDoc,
   collection,
   query,
@@ -72,10 +70,9 @@ export const getPoemArrayInfo = (poemDocIDs: Array<string>) => {
 }
 export const getNovelArrayInfo = (novelDocIDs: Array<string>) => {
   return Promise.all(novelDocIDs.map(async (docID: string) => {
-    const tmp = (await getDoc(doc(firestore, "novel", docID)))
+  const tmp = (await getDoc(doc(firestore, "novel", docID)))
     if (tmp.exists()) {
       const data = tmp.data()
-      const id = tmp.id
       return {...data, id: tmp.id}
     }
   }

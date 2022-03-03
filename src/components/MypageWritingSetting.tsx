@@ -5,8 +5,9 @@ interface props {
     title: string
     genre: genre
     killingVerse: string[]
+    synopsis: string
 }
-const MypageWritingSetting: React.FC<props> = ({ title, genre, killingVerse }) => {
+const MypageWritingSetting: React.FC<props> = ({ title, genre, killingVerse, synopsis }) => {
     const gerneType = {
         SCENARIO: "시나리오",
         POEM: "시",
@@ -36,8 +37,7 @@ const MypageWritingSetting: React.FC<props> = ({ title, genre, killingVerse }) =
                                 <span className="text-xl font-black">{title}</span>
                                 <span className="text-sm text-gray-700 font-black ml-3">{gerneType[genre]}</span>
                             </div>
-                            <span className="text-sm text-gray-400 mb-3 font-semibold">석주가 담배 오지게 피는 소설입니다.</span>
-                            <span className="italic">사람 이름이 엄준식?</span>
+                            <textarea value={synopsis} readOnly className="text-sm text-gray-400 mb-3 font-semibold resize-none bg-transparent overflow-y-hidden">{synopsis}</textarea>
                         </motion.div>
                     <AnimatePresence>
                         {hoverExpandDetail && killingVerse &&

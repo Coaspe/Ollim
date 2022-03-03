@@ -9,12 +9,13 @@ import NewWritingModal from "../components/NewWritingModal"
 import CustomNodeFlow from "../diagram/RelationShipDiagram"
 import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "../redux/store"
-import { getFirestoreNovel, getFirestorePoem, getFirestoreScenario, getFirestoreUser, getFirestoreUserWritings } from "../type"
-import { userInfoAction } from "../redux"
+import { alarmType, getFirestoreNovel, getFirestorePoem, getFirestoreScenario, getFirestoreUser, getFirestoreUserWritings } from "../type"
+import { alarmAction, userInfoAction } from "../redux"
 import { useParams } from "react-router-dom"
 
 import Calendar from "../components/Calendar"
 import { Alert } from "@mui/material"
+import axios from "axios"
 
 const Mypage = () => {
 
@@ -46,6 +47,9 @@ const Mypage = () => {
     // header context userInfo
     const setUserInfo = (userInfo: getFirestoreUser) => {
         dispatch(userInfoAction.setUserInfo({userInfo}))
+    }
+       const setAlarm = (alarm: [string ,alarmType, boolean]) => {
+        dispatch(alarmAction.setAlarm({alarm}))
     }
 
     useEffect(() => {
@@ -109,9 +113,18 @@ const Mypage = () => {
             width: 800,
             height: 800,
             success(result: any) {
-                // setFile(result)
                 const url = URL.createObjectURL(result)
-                // Get Photo's average color for space
+
+                const formData = new FormData()
+                formData.append("userUID", profileOwnerInfo.uid)
+                formData.append("userEmail", profileOwnerInfo.userEmail)
+                formData.append('file', result)
+
+                axios.post("http://localhost:3001/updateProfileImage", formData)
+                    .then((res) => {
+                        setAlarm(res.data)
+                        setTimeout(()=>{setAlarm(["", "success", false])}, 3000)
+                    })
                 setProfileImage(url)
             },
             error(err) {
@@ -159,7 +172,7 @@ const Mypage = () => {
             }
         </AnimatePresence>
         
-        {profileOwnerInfo && profileImage  && userWritings ?
+        {profileOwnerInfo && profileImage  && userWritings && totalWritings ?
             <div className="relative w-full font-noto bg-[#e6d6d1] bg-opacity-30">
                 {/* New Writing Modal */}
                 {newWritingModalOpen && <NewWritingModal setNewWritingModalOpen={setNewWritingModalOpen}/>}
@@ -205,23 +218,24 @@ const Mypage = () => {
                         </div>
                         
                         {/* Posts, Followers, Followings */}
-                        <div className="flex w-full items-center justify-center">
+                        {
+                        <div className="flex w-full items-center justify-center text-sm">
                             <div className="flex flex-col items-center justify-center">
-                                <span className="font-black ">0</span>                            
-                                <span className="text-sm ">글</span>                            
+                                <span className="font-bold text-gray-400 font-Nanum_Gothic">{totalWritings.length}</span>                            
+                                <span className="">글</span>                            
                             </div>
                             <div className="flex flex-col items-center justify-center mx-5">
-                                <span className="font-black">0</span>                            
-                                <span className="text-sm">팔로워</span>                            
+                                    <span className="font-bold text-gray-400 font-Nanum_Gothic">{profileOwnerInfo.followers.length}</span>                            
+                                <span className="">팔로워</span>                            
                                 </div>
                             <div className="flex flex-col items-center justify-center">
-                                <span className="font-black">0</span>                           
-                                <span className="text-sm">팔로우</span>                            
+                                <span className="font-bold text-gray-400 font-Nanum_Gothic">{profileOwnerInfo.followings.length}</span>                           
+                                <span className="">팔로우</span>                            
                             </div>
-                        </div>
+                        </div>}
                         <div className="flex w-full items-center justify-center mt-10">
-                            <motion.button onClick={()=>{setNewWritingModalOpen(true)}} whileHover={{ y:"-10%" }} className="mr-5 px-4 py-3 rounded-2xl bg-white shadow-md font-semibold">
-                                새 작품 쓰기
+                            <motion.button onClick={()=>{setNewWritingModalOpen(true)}} whileHover={{ y: "-10%" }} className="mr-5 px-4 py-3 rounded-2xl bg-white shadow-md font-semibold">
+                                새 작품 추가
                             </motion.button>
                             <motion.button whileHover={{ y:"-10%" }} className="px-4 py-3 rounded-2xl bg-white shadow-md font-semibold">
                                 다른 작가의 작품보기

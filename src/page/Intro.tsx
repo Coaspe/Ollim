@@ -68,15 +68,15 @@ const Intro = () => {
                             variants={pVariants}
                             initial="initial"
                             animate="animate"
-                            className="w-1/2 text-3xl whitespace-pre-line mb-10 font-black">
-                            안녕하세요! {`\n`} 우리는 <span className="text-4xl text-logoBrown font-black">올림</span> 입니다
+                            className="w-1/2 text-3xl whitespace-pre-line mb-10">
+                            안녕하세요! {`\n`} 우리는 <span className="text-4xl text-logoBrown font-extrabold">올림</span> 입니다
                         </motion.p>
                         
                         <motion.p
                             variants={pVariants2}
                             initial="initial"
                             animate="animate"
-                            className="w-1/2 text-lg font-extrabold">작가님의 포트폴리오를 관리하고, 다른 작가들의 글을 열람하세요!</motion.p>
+                            className="w-1/2 text-lg">작가님의 포트폴리오를 관리하고, 다른 작가들의 글을 열람하세요!</motion.p>
                         <motion.div
                             variants={divVariants}
                             initial="initial"
@@ -100,12 +100,12 @@ const Intro = () => {
                     :
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} key="login" className="w-full flex flex-col z-10 items-center">
                         <motion.p
-                            className="w-1/2 text-3xl whitespace-pre-line mb-10 font-black text-center ">
+                            className="w-1/2 text-3xl whitespace-pre-line mb-10 font-bold text-center ">
                             로그인
                         </motion.p>
                         <motion.div className="flex flex-col">
-                            <input className="border border-logoBrown rounded-2xl bg-transparent px-3 py-3 text-md mb-3" type="email" placeholder="이메일" />
-                            <input className="border border-logoBrown rounded-2xl bg-transparent px-3 py-3 text-md" type="password" placeholder="비밀번호" />
+                            <input className="border border-logoBrown rounded-2xl bg-transparent px-3 py-3 text-md mb-3 shadow-md" type="email" placeholder="이메일" />
+                            <input className="border border-logoBrown rounded-2xl bg-transparent px-3 py-3 text-md shadow-md" type="password" placeholder="비밀번호" />
                         </motion.div>
                         <div className="flex w-1/2 items-center justify-center mt-10 mb-3">
                             <hr className="w-1/4 border-gray-400" />

@@ -1,11 +1,10 @@
 import axios from "axios";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { alarmAction } from "../redux";
 import { alarmType, writingType, disclosure, genre } from "../type";
 import { motion, AnimatePresence } from 'framer-motion'
-import MypageWriting from "./MypageWriting";
 import MypageWritingSetting from "./MypageWritingSetting";
 
 interface props {
@@ -62,7 +61,7 @@ const WritingSetting: React.FC<props> = ({
                 {/* Synopsis div */}
                 <div className="flex flex-col w-2/3">
                     <div className="flex items-center mb-10">
-                        <span className="text-2xl font-bold mr-10">시놉시스</span>
+                        <span className="text-2xl font-bold mr-10">{writingInfo.genre !== "POEM" ? "시놉시스" : "여는 말"}</span>
                         <button 
                         onClick={()=>{
                             if (writingInfo.synopsis !== synopsis ) {
@@ -80,7 +79,7 @@ const WritingSetting: React.FC<props> = ({
                     <textarea 
                     value={synopsis}
                     onChange={(e)=>{setSynopsis(e.target.value)}} 
-                    className="resize-none px-3 py-3 border border-blue-400 w-full rounded-lg h-72 overflow-y-scroll bg-transparent focus:outline-none">
+                    className="border-opacity-5 shadow-lg resize-none px-3 py-3 border border-black w-full h-72 overflow-y-scroll bg-transparent focus:outline-none">
                         {synopsis}
                     </textarea>
                 </div>
@@ -92,8 +91,6 @@ const WritingSetting: React.FC<props> = ({
                         <button 
                         onClick={()=>{
                             if (writingInfo.killingVerse !== killingVerse) {
-                                console.log(writingInfo.genre);
-                                
                                 axios.post("http://localhost:3001/updateKillingVerse", { genre: writingInfo.genre, writingDocID, killingVerse: JSON.stringify(killingVerse) })
                                     .then((res) => {
                                         setAlarm(res.data)
@@ -109,11 +106,10 @@ const WritingSetting: React.FC<props> = ({
                     </div>
                     <div className="flex items-center w-full">
                         <div className="grid w-1/4">
-                            <MypageWritingSetting title={writingInfo.title} genre={writingInfo.genre as genre} killingVerse={killingVerse} /> 
+                            <MypageWritingSetting title={writingInfo.title} genre={writingInfo.genre as genre} killingVerse={killingVerse} synopsis={synopsis} /> 
                         </div>
-                            
                         <div className="border-l-[3px] h-36 mx-10"></div>
-                        <div className="flex flex-col justify-between w-1/3 h-72 border-2 rounded-xl px-10 py-2">
+                        <div className="flex flex-col justify-between w-1/3 h-72 border-black border border-opacity-5 shadow-lg rounded-lg px-10 py-5">
                             <AnimatePresence>
                                 <motion.div layout className="flex flex-col gap-2">
                                     {killingVerse.map((verse, index) => (
@@ -132,10 +128,10 @@ const WritingSetting: React.FC<props> = ({
                                     ))}
                                 </motion.div>
                             </AnimatePresence>
-                            
+                        
                             {/* New verse div */}
                             <div key="new verse" className="flex items-center justify-between">
-                                <input spellCheck={false} className="border px-2 py-1 rounded-lg bg-transparent focus:outline-none" onChange={(e) => { setNewVerse(e.target.value) }} type="text" value={newVerse} />
+                                <input spellCheck={false} className="border border-black px-2 py-1 rounded-lg bg-transparent focus:outline-none" onChange={(e) => { setNewVerse(e.target.value) }} type="text" value={newVerse} />
                                 <span onClick={() => {
                                     setKillingVerse((origin) => {
                                         let tmp = origin.slice()
@@ -171,9 +167,9 @@ const WritingSetting: React.FC<props> = ({
                         className="border border-blue-400 px-3 py-1 rounded-xl text-[0.75rem] text-blue-400 hover:bg-blue-100">저장</button>
                     </div>
                     <div className="w-full flex items-center justify-between mt-5 py-2 px-3">
-                        <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "PUBLIC" && "bg-[#f5e1db]"}`} onClick={()=>{setDisclosure("PUBLIC")}}>모두</button>
-                        <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "FOLLOWERS" && "bg-[#f5e1db]"}`} onClick={()=>{setDisclosure("FOLLOWERS")}}>팔로워</button>
-                        <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "PRIVATE" && "bg-[#f5e1db]"}`} onClick={()=>{setDisclosure("PRIVATE")}}>비공개</button>
+                        <motion.button whileHover={{scale:1.1}} whileTap={{scale:0.9}} className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "PUBLIC" && "bg-[#f5e1db] shadow-[#f5e1db] shadow-md"}`} onClick={()=>{setDisclosure("PUBLIC")}}>모두</motion.button>
+                        <motion.button whileHover={{scale:1.1}} whileTap={{scale:0.9}} className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "FOLLOWERS" && "bg-[#f5e1db] shadow-[#f5e1db] shadow-md"}`} onClick={()=>{setDisclosure("FOLLOWERS")}}>팔로워</motion.button>
+                        <motion.button whileHover={{scale:1.1}} whileTap={{scale:0.9}} className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "PRIVATE" && "bg-[#f5e1db] shadow-[#f5e1db] shadow-md"}`} onClick={()=>{setDisclosure("PRIVATE")}}>비공개</motion.button>
                     </div>
                 </div>
 

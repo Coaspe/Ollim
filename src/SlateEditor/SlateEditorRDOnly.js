@@ -124,7 +124,7 @@ const SlateEditorRDOnly = ({
       {loading ? (
         <div
           className={cx(
-            "border-2 border-blue-300 editor-inner",
+            "editor-inner shadow-[0px_0px_10px_rgba(0,0,0,0.3)]",
             css`
               width: 210mm;
               height: 297mm;

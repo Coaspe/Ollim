@@ -105,24 +105,30 @@ export const Instruction = React.forwardRef(({ className, ...props }, ref) => (
   />
 ));
 
-export const Menu = React.forwardRef(({ className, ...props }, ref) => (
-  <div
-    {...props}
-    ref={ref}
-    className={cx(
-      className,
-      css`
-        position: sticky;
-        & > * {
-          display: inline-block;
-        }
-        & > * + * {
-          margin-left: 15px;
-        }
-      `
-    )}
-  />
-));
+export const Menu = React.forwardRef(
+  ({ className, isFullScreen, ...props }, ref) => (
+    <div
+      {...props}
+      ref={ref}
+      className={cx(
+        className,
+        `${
+          isFullScreen ? "absolute" : "sticky"
+        } drop-shadow-md border-t border-black border-opacity-5`,
+        css`
+          border-radius: 10px;
+          margin-bottom: 10px;
+          & > * {
+            display: inline-block;
+          }
+          & > * + * {
+            margin-left: 15px;
+          }
+        `
+      )}
+    />
+  )
+);
 
 export const Portal = ({ children }) => {
   return typeof document === "object"
@@ -130,20 +136,26 @@ export const Portal = ({ children }) => {
     : null;
 };
 
-export const Toolbar = React.forwardRef(({ className, ...props }, ref) => (
-  <Menu
-    {...props}
-    ref={ref}
-    className={cx(
-      className,
-      css`
-        width: 210mm;
-        background-color: #eee;
-        padding: 12px 18px;
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-      `
-    )}
-  />
-));
+export const Toolbar = React.forwardRef(
+  ({ className, isFullScreen, ...props }, ref) => (
+    <Menu
+      {...props}
+      isFullScreen={isFullScreen}
+      ref={ref}
+      className={cx(
+        className,
+        `bg-[#f6f6f6] py-[12px] px-[18px] z-[1000] ${
+          isFullScreen ? "w-[90mm] top-1/2 left-4" : "w-[210mm] top-0 z-[1000]"
+        }`
+        // css`
+        //   width: 210mm;
+        //   background-color: #f6f6f6;
+        //   padding: 12px 18px;
+        //   position: sticky;
+        //   top: 0;
+        //   z-index: 1000;
+        // `
+      )}
+    />
+  )
+);

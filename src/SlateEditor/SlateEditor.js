@@ -22,6 +22,7 @@ import {
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { Tooltip } from "@mui/material";
+import "./Slate.css";
 
 const HOTKEYS = {
   "mod+b": "bold",
@@ -245,7 +246,7 @@ const SlateEditor = ({
           }}
         >
           {/* Tools */}
-          <Toolbar>
+          <Toolbar isFullScreen={isFullScreen}>
             <MarkButton format="bold" icon="format_bold" />
             <MarkButton format="italic" icon="format_italic" />
             <MarkButton format="underline" icon="format_underlined" />
@@ -253,7 +254,7 @@ const SlateEditor = ({
             <FontStyle />
 
             {/* Diagram */}
-            {genre !== "poem" && (
+            {genre !== "POEM" && (
               <SvgButton
                 openDiagram={openDiagram}
                 setOpenDiagram={setOpenDiagram}
@@ -300,7 +301,7 @@ const SlateEditor = ({
           {contentLoading && (
             <div
               className={cx(
-                "border-2 border-blue-300 z-50 editor-inner",
+                "z-50 editor-inner shadow-[0px_0px_10px_rgba(0,0,0,0.3)]",
                 css`
                   width: 210mm;
                   height: 297mm;
@@ -405,7 +406,7 @@ const SlateEditor = ({
             animate={{ y: ["100%", "0%"] }}
             exit={{ y: ["0%", "100%"] }}
             transition={{ y: { duration: 0.3 } }}
-            className="z-50 bottom-0 fixed w-full h-1/3 bg-white"
+            className="z-50 bottom-0 fixed w-full h-1/3 bg-white shadow-[0px_-4px_10px_rgba(0,0,0,0.05)]"
           >
             <DiagramWrite
               isInitialMount={isInitialMount}
@@ -424,7 +425,7 @@ const SlateEditor = ({
             initial="initial"
             animate="animate"
             exit="exit"
-            className="fixed w-60 h-96 right-0 top-1/3 z-[51]"
+            className="fixed w-72 h-96 right-0 top-1/3 z-[51] drop-shadow-lg"
           >
             <textarea
               spellCheck={false}
@@ -432,7 +433,7 @@ const SlateEditor = ({
               onChange={(e) => {
                 setMemo(e.target.value);
               }}
-              className="px-3 py-3 resize-none overflow-y-scroll w-full h-full font-noto focus:outline-none"
+              className="rounded-l-xl px-4 py-4 resize-none overflow-y-scroll w-full h-full font-noto focus:outline-none"
             >
               {memo}
             </textarea>

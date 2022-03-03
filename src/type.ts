@@ -10,7 +10,7 @@ export type alarmType = "error" | "warning" | "info" | "success"
 export type getFirestoreUser = {
     dateCreated: number
     followers: Array<string>
-    followering: Array<string>
+    followings: Array<string>
     profileCaption: string
     profileImg: string
     uid: string

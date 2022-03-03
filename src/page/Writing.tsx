@@ -141,7 +141,7 @@ const Writing = () => {
             </AnimatePresence>
             
             {table !== "WRITE" && 
-                <div onClick={()=>{navigate(`/${contextUser.uid}`)}} className="cursor-pointer flex w-full font-noto items-center justify-between px-20">
+                <div onClick={()=>{navigate(`/`)}} className="cursor-pointer flex w-full font-noto items-center justify-between px-20">
                     {/* logo */}
                     <img className="h-28" src="/logo/Ollim-logos_transparent.png" alt="header logo" />
                     {contextUserInfo.profileImg && 
@@ -155,20 +155,31 @@ const Writing = () => {
             {/* Writing title, genre, owner's name,  */}
             <div className="flex font-noto flex-col items-start px-20">
                 <div className="flex flex-col items-start justify-center font-bold mb-10">
-                    <span className="mb-5" >{writingOwnerInfo.username}</span>
+                    <div className="flex items-center justify-between mb-5">
+                        <img className="w-7 rounded-full mr-2" src={writingOwnerInfo.profileImg} alt="writing owner" />
+                        <span>{writingOwnerInfo.username}</span>
+                    </div>
                     <div className="flex items-center justify-center">
                         <span className="text-2xl">{writingInfo.title}
                         <span className="text-lg mx-2">·</span>
                         <span className="text-lg">{gerneMatching[writingInfo.genre as gerneType]}</span></span>
                     </div>
                 </div>
-                <div className="flex items-center text-[0.75rem] text-blue-400">
-                    <button className={`border border-blue-400 px-3 py-1 rounded-xl ${table === "OVERVIEW" && "bg-blue-50"} hover:bg-blue-100`} onClick={()=>{setTable("OVERVIEW")}}>개요</button>
-                    <button onClick={()=>{setTable("BROWSE")}} className={`ml-5 border border-blue-400 px-3 py-1 rounded-xl ${table === "BROWSE" && "bg-blue-50"} hover:bg-blue-100`} >열람</button>
-                    { contextUser.uid === uid &&
+                <div className="flex items-center text-[0.75rem] text-[#ada6a2]">
+                    <span className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-[#c69e92] ${table === "OVERVIEW" && "text-[#c69e92] shadow-[#c69e92]"}`} onClick={()=>{setTable("OVERVIEW")}}>
+                    summarize
+                    </span>
+                    <span onClick={()=>{setTable("BROWSE")}} className={`shadow ml-5 material-icons cursor-pointer px-1 py-1 rounded-full hover:text-[#c69e92] ${table === "BROWSE" && "text-[#c69e92] shadow-[#c69e92]"}`}>
+                    play_circle
+                    </span>
+                    { uid && contextUser.uid === uid &&
                     <>
-                        <button onClick={()=>{setTable("WRITE")}} className={`mx-5 border border-blue-400 px-3 py-1 rounded-xl ${table === "WRITE" && "bg-blue-50"} hover:bg-blue-100`}>작성</button>
-                        <button onClick={()=>{setTable("SETTING")}} className={`border border-blue-400 px-3 py-1 rounded-xl ${table === "SETTING" && "bg-blue-50"} hover:bg-blue-100`}>설정</button>
+                        <span onClick={()=>{setTable("WRITE")}} className={`material-icons shadow mx-5 cursor-pointer px-1 py-1 rounded-full ${table === "WRITE" && "text-[#c69e92] shadow-[#c69e92]"} hover:text-[#c69e92]`}>
+                        drive_file_rename_outline
+                        </span>
+                        <span onClick={()=>{setTable("SETTING")}} className={`material-icons shadow cursor-pointer px-1 py-1 rounded-full ${table === "SETTING" && "text-[#c69e92] shadow-[#c69e92]"} hover:text-[#c69e92]`}>
+                        settings
+                        </span>
                     </>}
                 </div>
             </div>
@@ -182,7 +193,7 @@ const Writing = () => {
                             {/* Synopsis div */}
                             <div className="flex flex-col w-2/3">
                                 <span className="text-2xl font-bold mb-10">여는 말</span>
-                                <p className="px-3 py-3 border border-blue-400 w-full h-72 overflow-y-scroll">{writingInfo.synopsis}</p>
+                                <p className="px-3 py-3 border border-opacity-5 border-black shadow-lg w-full h-72 overflow-y-scroll">{writingInfo.synopsis}</p>
                             </div>
                         </div>
                     ) : (
@@ -191,7 +202,7 @@ const Writing = () => {
                             {/* Synopsis div */}
                             <div className="flex flex-col w-2/3">
                                 <span className="text-2xl font-bold mb-10">시놉시스</span>
-                                <textarea value={writingInfo.synopsis} disabled className="px-3 py-3 resize-none border border-blue-400 w-full rounded-lg h-72 overflow-y-scroll bg-transparent focus:outline-none">{writingInfo.synopsis}</textarea>
+                                <textarea value={writingInfo.synopsis} disabled className="border-opacity-5 border-black shadow-lg px-3 py-3 resize-none border w-full h-72 overflow-y-scroll bg-transparent focus:outline-none">{writingInfo.synopsis}</textarea>
                             </div>
                             {/* diagram div */}
                             <div className="flex flex-col w-2/3 my-20">
@@ -207,7 +218,7 @@ const Writing = () => {
                 table === "WRITE" && uid === contextUser.uid &&
                     <div
                     className={cx(
-                        "w-full h-full mt-10 flex flex-col items-center justify-center pb-32 editor-container",
+                        "w-full h-full mt-10 flex flex-col items-center justify-center pb-32 editor-container relative",
                         css`
                             :fullscreen {
                                 background-color: #e6ddda;

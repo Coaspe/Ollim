@@ -6,6 +6,7 @@ import { getDatabase } from "firebase/database";
 const firebaseConfig = {
   apiKey: "AIzaSyD4m-vmjusGiwAC4F3JRekSDTW2a9ITn9c",
   authDomain: "ollim-df732.firebaseapp.com",
+  databaseURL: "https://ollim-df732-default-rtdb.firebaseio.com",
   projectId: "ollim-df732",
   storageBucket: "ollim-df732.appspot.com",
   messagingSenderId: "292055520391",

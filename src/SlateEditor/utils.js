@@ -107,7 +107,7 @@ export const FontSize = () => {
   return (
     <div className="relative group cursor-pointer z-40 font-noto">
       <span>{size[getFontSize(editor)]}</span>
-      <div className="absolute flex flex-col pt-3 invisible group-hover:visible bg-[#eee]">
+      <div className="absolute flex flex-col pt-3 invisible group-hover:visible bg-[white]">
         <button
           onMouseDown={(e) => {
             e.preventDefault();
@@ -200,7 +200,7 @@ export const FontStyle = () => {
         <span className={`${getFontStyle(editor)}`}>
           {fontStlyeObject[getFontStyle(editor)]}
         </span>
-        <div className="absolute flex flex-col pt-3 invisible group-hover:visible bg-[#eee]">
+        <div className="absolute flex flex-col pt-3 invisible group-hover:visible bg-white">
           <button
             onMouseDown={(e) => {
               handleFontStyleButtonClick(e);

@@ -47,7 +47,10 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
     const handleAddWriting = (data: addNovelScenarioArg | addPoemArg, genre: string) => {
         axios.post(`http://localhost:3001/add${genre}`, { data: JSON.stringify(data) }).then((res) => {
             setAlarm(res.data)
-            setTimeout(()=>{setAlarm(["","success",false])},3000)
+            setTimeout(() => { setAlarm(["", "success", false]) }, 3000)
+            if (res.data[1] === "success") {
+                window.location.reload()
+            }
         })
     }
     return (

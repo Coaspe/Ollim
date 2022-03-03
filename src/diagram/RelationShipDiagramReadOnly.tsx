@@ -35,7 +35,7 @@ const CustomNodeFlowRDOnly:React.FC<props> = ({diagram}) => {
       reactflowInstance && reactflowInstance.fitView({padding: 1})
     },[reactflowInstance])
   return (
-    <div className='w-full h-80 border border-blue-400'>
+    <div className='w-full h-80 border-opacity-5 border border-black drop-shadow-lg'>
         {diagram.elements &&
          <ReactFlow
           elements={diagram.elements}
