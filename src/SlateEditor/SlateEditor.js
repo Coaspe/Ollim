@@ -398,10 +398,7 @@ const SlateEditor = ({
         </Slate>
       ) : (
         // Loading Div
-        <div
-          style={{ backgroundColor: "#e6e2e1" }}
-          className="w-full h-full top-0 left-0 fixed flex items-center justify-center"
-        >
+        <div className="w-full h-full top-0 left-0 fixed flex items-center justify-center">
           <img
             style={{ width: "12%" }}
             src="/logo/Ollim-logos_black.png"

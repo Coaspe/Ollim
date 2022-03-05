@@ -43,7 +43,6 @@ const Writing = () => {
     const [killingVerse, setKillingVerse] = useState<string[]>([])
     // Memo State
     const [memo, setMemo] = useState("")
-
     const dispatch = useDispatch()
 
     const navigator = useNavigate()
@@ -88,7 +87,6 @@ const Writing = () => {
             })
         }
     }, [uid])
-
     useEffect(() => {
         if (writingDocID && genre && table === "OVERVIEW") {
             getWritingInfo(writingDocID, genre).then((res: any) => {
@@ -125,7 +123,7 @@ const Writing = () => {
     return (
         <>
         { Object.keys(writingInfo).length > 0 && uid && genre && writingDocID &&
-        <div style={{backgroundColor: "#e6e2e1"}} className=" w-full bg-opacity-30 relative writing-container">
+        <div className=" w-full bg-opacity-30 relative writing-container">
 
             {/* Alarm */}
             <AnimatePresence>

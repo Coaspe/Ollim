@@ -179,7 +179,7 @@ const Mypage = () => {
         </AnimatePresence>
         
         {profileOwnerInfo && profileImage  && userWritings && totalWritings ?
-            <div style={{backgroundColor: "#e6e2e1"}} className="relative w-full font-noto bg-opacity-30">
+            <div className="relative w-full font-noto bg-opacity-30">
                 {/* New Writing Modal */}
                 {newWritingModalOpen && <NewWritingModal setNewWritingModalOpen={setNewWritingModalOpen}/>}
                 <div className="flex w-full items-center justify-between px-20">
@@ -331,7 +331,7 @@ const Mypage = () => {
                 </div>
             </div>
             :
-            <div style={{backgroundColor: "#e6e2e1"}} className="w-screen h-screen flex items-center justify-center bg-opacity-30">
+            <div className="w-screen h-screen flex items-center justify-center bg-opacity-30">
                 <img src="/logo/Ollim-logos_black.png" className="w-32 opacity-50" alt="loading" />
             </div>
             }
