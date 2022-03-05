@@ -12,7 +12,7 @@ interface NewWritingProps {
     setNewWritingModalOpen:React.Dispatch<React.SetStateAction<boolean>>
 }
 const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) => {
-
+    
     const [page, setPage] = useState<page>("MAIN")
     const [genrn, setGenrn] = useState<genre>("NOVEL")
     const [genrnError, setGenrnError] = useState(false)
@@ -45,7 +45,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
         dispatch(alarmAction.setAlarm({alarm}))
     }
     const handleAddWriting = (data: addNovelScenarioArg | addPoemArg, genre: string) => {
-        axios.post(`http://localhost:3001/add${genre}`, { data: JSON.stringify(data) }).then((res) => {
+        axios.post(`${process.env.REACT_APP_URL}/add${genre}`, { data: JSON.stringify(data) }).then((res) => {
             setAlarm(res.data)
             setTimeout(() => { setAlarm(["", "success", false]) }, 3000)
             if (res.data[1] === "success") {

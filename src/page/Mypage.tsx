@@ -125,7 +125,7 @@ const Mypage = () => {
                 formData.append("userEmail", profileOwnerInfo.userEmail)
                 formData.append('file', result)
 
-                axios.post("http://localhost:3001/updateProfileImage", formData)
+                axios.post(`${process.env.REACT_APP_URL}/updateProfileImage`, formData)
                     .then((res) => {
                         setAlarm(res.data)
                         setTimeout(()=>{setAlarm(["", "success", false])}, 3000)
@@ -232,7 +232,7 @@ const Mypage = () => {
                             {uid && contextUser.uid !== uid && 
                                 <button onClick={() => {
                                     setDoseUserFollow((origin) => {
-                                        axios.post("http://localhost:3001/updateFollowing", {
+                                        axios.post(`${process.env.REACT_APP_URL}/updateFollowing`, {
                                             followingUserEmail: userInfo.userEmail,
                                             followingUserUID: userInfo.uid,
                                             followedUserEmail: profileOwnerInfo.userEmail,

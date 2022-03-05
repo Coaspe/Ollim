@@ -100,7 +100,7 @@ const SlateEditor = ({
   // Save fuctions
   const handleRequestTempSave = () => {
     axios
-      .post("http://localhost:3001/temporarySave", {
+      .post(`${process.env.REACT_APP_URL}/temporarySave`, {
         contents: JSON.stringify(value),
         writingDocID,
         genre: writingInfo.genre,
@@ -283,7 +283,7 @@ const SlateEditor = ({
               <span
                 onClick={() => {
                   if (openMemo && isInitMemo.current !== memo) {
-                    axios.post("http://localhost:3001/updateMemo", {
+                    axios.post(`${process.env.REACT_APP_URL}/updateMemo`, {
                       genre: writingInfo.genre,
                       writingDocID,
                       memo,
