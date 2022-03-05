@@ -77,6 +77,7 @@ const WritingSetting: React.FC<props> = ({
                         className="border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100">저장</button>
                     </div>
                     <textarea 
+                    style={{backgroundColor: "#FAF6F5",}}
                     value={synopsis}
                     onChange={(e)=>{setSynopsis(e.target.value)}} 
                     className="border-opacity-5 shadow-lg resize-none px-3 py-3 border border-black w-full h-72 overflow-y-scroll bg-transparent focus:outline-none">
@@ -114,15 +115,17 @@ const WritingSetting: React.FC<props> = ({
                             <AnimatePresence>
                                 <motion.div layout className="flex flex-col gap-2">
                                     {killingVerse.map((verse, index) => (
-                                        <motion.div layout key={`${verse}+${index}`} variants={variants} initial="initial" animate="animate" exit="exit" className="flex items-center justify-between">
-                                            <span>{verse}</span>
+                                        <motion.div className="flex items-center" layout key={`${verse}+${index}`} variants={variants} initial="initial" animate="animate" exit="exit">
+                                            <div className="flex w-full items-center justify-between shadow-md border border-gray-200 px-3 py-2 rounded-2xl">
+                                                {verse}
+                                            </div>
                                             <span onClick={() => {
                                                 setKillingVerse((origin) => {
                                                     let tmp = origin.slice()
                                                     tmp.splice(index, 1)
                                                     return tmp
                                                 })
-                                            }} className="material-icons text-red-400 rounded-full cursor-pointer hover:bg-red-100">
+                                            }} className="mx-4 material-icons text-red-400 rounded-full cursor-pointer hover:bg-red-100">
                                             highlight_off
                                             </span>
                                         </motion.div>
@@ -131,8 +134,8 @@ const WritingSetting: React.FC<props> = ({
                             </AnimatePresence>
                         
                             {/* New verse div */}
-                            <div key="new verse" className="flex items-center justify-between">
-                                <input spellCheck={false} className="border border-black px-2 py-1 rounded-lg bg-transparent focus:outline-none" onChange={(e) => { setNewVerse(e.target.value) }} type="text" value={newVerse} />
+                            <div key="new verse" className="flex items-center">
+                                <input spellCheck={false} className="shadow-md w-full border-gray-200 border px-3 py-1 rounded-2xl bg-transparent focus:outline-gray-500" onChange={(e) => { setNewVerse(e.target.value) }} type="text" value={newVerse} />
                                 <span onClick={() => {
                                     setKillingVerse((origin) => {
                                         let tmp = origin.slice()
@@ -141,7 +144,7 @@ const WritingSetting: React.FC<props> = ({
                                     })
                                     setNewVerse("")
                                     }}
-                                    className="material-icons text-green-400 rounded-full cursor-pointer hover:bg-green-100" >
+                                    className="mx-4 material-icons text-green-400 rounded-full cursor-pointer hover:bg-green-100" >
                                     add_circle_outline
                                 </span>
                             </div>

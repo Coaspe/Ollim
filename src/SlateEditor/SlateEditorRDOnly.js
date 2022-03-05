@@ -124,7 +124,10 @@ const SlateEditorRDOnly = ({
       )}
       {loading ? (
         <div
-          style={{ boxShadow: "0px 0px 10px rgba(0,0,0,0.3)" }}
+          style={{
+            boxShadow: "0px 0px 10px rgba(0,0,0,0.3)",
+            backgroundColor: "#FAF6F5",
+          }}
           className={cx(
             "editor-inner",
             css`

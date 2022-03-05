@@ -203,7 +203,7 @@ const Writing = () => {
                             {/* Synopsis div */}
                             <div className="flex flex-col w-2/3">
                                 <span className="text-2xl font-bold mb-10">시놉시스</span>
-                                <textarea value={writingInfo.synopsis} disabled className="border-opacity-5 border-black shadow-lg px-3 py-3 resize-none border w-full h-72 overflow-y-scroll bg-transparent focus:outline-none">{writingInfo.synopsis}</textarea>
+                                <textarea value={writingInfo.synopsis} style={{backgroundColor: "#FAF6F5"}} disabled className="border-opacity-5 border-black shadow-lg px-3 py-3 resize-none border w-full h-72 overflow-y-scroll focus:outline-none">{writingInfo.synopsis}</textarea>
                             </div>
                             {/* diagram div */}
                             <div className="flex flex-col w-2/3 my-20">
