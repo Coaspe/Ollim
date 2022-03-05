@@ -125,7 +125,7 @@ const Mypage = () => {
                 formData.append("userEmail", profileOwnerInfo.userEmail)
                 formData.append('file', result)
 
-                axios.post(`${process.env.REACT_APP_URL}/updateProfileImage`, formData)
+                axios.post(`https://ollim.herokuapp.com/updateProfileImage`, formData)
                     .then((res) => {
                         setAlarm(res.data)
                         setTimeout(()=>{setAlarm(["", "success", false])}, 3000)
@@ -232,7 +232,7 @@ const Mypage = () => {
                             {uid && contextUser.uid !== uid && 
                                 <button onClick={() => {
                                     setDoseUserFollow((origin) => {
-                                        axios.post(`${process.env.REACT_APP_URL}/updateFollowing`, {
+                                        axios.post(`https://ollim.herokuapp.com/updateFollowing`, {
                                             followingUserEmail: userInfo.userEmail,
                                             followingUserUID: userInfo.uid,
                                             followedUserEmail: profileOwnerInfo.userEmail,

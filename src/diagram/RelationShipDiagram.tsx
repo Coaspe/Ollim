@@ -148,7 +148,7 @@ const onElementClick = (event:any, element:any) => console.log('click', element)
               // If diagram changed
               if (isInitialMount && isInitialMount.current === 2) {
                 // Edit firestore diagram info
-                axios.post(`${process.env.REACT_APP_URL}/editDiagram`, {
+                axios.post(`https://ollim.herokuapp.com/editDiagram`, {
                   diagram: JSON.stringify(diagram),
                   genre,
                   writingDocID,

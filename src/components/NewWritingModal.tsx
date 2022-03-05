@@ -45,7 +45,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
         dispatch(alarmAction.setAlarm({alarm}))
     }
     const handleAddWriting = (data: addNovelScenarioArg | addPoemArg, genre: string) => {
-        axios.post(`${process.env.REACT_APP_URL}/add${genre}`, { data: JSON.stringify(data) }).then((res) => {
+        axios.post(`https://ollim.herokuapp.com/add${genre}`, { data: JSON.stringify(data) }).then((res) => {
             setAlarm(res.data)
             setTimeout(() => { setAlarm(["", "success", false]) }, 3000)
             if (res.data[1] === "success") {

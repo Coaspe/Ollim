@@ -64,7 +64,7 @@ const WritingSetting: React.FC<props> = ({
                         <button 
                         onClick={()=>{
                             if (writingInfo.synopsis !== synopsis ) {
-                                axios.post(`${process.env.REACT_APP_URL}/updateSynopsis`, { genre: writingInfo.genre, writingDocID, synopsis })
+                                axios.post(`https://ollim.herokuapp.com/updateSynopsis`, { genre: writingInfo.genre, writingDocID, synopsis })
                                     .then((res) => {
                                         setAlarm(res.data)
                                         setTimeout(() => {
@@ -90,7 +90,7 @@ const WritingSetting: React.FC<props> = ({
                         <button 
                         onClick={()=>{
                             if (writingInfo.killingVerse !== killingVerse) {
-                                axios.post(`${process.env.REACT_APP_URL}/updateKillingVerse`, { genre: writingInfo.genre, writingDocID, killingVerse: JSON.stringify(killingVerse) })
+                                axios.post(`https://ollim.herokuapp.com/updateKillingVerse`, { genre: writingInfo.genre, writingDocID, killingVerse: JSON.stringify(killingVerse) })
                                     .then((res) => {
                                         setAlarm(res.data)
                                         setTimeout(() => {
@@ -154,7 +154,7 @@ const WritingSetting: React.FC<props> = ({
                         <button 
                         onClick={()=>{
                             if (writingInfo.disclosure !== disclosure ) {
-                                axios.post(`${process.env.REACT_APP_URL}/updateDisclosure`, { genre:writingInfo.genre, writingDocID, disclosure })
+                                axios.post(`https://ollim.herokuapp.com/updateDisclosure`, { genre:writingInfo.genre, writingDocID, disclosure })
                                     .then((res) => {
                                         setAlarm(res.data)
                                         setTimeout(() => {
@@ -196,7 +196,7 @@ const WritingSetting: React.FC<props> = ({
                                     <input spellCheck={false} value={deleteInput} onChange={(e)=>{setDeleteInput(e.target.value)}} className="border mr-5 px-2 py-2 rounded-xl focus:outline-none" type="text" />
                                     <button
                                     onClick={()=>{
-                                        axios.post(`${process.env.REACT_APP_URL}/deleteWriting`, {
+                                        axios.post(`https://ollim.herokuapp.com/deleteWriting`, {
                                             writingDocID,
                                             genre: writingInfo.genre
                                         }).then((res) => {
