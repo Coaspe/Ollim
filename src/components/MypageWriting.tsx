@@ -1,7 +1,6 @@
 import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion"
-import { memo, useContext, useState } from "react"
+import { memo, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import UserContext from "../context/user"
 import { genre, getFirestoreNovel, getFirestorePoem, getFirestoreScenario } from "../type"
 interface props {
     data: getFirestoreNovel | getFirestorePoem | getFirestoreScenario
@@ -15,7 +14,6 @@ const MypageWriting: React.FC<props> = ({ data }) => {
     const [hoverExpandDetail, setHoverExpandDetail] = useState(false)
     const [timer, setTimer] = useState<NodeJS.Timeout>()
     const [infoVisible, setInfoVisible] = useState(false)
-    const {user: contextUser} = useContext(UserContext) 
     const navigator = useNavigate()
     
     return (
@@ -35,7 +33,7 @@ const MypageWriting: React.FC<props> = ({ data }) => {
                 <AnimateSharedLayout>
                     <motion.div key="container-before" layoutId="container" className="w-full h-full relative flex flex-col text-noto border border-logoBrown border-opacity-50 rounded-xl shadow-lg cursor-pointer py-5 px-3 z-0">  
                             {infoVisible && <span className="absolute bg-gray-800 text-white top-1 right-1 text-xs rounded-lg px-2 py-1 font-Nanum_Gothic">기다려서 세부사항을 확인하기</span>}
-                            <div  className="mb-3">
+                            <div className="mb-3">
                                 <span className="text-xl font-black">{data.title}</span>
                                 <span className="text-sm text-gray-700 font-black ml-3">{gerneType[data.genre as genre]}</span>
                             </div>

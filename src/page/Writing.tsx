@@ -18,7 +18,7 @@ import WritingSetting from "../components/WritingSetting"
 
 const Writing = () => {
 
-    const gerneMatching = {
+    const genreMatching = {
         NOVEL: "소설",
         POEM: "시",
         SCENARIO: "시나리오"
@@ -45,6 +45,8 @@ const Writing = () => {
     const [memo, setMemo] = useState("")
 
     const dispatch = useDispatch()
+
+    const navigator = useNavigate()
 
     // ReadOnly Diagram state
     const [readOnlyDiagram, setReadOnlyDiagram] = useState<toObjectElements>({} as toObjectElements)
@@ -122,7 +124,7 @@ const Writing = () => {
     }
     return (
         <>
-        { Object.keys(writingInfo).length > 0 && 
+        { Object.keys(writingInfo).length > 0 && uid && genre && writingDocID &&
         <div className=" w-full bg-[#e6d6d1] bg-opacity-30 relative writing-container">
 
             {/* Alarm */}
@@ -146,8 +148,8 @@ const Writing = () => {
                     <img className="h-28" src="/logo/Ollim-logos_transparent.png" alt="header logo" />
                     {contextUserInfo.profileImg && 
                     <div className="flex items-center">
-                        <img className="rounded-full w-10" src={contextUserInfo.profileImg} alt="header profile" />
-                        <span className="font-bold ml-3">{contextUserInfo.username}</span>
+                        <img className="rounded-full w-7" src={contextUserInfo.profileImg} alt="header profile" />
+                        <span className="ml-3 font-noto_sans">{contextUserInfo.username}</span>
                     </div>}
                 </div>
             }
@@ -155,14 +157,14 @@ const Writing = () => {
             {/* Writing title, genre, owner's name,  */}
             <div className="flex font-noto flex-col items-start px-20">
                 <div className="flex flex-col items-start justify-center font-bold mb-10">
-                    <div className="flex items-center justify-between mb-5">
+                    <div onClick={()=>{navigator(`/${writingOwnerInfo.uid}`)}} className="flex items-center justify-between mb-5 cursor-pointer">
                         <img className="w-7 rounded-full mr-2" src={writingOwnerInfo.profileImg} alt="writing owner" />
                         <span>{writingOwnerInfo.username}</span>
                     </div>
                     <div className="flex items-center justify-center">
                         <span className="text-2xl">{writingInfo.title}
                         <span className="text-lg mx-2">·</span>
-                        <span className="text-lg">{gerneMatching[writingInfo.genre as gerneType]}</span></span>
+                        <span className="text-lg">{genreMatching[writingInfo.genre as gerneType]}</span></span>
                     </div>
                 </div>
                 <div className="flex items-center text-[0.75rem] text-[#ada6a2]">

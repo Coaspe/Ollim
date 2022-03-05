@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "../redux/store"
 import { alarmType, getFirestoreNovel, getFirestorePoem, getFirestoreScenario, getFirestoreUser, getFirestoreUserWritings } from "../type"
 import { alarmAction, userInfoAction } from "../redux"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 
 import Calendar from "../components/Calendar"
 import { Alert } from "@mui/material"
@@ -33,7 +33,7 @@ const Mypage = () => {
     const [newWritingModalOpen, setNewWritingModalOpen] = useState(false)
     // category state
     const [onWritingCategory, setOnWritingCategory] = useState("TOTAL")
-
+    const [doseUserFollow, setDoseUserFollow] = useState(false)
     // Profile owner's poems list
     const [poems, setPoems] = useState<Array<getFirestorePoem>>([])
     // Profile owner's novels list
@@ -48,9 +48,13 @@ const Mypage = () => {
     const setUserInfo = (userInfo: getFirestoreUser) => {
         dispatch(userInfoAction.setUserInfo({userInfo}))
     }
-       const setAlarm = (alarm: [string ,alarmType, boolean]) => {
+    const userInfo = useSelector((state: RootState) => state.setUserInfo.userInfo)
+    
+    const setAlarm = (alarm: [string ,alarmType, boolean]) => {
         dispatch(alarmAction.setAlarm({alarm}))
     }
+
+    const navigator = useNavigate()
 
     useEffect(() => {
         if (uid) {
@@ -58,8 +62,8 @@ const Mypage = () => {
                 const data = res.docs[0].data();
                 
                 setProfileOwnerInfo(data)
-                getUserWritings(data.uid).then((writings) => {setUserWritings(writings as getFirestoreUserWritings)})
                 setProfileImage(data.profileImg)
+                getUserWritings(data.uid).then((writings) => {setUserWritings(writings as getFirestoreUserWritings)})
             })
         } else {
             getUserByUID(contextUser.uid).then((res: any) => {
@@ -75,8 +79,9 @@ const Mypage = () => {
         getUserByUID(contextUser.uid).then((res: any) => {
             const data = res.docs[0].data()
             setUserInfo(data)
+            setDoseUserFollow(data.followings.includes(uid))
         })
-    }, [])
+    }, [uid])
 
     useEffect(() => {
         // get Writings informations from firestore
@@ -179,6 +184,32 @@ const Mypage = () => {
                 <div className="flex w-full items-center justify-between px-20">
                     {/* logo */}
                     <img className="h-28" src="logo/Ollim-logos_transparent.png" alt="header logo" />
+                    {userInfo ?
+                    <div onClick={()=>{
+                        navigator(`/${userInfo.uid}`)
+                    }} className="flex items-center cursor-pointer">
+                        <img src={userInfo.profileImg} className="w-7 mr-3 rounded-full" alt="user profile" />
+                        <span>{userInfo.username}</span>
+                    </div>
+                    : 
+                    <div>
+                        <svg
+                            className="w-7 rounded-full"
+                            x="0px" y="0px"
+                            viewBox="0 0 481.5 481.5">
+                        <g>
+                            <g>
+                                <path d="M0,240.7c0,7.5,6,13.5,13.5,13.5h326.1l-69.9,69.9c-5.3,5.3-5.3,13.8,0,19.1c2.6,2.6,6.1,4,9.5,4s6.9-1.3,9.5-4l93-93
+                                    c5.3-5.3,5.3-13.8,0-19.1l-93-93c-5.3-5.3-13.8-5.3-19.1,0c-5.3,5.3-5.3,13.8,0,19.1l69.9,69.9h-326C6,227.2,0,233.2,0,240.7z"/>
+                                <path d="M382.4,0H99C44.4,0,0,44.4,0,99v58.2c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5V99c0-39.7,32.3-72,72-72h283.5
+                                    c39.7,0,72,32.3,72,72v283.5c0,39.7-32.3,72-72,72H99c-39.7,0-72-32.3-72-72V325c0-7.5-6-13.5-13.5-13.5S0,317.5,0,325v57.5
+                                    c0,54.6,44.4,99,99,99h283.5c54.6,0,99-44.4,99-99V99C481.4,44.4,437,0,382.4,0z"/>
+                            </g>
+                        </g>
+                        </svg>
+
+                    </div>
+                    }
                 </div> 
                 <div className="w-full flex">
                     
@@ -198,6 +229,23 @@ const Mypage = () => {
                         {/* Username */}
                         <div className="flex items-center justify-center">
                             <span className="text-2xl font-bold my-7 mr-3">{profileOwnerInfo.username}</span>
+                            {uid && contextUser.uid !== uid && 
+                                <button onClick={() => {
+                                    setDoseUserFollow((origin) => {
+                                        axios.post("http://localhost:3001/updateFollowing", {
+                                            followingUserEmail: userInfo.userEmail,
+                                            followingUserUID: userInfo.uid,
+                                            followedUserEmail: profileOwnerInfo.userEmail,
+                                            followedUserUID: profileOwnerInfo.uid,
+                                            followingState: doseUserFollow
+                                        }).then((res) => {
+                                        })
+                                        return !origin
+                                    })
+                                }
+                                } className={`${doseUserFollow ? "bg-blue-400" : "bg-gray-300"} px-2 py-1 rounded-xl text-xs font-Nanum_Gothic font-bold text-gray-700`}>팔로우</button>
+                            }
+                            {(!uid || contextUser.uid === uid) && 
                             <svg
                             onClick={signOutAuth}
                             className="w-7 cursor-pointer"
@@ -214,7 +262,7 @@ const Mypage = () => {
                                             C380.6,325.15,380.6,332.95,385.4,337.65z"/>
                                     </g>
                                 </g>
-                            </svg>
+                            </svg>}
                         </div>
                         
                         {/* Posts, Followers, Followings */}
@@ -233,7 +281,7 @@ const Mypage = () => {
                                 <span className="">팔로우</span>                            
                             </div>
                         </div>}
-                        <div className="flex w-full items-center justify-center mt-10">
+                        <div className="flex w-full items-center justify-center my-10">
                             <motion.button onClick={()=>{setNewWritingModalOpen(true)}} whileHover={{ y: "-10%" }} className="mr-5 px-4 py-3 rounded-2xl bg-white shadow-md font-semibold">
                                 새 작품 추가
                             </motion.button>
@@ -271,7 +319,7 @@ const Mypage = () => {
                                 <span className="text-2xl font-bold justify-center col-start-2 w-full text-center">완결된 글</span>
                             </div>
                             <motion.div className="grid grid-cols-3 items-center justify-between w-full gap-5">
-                                {totalWritings.map((data)=>(<MypageWriting key={data.dateCreated} data={data} />))}
+                                {totalWritings.filter((data)=>(data.done === true)).map((data)=>(<MypageWriting key={data.dateCreated} data={data} />))}
                             </motion.div>
                         </motion.div>
                     </div>

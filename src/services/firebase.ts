@@ -17,13 +17,13 @@ export const singInWithGoogleInfoToFB = (info: any) => {
     novelDocID: [],
     poemDocID: [],
     scenarioDocID: [],
-    totalCommits: [],
+    totalCommits: {},
   })
   return setDoc(doc(firestore, "users", info.user.email), {
     userEmail: info.user.email.toLowerCase(),
     uid: info.user.uid,
     username: info.user.displayName.toLowerCase(),
-    following: [],
+    followings: [],
     followers: [],
     writingsDocId: [],
     dateCreated: Date.now(),
