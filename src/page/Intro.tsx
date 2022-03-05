@@ -90,9 +90,10 @@ const Intro = () => {
                             로그인
                             </motion.button>
                             <motion.button
+                            style={{backgroundColor: "#c69e92"}}
                                 onClick={()=>{navigator("/community")}}
                                 whileHover={{ y: "-10%" }}
-                                className="px-5 py-3 rounded-2xl bg-[#c69e92] shadow-md font-semibold">
+                                className="px-5 py-3 rounded-2xl shadow-md font-semibold">
                             다른 작가들의 글
                             </motion.button>
                         </motion.div>

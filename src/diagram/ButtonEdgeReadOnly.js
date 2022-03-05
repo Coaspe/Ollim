@@ -52,7 +52,10 @@ export default memo(function CustomEdgeReadOnly({
       >
         <div className="group w-full h-full flex items-center justify-center relative">
           {/* SVG div */}
-          <div className="w-full h-fit py-1 flex items-center justify-center border border-gray-500 rounded-lg bg-[#faf6f5] text-center">
+          <div
+            style={{ backgroundColor: "#faf6f5" }}
+            className="w-full h-fit py-1 flex items-center justify-center border border-gray-500 rounded-lg text-center"
+          >
             <span
               className={`text-xs text-center w-full h-full bg-transparent focus:outline-none`}
             >

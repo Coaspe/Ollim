@@ -3,7 +3,7 @@ import { Handle, removeElements, isEdge } from "react-flow-renderer";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { elementsAction } from "../redux";
-import "./test.css";
+import "../style/test.css";
 
 export default memo(({ id, data, isConnectable }) => {
   const elements = useSelector((state) => state.setElements.elements);
@@ -128,7 +128,7 @@ export default memo(({ id, data, isConnectable }) => {
             exit={{ opacity: [1, 0], y: [0, 10] }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
             role="tooltip"
-            className="absolute text-xs -top-20 border border-black w-48 h-16 px-3 py-2 resize-none rounded-xl placeholder:italic focus:outline-none"
+            className="absolute text-xs -top-20 border border-black w-48 h-16 px-3 py-2 resize-none rounded-xl focus:outline-none"
             value={descState}
             placeholder={descState ? descState : "간략한 설명을 기록하세요."}
             onBlur={(e) => {

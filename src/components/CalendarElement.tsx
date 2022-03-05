@@ -28,7 +28,7 @@ const CalendarElement: React.FC<props> = ({ yearMonth, keys, totalCommits }) => 
             {elementCommits && 
                 <div className="flex flex-col items-center font-bold">
                     <span className="text-sm mb-3">{yearMonth}</span>
-                    <div className="w-3/4 px-2 py-2 border gap-3 border-[#c0c0c0] grid grid-cols-7 place-items-center rounded-lg">
+                    <div style={{borderColor: "#c0c0c0"}} className="w-3/4 px-2 py-2 border gap-3 grid grid-cols-7 place-items-center rounded-lg">
                         {Object.keys(elementCommits).map((date) => (
                             <CalendarElementNode key={`${yearMonth}-${date}`} date={date} elementCommits={elementCommits} />
                         ))}

@@ -171,14 +171,15 @@ const Mypage = () => {
                 initial="initial"
                 animate="animate"
                 exit="exit"
-                className="fixed w-1/2 top-5 translate-x-1/2 left-1/4 z-[2000]">
+                style={{zIndex: 2000}}
+                className="fixed w-1/2 top-5 translate-x-1/2 left-1/4">
                     <Alert severity={alarm[1]}>{alarm[0]}</Alert>
                 </motion.div>
             }
         </AnimatePresence>
         
         {profileOwnerInfo && profileImage  && userWritings && totalWritings ?
-            <div className="relative w-full font-noto bg-[#e6d6d1] bg-opacity-30">
+            <div style={{backgroundColor: "#e6e2e1"}} className="relative w-full font-noto bg-opacity-30">
                 {/* New Writing Modal */}
                 {newWritingModalOpen && <NewWritingModal setNewWritingModalOpen={setNewWritingModalOpen}/>}
                 <div className="flex w-full items-center justify-between px-20">
@@ -330,7 +331,7 @@ const Mypage = () => {
                 </div>
             </div>
             :
-            <div className="w-screen h-screen flex items-center justify-center bg-gradient-to-b from-[#e4d0ca] to-transparent bg-opacity-30">
+            <div style={{backgroundColor: "#e6e2e1"}} className="w-screen h-screen flex items-center justify-center bg-opacity-30">
                 <img src="/logo/Ollim-logos_black.png" className="w-32 opacity-50" alt="loading" />
             </div>
             }

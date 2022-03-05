@@ -107,7 +107,10 @@ export default memo(function CustomEdge({
           className="group w-full h-full flex items-center justify-center relative"
         >
           {/* SVG div */}
-          <div className="w-full h-fit py-1 flex items-center justify-center border border-gray-500 rounded-lg bg-[#faf6f5] text-center">
+          <div
+            style={{ backgroundColor: "#faf6f5" }}
+            className="w-full h-fit py-1 flex items-center justify-center border border-gray-500 rounded-lg text-center"
+          >
             {/* Remove edge, Show edge label svg */}
             {/* Label input */}
             {/* While hover shows svgs and in other cases shows label input with current value*/}

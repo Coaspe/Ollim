@@ -125,7 +125,7 @@ const Writing = () => {
     return (
         <>
         { Object.keys(writingInfo).length > 0 && uid && genre && writingDocID &&
-        <div className=" w-full bg-[#e6d6d1] bg-opacity-30 relative writing-container">
+        <div style={{backgroundColor: "#e6e2e1"}} className=" w-full bg-opacity-30 relative writing-container">
 
             {/* Alarm */}
             <AnimatePresence>
@@ -136,7 +136,8 @@ const Writing = () => {
                     initial="initial"
                     animate="animate"
                     exit="exit"
-                    className="fixed w-1/2 top-5 translate-x-1/2 left-1/4 z-[2000]">
+                    style={{zIndex: 2000}}
+                    className="fixed w-1/2 top-5 translate-x-1/2 left-1/4">
                         <Alert severity={alarm[1]}>{alarm[0]}</Alert>
                     </motion.div>
                 }
@@ -167,19 +168,19 @@ const Writing = () => {
                         <span className="text-lg">{genreMatching[writingInfo.genre as gerneType]}</span></span>
                     </div>
                 </div>
-                <div className="flex items-center text-[0.75rem] text-[#ada6a2]">
-                    <span className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-[#c69e92] ${table === "OVERVIEW" && "text-[#c69e92] shadow-[#c69e92]"}`} onClick={()=>{setTable("OVERVIEW")}}>
+                <div style={{fontSize: "0.75rem", color: "#ada6a2"}} className="flex items-center">
+                    <span className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${table === "OVERVIEW" && "text-hoverSpanMenu shadow-hoverSpanMenu"}`} onClick={()=>{setTable("OVERVIEW")}}>
                     summarize
                     </span>
-                    <span onClick={()=>{setTable("BROWSE")}} className={`shadow ml-5 material-icons cursor-pointer px-1 py-1 rounded-full hover:text-[#c69e92] ${table === "BROWSE" && "text-[#c69e92] shadow-[#c69e92]"}`}>
+                    <span onClick={()=>{setTable("BROWSE")}} className={`shadow ml-5 material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${table === "BROWSE" && "text-hoverSpanMenu shadow-hoverSpanMenu"}`}>
                     play_circle
                     </span>
                     { uid && contextUser.uid === uid &&
                     <>
-                        <span onClick={()=>{setTable("WRITE")}} className={`material-icons shadow mx-5 cursor-pointer px-1 py-1 rounded-full ${table === "WRITE" && "text-[#c69e92] shadow-[#c69e92]"} hover:text-[#c69e92]`}>
+                        <span onClick={()=>{setTable("WRITE")}} className={`material-icons shadow mx-5 cursor-pointer px-1 py-1 rounded-full ${table === "WRITE" && "text-hoverSpanMenu shadow-hoverSpanMenu"} hover:text-hoverSpanMenu`}>
                         drive_file_rename_outline
                         </span>
-                        <span onClick={()=>{setTable("SETTING")}} className={`material-icons shadow cursor-pointer px-1 py-1 rounded-full ${table === "SETTING" && "text-[#c69e92] shadow-[#c69e92]"} hover:text-[#c69e92]`}>
+                        <span onClick={()=>{setTable("SETTING")}} className={`material-icons shadow cursor-pointer px-1 py-1 rounded-full ${table === "SETTING" && "text-hoverSpanMenu shadow-hoverSpanMenu"} hover:text-hoverSpanMenu`}>
                         settings
                         </span>
                     </>}
@@ -250,7 +251,8 @@ const Writing = () => {
                                     justify-content: center;
                                 }
                             `
-                            )}>
+                                )}
+                            >
                             <SlateEditorRDOnly openDiagram={openDiagram} setOpenDiagram={setOpenDiagram} writingDocID={writingDocID} genre={writingInfo.genre}/>
                     </div>
             }

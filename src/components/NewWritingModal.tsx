@@ -58,7 +58,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
             
             {/* First page: Decide Gerne, Title, Synopsis*/}
             {page === "MAIN" && userInfo &&
-            <div onClick={(e) => { e.stopPropagation() }} className="relative w-1/2 h-3/4 py-5 px-5 flex flex-col items-center rounded-xl bg-[#faf6f5]">
+            <div onClick={(e) => { e.stopPropagation() }} style={{backgroundColor: "#faf6f5"}} className="relative w-1/2 h-3/4 py-5 px-5 flex flex-col items-center rounded-xl">
 
                 {/* right arrow (scenario, novel) or confirm svg (poem) */}
                 {genrn !== 'POEM' ?
@@ -119,17 +119,17 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                         {genrnError && <motion.span className="text-sm ml-2 font-bold text-red-400" animate={{ opacity: [0, 1] }} transition={{ duration: 0.1 }}>장르를 선택해주세요!</motion.span>}
                     </div>
                     <div className="flex items-center justify-between mt-5 w-1/2">
-                        <span className={`text-md font-bold cursor-pointer border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${genrn === "NOVEL" && "bg-[#f5e1db]"}`}
+                        <span style={{borderColor: "#e4d0ca"}} className={`text-md font-bold cursor-pointer border py-2 px-3 rounded-full hover:bg-hoverBGColor ${genrn === "NOVEL" && "bg-genreSelectedBG"}`}
                             onClick={() => {
                                 setGenrn("NOVEL")
                                 handleGenrnError()
                             }}>소설</span>
-                        <span className={`text-md font-bold cursor-pointer border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${genrn === "POEM" && "bg-[#f5e1db]"}`}
+                        <span style={{borderColor: "#e4d0ca"}} className={`text-md font-bold cursor-pointer border py-2 px-3 rounded-full hover:bg-hoverBGColor ${genrn === "POEM" && "bg-genreSelectedBG"}`}
                             onClick={() => {
                                 setGenrn("POEM")
                                 handleGenrnError()
                             }}>시</span>
-                        <span className={`text-md font-bold cursor-pointer border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${genrn === "SCENARIO" && "bg-[#f5e1db]"}`}
+                        <span style={{borderColor: "#e4d0ca"}} className={`text-md font-bold cursor-pointer border py-2 px-3 rounded-full hover:bg-hoverBGColor ${genrn === "SCENARIO" && "bg-genreSelectedBG"}`}
                             onClick={() => {
                                 setGenrn("SCENARIO")
                                 handleGenrnError()
@@ -144,7 +144,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                             <span className="text-2xl font-bold">제목</span>
                             {titleError && <motion.span className="text-sm ml-2 font-bold text-red-400" animate={{ opacity: [0, 1] }} transition={{ duration: 0.1 }}>제목을 입력해주세요!</motion.span>}
                         </div>
-                        <input className="text-lg font-md border-2 border-[#e4d0ca] py-2 px-3 mt-5 rounded-xl w-full placeholder:italic"
+                        <input style={{borderColor: "#e4d0ca"}} className="text-lg font-md border-2 py-2 px-3 mt-5 rounded-xl w-full placeholder:italic"
                             placeholder="제목을 입력해주세요."
                             type="text"
                             value={title}
@@ -156,9 +156,9 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                         <div className="flex flex-col items-start w-1/2 h-full">
                             <span className="text-2xl font-bold">공개 범위</span>
                             <div className="w-full flex items-center justify-between mt-5 py-2 px-3">
-                                <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "PUBLIC" && "bg-[#f5e1db]"}`} onClick={()=>{setDisclosure("PUBLIC")}}>모두</button>
-                                <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "FOLLOWERS" && "bg-[#f5e1db]"}`} onClick={()=>{setDisclosure("FOLLOWERS")}}>팔로워</button>
-                                <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "PRIVATE" && "bg-[#f5e1db]"}`} onClick={()=>{setDisclosure("PRIVATE")}}>비공개</button>
+                                <button style={{borderColor: "#e4d0ca"}} className={`text-md font-bold border py-2 px-3 rounded-full hover:bg-hoverBGColor ${disclosure === "PUBLIC" && "bg-genreSelectedBG"}`} onClick={()=>{setDisclosure("PUBLIC")}}>모두</button>
+                                <button style={{borderColor: "#e4d0ca"}} className={`text-md font-bold border py-2 px-3 rounded-full hover:bg-hoverBGColor ${disclosure === "FOLLOWERS" && "bg-genreSelectedBG"}`} onClick={()=>{setDisclosure("FOLLOWERS")}}>팔로워</button>
+                                <button style={{borderColor: "#e4d0ca"}} className={`text-md font-bold border py-2 px-3 rounded-full hover:bg-hoverBGColor ${disclosure === "PRIVATE" && "bg-genreSelectedBG"}`} onClick={()=>{setDisclosure("PRIVATE")}}>비공개</button>
                             </div>
                         </div>
                 </div>
@@ -166,13 +166,13 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                 {/* Opening article div */}
                 <div className="mt-10 flex flex-col items-start w-3/4">
                     <span className="text-2xl font-bold">{genrn === 'POEM' ? "여는 말" : "시놉시스"}</span>
-                    <textarea className="resize-none border-2 border-[#e4d0ca] py-2 px-3 mt-5 rounded-xl h-28 w-full italic" placeholder={genrn === 'POEM' ? "전시될 여는말을 서술해주세요." : "전시될 시놉시스를 간략하게 서술해주세요."} value={synopsis} spellCheck="false" onChange={(e) => { setSynopsis(e.target.value) }} />
+                    <textarea style={{borderColor: "#e4d0ca"}} className="resize-none border-2 py-2 px-3 mt-5 rounded-xl h-28 w-full italic" placeholder={genrn === 'POEM' ? "전시될 여는말을 서술해주세요." : "전시될 시놉시스를 간략하게 서술해주세요."} value={synopsis} spellCheck="false" onChange={(e) => { setSynopsis(e.target.value) }} />
                 </div>
             </div>}
 
             {/* (if Novel and Scenario) Second page: Decide Characters relationships diagram */}
             {page === "DIAGRAM" && (genrn === "SCENARIO" || genrn === "NOVEL") &&
-            <div onClick={(e) => { e.stopPropagation() }} className="relative w-1/2 h-3/4 py-5 px-5 flex flex-col items-center rounded-xl bg-[#faf6f5]">
+            <div style={{backgroundColor: "#faf6f5"}} onClick={(e) => { e.stopPropagation() }} className="relative w-1/2 h-3/4 py-5 px-5 flex flex-col items-center rounded-xl">
 
                 {/* arrow div */}
                 <div className="absolute top-5 right-5 z-20 flex items-center justify-between">

@@ -22,7 +22,7 @@ import {
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { Tooltip } from "@mui/material";
-import "./Slate.css";
+import "../style/Slate.css";
 
 const HOTKEYS = {
   "mod+b": "bold",
@@ -197,7 +197,8 @@ const SlateEditor = ({
             backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],
           }}
           transition={{ duration: 0.2 }}
-          className="fixed w-full h-full z-[10000] items-center justify-center top-0 left-0 flex"
+          style={{ zIndex: 10000 }}
+          className="fixed w-full h-full items-center justify-center top-0 left-0 flex"
           onClick={(e) => {
             e.stopPropagation();
             setOpenModal(false);
@@ -273,7 +274,8 @@ const SlateEditor = ({
                     setIsFullScreen(!document.fullscreenElement);
                   }
                 }}
-                className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[20px] align-middle"
+                style={{ fontSize: "20px" }}
+                className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-middle"
               >
                 {isFullScreen ? "fullscreen_exit" : "fullscreen"}
               </span>
@@ -291,7 +293,8 @@ const SlateEditor = ({
                   }
                   setOpenMemo((origin) => !origin);
                 }}
-                className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[20px] align-middle"
+                style={{ fontSize: "20px" }}
+                className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-middle"
               >
                 storage
               </span>
@@ -300,8 +303,9 @@ const SlateEditor = ({
 
           {contentLoading && (
             <div
+              style={{ boxShadow: "0px 0px 10px rgba(0,0,0,0.3)" }}
               className={cx(
-                "z-50 editor-inner shadow-[0px_0px_10px_rgba(0,0,0,0.3)]",
+                "z-50 editor-inner",
                 css`
                   width: 210mm;
                   height: 297mm;
@@ -350,7 +354,7 @@ const SlateEditor = ({
           )}
 
           {/* Save Div */}
-          <div className="fixed bottom-[3%] right-[2%] font-noto">
+          <div style={{ bottom: "3%", right: "2%" }} className="fixedfont-noto">
             <motion.button
               whileHover={{ y: "-10%" }}
               onClick={() => {
@@ -374,7 +378,8 @@ const SlateEditor = ({
           {/* Commit load Div */}
           <motion.div
             whileHover={{ y: "-10%" }}
-            className="fixed bottom-[5%] left-[5%] font-noto flex"
+            style={{ bottom: "5%", left: "5%", fontSize: "50px" }}
+            className="fixed font-noto flex"
           >
             <span
               onClick={() => {
@@ -382,7 +387,7 @@ const SlateEditor = ({
                   setOpenModal(true);
                 }
               }}
-              className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[50px] align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
+              className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
             >
               update
             </span>
@@ -390,11 +395,14 @@ const SlateEditor = ({
         </Slate>
       ) : (
         // Loading Div
-        <div className="w-full h-full top-0 left-0 fixed flex items-center justify-center bg-[#e6d6d1]">
+        <div
+          style={{ backgroundColor: "#e6d6d1" }}
+          className="w-full h-full top-0 left-0 fixed flex items-center justify-center"
+        >
           <img
+            style={{ width: "12%" }}
             src="/logo/Ollim-logos_black.png"
             alt="writing loading..."
-            className="w-[12%]"
           />
         </div>
       )}
@@ -406,7 +414,8 @@ const SlateEditor = ({
             animate={{ y: ["100%", "0%"] }}
             exit={{ y: ["0%", "100%"] }}
             transition={{ y: { duration: 0.3 } }}
-            className="z-50 bottom-0 fixed w-full h-1/3 bg-white shadow-[0px_-4px_10px_rgba(0,0,0,0.05)]"
+            style={{ boxShadow: "0px -4px 10px rgba(0,0,0,0.05)" }}
+            className="z-50 bottom-0 fixed w-full h-1/3 bg-white"
           >
             <DiagramWrite
               isInitialMount={isInitialMount}
@@ -425,7 +434,8 @@ const SlateEditor = ({
             initial="initial"
             animate="animate"
             exit="exit"
-            className="fixed w-72 h-96 right-0 top-1/3 z-[51] drop-shadow-lg"
+            style={{ zIndex: 51 }}
+            className="fixed w-72 h-96 right-0 top-1/3 drop-shadow-lg"
           >
             <textarea
               spellCheck={false}

@@ -41,7 +41,7 @@ const MypageWritingSetting: React.FC<props> = ({ title, genre, killingVerse, syn
                         </motion.div>
                     <AnimatePresence>
                         {hoverExpandDetail && killingVerse &&
-                        <motion.div key="container-after" layoutId="container" className="w-full h-72 absolute left-0 -top-[76px] flex flex-col justify-center items-center bg-white border border-logoBrown border-opacity-50 rounded-xl shadow-lg py-5 px-3 z-10">
+                        <motion.div key="container-after" style={{top: "-76px"}} layoutId="container" className="w-full h-72 absolute left-0 flex flex-col justify-center items-center bg-white border border-logoBrown border-opacity-50 rounded-xl shadow-lg py-5 px-3 z-10">
                             {killingVerse.map((verse, index) => (
                                 <motion.span
                                     className="font-bold italic"

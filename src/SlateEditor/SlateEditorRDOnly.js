@@ -82,7 +82,8 @@ const SlateEditorRDOnly = ({
             backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],
           }}
           transition={{ duration: 0.2 }}
-          className="fixed w-full h-full z-[10000] items-center justify-center top-0 left-0 flex"
+          style={{ zIndex: 10000 }}
+          className="fixed w-full h-full items-center justify-center top-0 left-0 flex"
           onClick={(e) => {
             e.stopPropagation();
             setOpenModal(false);
@@ -123,8 +124,9 @@ const SlateEditorRDOnly = ({
       )}
       {loading ? (
         <div
+          style={{ boxShadow: "0px 0px 10px rgba(0,0,0,0.3)" }}
           className={cx(
-            "editor-inner shadow-[0px_0px_10px_rgba(0,0,0,0.3)]",
+            "editor-inner",
             css`
               width: 210mm;
               height: 297mm;
@@ -154,7 +156,8 @@ const SlateEditorRDOnly = ({
               />
               <motion.div
                 whileHover={{ y: "-10%" }}
-                className="fixed bottom-[5%] right-[5%] font-noto flex"
+                style={{ bottom: "5%", right: "5%" }}
+                className="fixed font-noto flex"
               >
                 <span
                   onClick={() => {
@@ -166,7 +169,8 @@ const SlateEditorRDOnly = ({
                       setIsFullScreen(!document.fullscreenElement);
                     }
                   }}
-                  className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[50px] align-middle bg-white rounded-full inline-block px-2 py-2"
+                  style={{ fontSize: "50px" }}
+                  className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-middle bg-white rounded-full inline-block px-2 py-2"
                 >
                   {isFullScreen ? "fullscreen_exit" : "fullscreen"}
                 </span>
@@ -176,7 +180,8 @@ const SlateEditorRDOnly = ({
                       setOpenModal(true);
                     }
                   }}
-                  className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 text-[50px] align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
+                  style={{ fontSize: "50px" }}
+                  className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
                 >
                   update
                 </span>
@@ -185,11 +190,14 @@ const SlateEditorRDOnly = ({
           )}
         </div>
       ) : (
-        <div className="w-full h-full top-0 left-0 fixed flex items-center justify-center bg-[#e6d6d1]">
+        <div
+          style={{ backgroundColor: "#e6d6d1" }}
+          className="w-full h-full top-0 left-0 fixed flex items-center justify-center"
+        >
           <img
+            style={{ width: "12%" }}
             src="/logo/Ollim-logos_black.png"
             alt="writing loading..."
-            className="w-[12%]"
           />
         </div>
       )}

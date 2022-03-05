@@ -61,7 +61,8 @@ const WritingSetting: React.FC<props> = ({
                 <div className="flex flex-col w-2/3">
                     <div className="flex items-center mb-10">
                         <span className="text-2xl font-bold mr-10">{writingInfo.genre !== "POEM" ? "시놉시스" : "여는 말"}</span>
-                        <button 
+                    <button 
+                        style={{fontSize: "0.75rem"}}
                         onClick={()=>{
                             if (writingInfo.synopsis !== synopsis ) {
                                 axios.post(`https://ollim.herokuapp.com/updateSynopsis`, { genre: writingInfo.genre, writingDocID, synopsis })
@@ -73,7 +74,7 @@ const WritingSetting: React.FC<props> = ({
                                 })
                             }
                         }}
-                        className="border border-blue-400 px-3 py-1 rounded-xl text-[0.75rem] text-blue-400 hover:bg-blue-100">저장</button>
+                        className="border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100">저장</button>
                     </div>
                     <textarea 
                     value={synopsis}
@@ -88,6 +89,7 @@ const WritingSetting: React.FC<props> = ({
                     <div className="flex items-center mb-10">
                         <span className="text-2xl font-bold mr-10">표지</span>
                         <button 
+                        style={{fontSize: "0.75rem"}}
                         onClick={()=>{
                             if (writingInfo.killingVerse !== killingVerse) {
                                 axios.post(`https://ollim.herokuapp.com/updateKillingVerse`, { genre: writingInfo.genre, writingDocID, killingVerse: JSON.stringify(killingVerse) })
@@ -101,13 +103,13 @@ const WritingSetting: React.FC<props> = ({
                                 })
                             }
                         }}
-                        className="border border-blue-400 px-3 py-1 rounded-xl text-[0.75rem] text-blue-400 hover:bg-blue-100">저장</button>
+                        className="border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100">저장</button>
                     </div>
                     <div className="flex items-center w-full">
                         <div className="grid w-1/4">
                             <MypageWritingSetting title={writingInfo.title} genre={writingInfo.genre as genre} killingVerse={killingVerse} synopsis={synopsis} /> 
                         </div>
-                        <div className="border-l-[3px] h-36 mx-10"></div>
+                        <div style={{borderLeft: "3px"}} className="h-36 mx-10"></div>
                         <div className="flex flex-col justify-between w-1/3 h-72 border-black border border-opacity-5 shadow-lg rounded-lg px-10 py-5">
                             <AnimatePresence>
                                 <motion.div layout className="flex flex-col gap-2">
@@ -152,6 +154,7 @@ const WritingSetting: React.FC<props> = ({
                     <div className="flex items-center">
                         <span className="text-2xl font-bold mr-10">공개 범위</span>
                         <button 
+                        style={{fontSize: "0.75rem"}}
                         onClick={()=>{
                             if (writingInfo.disclosure !== disclosure ) {
                                 axios.post(`https://ollim.herokuapp.com/updateDisclosure`, { genre:writingInfo.genre, writingDocID, disclosure })
@@ -163,12 +166,12 @@ const WritingSetting: React.FC<props> = ({
                                     })
                             }
                         }}
-                        className="border border-blue-400 px-3 py-1 rounded-xl text-[0.75rem] text-blue-400 hover:bg-blue-100">저장</button>
+                        className="border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100">저장</button>
                     </div>
                     <div className="w-full flex items-center justify-between mt-5 py-2 px-3">
-                        <motion.button whileHover={{scale:1.1}} whileTap={{scale:0.9}} className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "PUBLIC" && "bg-[#f5e1db] shadow-[#f5e1db] shadow-md"}`} onClick={()=>{setDisclosure("PUBLIC")}}>모두</motion.button>
-                        <motion.button whileHover={{scale:1.1}} whileTap={{scale:0.9}} className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "FOLLOWERS" && "bg-[#f5e1db] shadow-[#f5e1db] shadow-md"}`} onClick={()=>{setDisclosure("FOLLOWERS")}}>팔로워</motion.button>
-                        <motion.button whileHover={{scale:1.1}} whileTap={{scale:0.9}} className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "PRIVATE" && "bg-[#f5e1db] shadow-[#f5e1db] shadow-md"}`} onClick={()=>{setDisclosure("PRIVATE")}}>비공개</motion.button>
+                        <motion.button whileHover={{scale:1.1}} whileTap={{scale:0.9}} className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "PUBLIC" && "bg-genreSelectedBG shadow-genreSelectedBG shadow-md"}`} onClick={()=>{setDisclosure("PUBLIC")}}>모두</motion.button>
+                        <motion.button whileHover={{scale:1.1}} whileTap={{scale:0.9}} className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "FOLLOWERS" && "bg-genreSelectedBG shadow-genreSelectedBG shadow-md"}`} onClick={()=>{setDisclosure("FOLLOWERS")}}>팔로워</motion.button>
+                        <motion.button whileHover={{scale:1.1}} whileTap={{scale:0.9}} className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "PRIVATE" && "bg-genreSelectedBG shadow-genreSelectedBG shadow-md"}`} onClick={()=>{setDisclosure("PRIVATE")}}>비공개</motion.button>
                     </div>
                 </div>
 
@@ -176,11 +179,12 @@ const WritingSetting: React.FC<props> = ({
                 {
                     deleteModalOpen && 
                     <motion.div
+                    style={{zIndex: 10000}}
                     animate={{
                         backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],
                     }}
                     transition={{ duration: 0.2 }}
-                    className="fixed w-full h-full z-[10000] items-center justify-center top-0 left-0 flex"
+                    className="fixed w-full h-full items-center justify-center top-0 left-0 flex"
                     onClick={(e) => {
                         e.stopPropagation();
                         setDeleteModalOpen(false);
@@ -216,7 +220,7 @@ const WritingSetting: React.FC<props> = ({
                 <div className="flex flex-col items-start w-1/3 my-20">
                     <div className="flex flex-col">
                         <span className="text-2xl font-bold mb-10">글 삭제</span>
-                        <button className={`text-md font-bold border border-[#e4d0ca] py-2 px-3 rounded-full hover:bg-[#f2e3de] ${disclosure === "PUBLIC" && "bg-[#f5e1db]"}`} onClick={()=>{setDeleteModalOpen(true)}}>삭제 하기</button>
+                        <button className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "PUBLIC" && "bg-genreSelectedBG"}`} onClick={()=>{setDeleteModalOpen(true)}}>삭제 하기</button>
                     </div>
                 </div>
             </div>

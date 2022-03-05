@@ -142,19 +142,18 @@ export const Toolbar = React.forwardRef(
       {...props}
       isFullScreen={isFullScreen}
       ref={ref}
+      style={{
+        backgroundColor: "#f6f6f6",
+        padding: "12px, 18px",
+        zIndex: 1000,
+      }}
       className={cx(
         className,
-        `bg-[#f6f6f6] py-[12px] px-[18px] z-[1000] ${
-          isFullScreen ? "w-[90mm] top-1/2 left-4" : "w-[210mm] top-0 z-[1000]"
+        `${
+          isFullScreen
+            ? "w-fullScreenMenu top-1/2 left-4"
+            : "w-noneFullScreenMenu top-0"
         }`
-        // css`
-        //   width: 210mm;
-        //   background-color: #f6f6f6;
-        //   padding: 12px 18px;
-        //   position: sticky;
-        //   top: 0;
-        //   z-index: 1000;
-        // `
       )}
     />
   )

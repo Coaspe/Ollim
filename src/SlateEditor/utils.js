@@ -21,7 +21,7 @@ export const Leaf = ({ attributes, children, leaf }) => {
   }
 
   if (leaf.fontSize) {
-    children = <span className={`text-[${leaf.fontSize}px]`}>{children}</span>;
+    children = <span style={{ fontSize: leaf.fontSize }}>{children}</span>;
   }
 
   if (leaf.fontStyle) {
@@ -107,13 +107,14 @@ export const FontSize = () => {
   return (
     <div className="relative group cursor-pointer z-40 font-noto">
       <span>{size[getFontSize(editor)]}</span>
-      <div className="absolute flex flex-col pt-3 invisible group-hover:visible bg-[white]">
+      <div className="absolute flex flex-col pt-3 invisible group-hover:visible bg-white">
         <button
           onMouseDown={(e) => {
             e.preventDefault();
             fontSizeMark(editor, e.target.value);
           }}
-          className="text-[13.3px] w-14 hover:bg-gray-300 py-1"
+          style={{ fontSize: "13.3px" }}
+          className=" w-14 hover:bg-gray-300 py-1"
           value={13.3}
         >
           10pt
@@ -123,7 +124,8 @@ export const FontSize = () => {
             e.preventDefault();
             fontSizeMark(editor, e.target.value);
           }}
-          className="text-[14.7px] w-14 hover:bg-gray-300 py-1"
+          style={{ fontSize: "14.7" }}
+          className=" w-14 hover:bg-gray-300 py-1"
           value={14.7}
         >
           11pt
@@ -133,7 +135,8 @@ export const FontSize = () => {
             e.preventDefault();
             fontSizeMark(editor, e.target.value);
           }}
-          className="text-[16px] w-14 hover:bg-gray-300 py-1"
+          style={{ fontSize: "16" }}
+          className="w-14 hover:bg-gray-300 py-1"
           value={16}
         >
           12pt
@@ -143,7 +146,8 @@ export const FontSize = () => {
             e.preventDefault();
             fontSizeMark(editor, e.target.value);
           }}
-          className="text-[17.3px] w-14 hover:bg-gray-300 py-1"
+          style={{ fontSize: "17.3" }}
+          className="w-14 hover:bg-gray-300 py-1"
           value={17.3}
         >
           13pt
@@ -153,7 +157,8 @@ export const FontSize = () => {
             e.preventDefault();
             fontSizeMark(editor, e.target.value);
           }}
-          className="text-[18.7px] w-14 hover:bg-gray-300 py-1"
+          style={{ fontSize: "18.7" }}
+          className="w-14 hover:bg-gray-300 py-1"
           value={18.7}
         >
           14pt
@@ -163,7 +168,8 @@ export const FontSize = () => {
             e.preventDefault();
             fontSizeMark(editor, e.target.value);
           }}
-          className="text-[20px] w-14 hover:bg-gray-300 py-1"
+          style={{ fontSize: "20px" }}
+          className="w-14 hover:bg-gray-300 py-1"
           value={20}
         >
           15pt
@@ -271,7 +277,8 @@ export const SvgButton = ({ openDiagram, setOpenDiagram }) => {
         onClick={() => {
           setOpenDiagram((origin) => !origin);
         }}
-        className={`w-[18px] cursor-pointer hover:fill-slate-400`}
+        style={{ fontSize: "18px" }}
+        className={`cursor-pointer hover:fill-slate-400`}
         fill={`${openDiagram ? "black" : "#ccc"}`}
       >
         <path
@@ -307,7 +314,8 @@ export const DictButton = ({ selectedProp }) => {
                 "width=450,height=600"
               );
         }}
-        className={`w-[18px] cursor-pointer fill-[#ccc] ${
+        style={{ fontSize: "18px", fill: "#ccc" }}
+        className={`cursor-pointer ${
           selectedProp && "fill-slate-400"
         } hover:fill-slate-400`}
         viewBox="0 0 24 24"

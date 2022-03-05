@@ -1,7 +1,7 @@
 import { memo, useState } from "react";
 import { Handle } from "react-flow-renderer";
 import { motion, AnimatePresence } from "framer-motion";
-import "./test.css";
+import "../style/test.css";
 
 export default memo(({ id, data, isConnectable }) => {
   const [click, setClick] = useState(false);
@@ -49,7 +49,7 @@ export default memo(({ id, data, isConnectable }) => {
             exit={{ opacity: [1, 0], y: [0, 10] }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
             role="tooltip"
-            className="absolute pointer-events-none text-xs -top-20 border border-black w-48 h-16 px-3 py-2 resize-none rounded-xl placeholder:italic"
+            className="absolute pointer-events-none text-xs -top-20 border border-black w-48 h-16 px-3 py-2 resize-none rounded-xl"
           >
             {data.desc}
           </motion.textarea>

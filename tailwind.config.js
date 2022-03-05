@@ -1,5 +1,9 @@
 module.exports = {
-  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  content: [
+    "./public/**/*.html",
+    "./src/**/*.{js,jsx,ts,tsx}",
+    "./src/style/*.css",
+  ],
   theme: {
     extend: {
       fontFamily: {
@@ -11,11 +15,20 @@ module.exports = {
       },
       colors: {
         logoBrown: "#905C4C",
+        hoverBGColor: "#f2e3de",
+        genreSelectedBG: "#f5e1db",
+        writingSettingBorder: "#e4d0ca",
+        writingSettingHoverBG: "#f2e3de",
+        hoverSpanMenu: "#c69e92",
       },
       fontSize: {
         xs: ".55rem",
       },
+      width: {
+        fullScreenMenu: "90mm",
+        noneFullScreenMenu: "210mm",
+      },
     },
   },
-  plugins: [require("@tailwindcss/typography")],
+  plugins: [],
 };

@@ -41,7 +41,7 @@ const MypageWriting: React.FC<props> = ({ data }) => {
                         </motion.div>
                     <AnimatePresence>
                         {hoverExpandDetail && data.killingVerse &&
-                        <motion.div key="container-after" layoutId="container" className="w-full h-72 absolute left-0 -top-[76px] flex flex-col justify-center items-center bg-white border border-logoBrown border-opacity-50 rounded-xl shadow-lg py-5 px-3 cursor-pointer z-10">
+                        <motion.div style={{top: "-76px"}} key="container-after" layoutId="container" className="w-full h-72 absolute left-0 flex flex-col justify-center items-center bg-white border border-logoBrown border-opacity-50 rounded-xl shadow-lg py-5 px-3 cursor-pointer z-10">
                             {data.killingVerse.length !== 0 ?
                                 <div className="flex flex-col items-center">
                                     {data.killingVerse.map((verse: string, index) => (
@@ -53,9 +53,9 @@ const MypageWriting: React.FC<props> = ({ data }) => {
                                             {verse}
                                         </motion.span>
                                     ))}
-                                <span className="absolute top-[5%] right-[5%] text-xs font-Nanum_Gothic rounded-lg bg-gray-800 text-white px-2 py-1">클릭해서 열람하기</span>
+                                <span style={{top: "5%", right: "5%"}} className="absolute text-xs font-Nanum_Gothic rounded-lg bg-gray-800 text-white px-2 py-1">클릭해서 열람하기</span>
                                 </div> :
-                                <motion.textarea layoutId="textarea" value={data.synopsis} readOnly className="px-3 py-2 text-sm text-gray-400 mb-3 overflow-y-scroll font-semibold bg-transparent resize-none z-[1000] h-full w-full cursor-pointer focus:outline-none">{data.synopsis}</motion.textarea>
+                                <motion.textarea style={{zIndex: 1000}} layoutId="textarea" value={data.synopsis} readOnly className="px-3 py-2 text-sm text-gray-400 mb-3 overflow-y-scroll font-semibold bg-transparent resize-none h-full w-full cursor-pointer focus:outline-none">{data.synopsis}</motion.textarea>
                             }
                         </motion.div>
                     }
