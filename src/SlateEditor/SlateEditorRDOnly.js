@@ -191,7 +191,7 @@ const SlateEditorRDOnly = ({
         </div>
       ) : (
         <div
-          style={{ backgroundColor: "#e6d6d1" }}
+          style={{ backgroundColor: "#e6e2e1" }}
           className="w-full h-full top-0 left-0 fixed flex items-center justify-center"
         >
           <img

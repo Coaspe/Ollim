@@ -144,7 +144,7 @@ export const Toolbar = React.forwardRef(
       ref={ref}
       style={{
         backgroundColor: "#f6f6f6",
-        padding: "12px, 18px",
+        padding: "12px 18px",
         zIndex: 1000,
       }}
       className={cx(

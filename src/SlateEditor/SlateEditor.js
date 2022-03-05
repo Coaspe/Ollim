@@ -354,7 +354,10 @@ const SlateEditor = ({
           )}
 
           {/* Save Div */}
-          <div style={{ bottom: "3%", right: "2%" }} className="fixedfont-noto">
+          <div
+            style={{ bottom: "3%", right: "2%" }}
+            className="fixed font-noto"
+          >
             <motion.button
               whileHover={{ y: "-10%" }}
               onClick={() => {
@@ -396,7 +399,7 @@ const SlateEditor = ({
       ) : (
         // Loading Div
         <div
-          style={{ backgroundColor: "#e6d6d1" }}
+          style={{ backgroundColor: "#e6e2e1" }}
           className="w-full h-full top-0 left-0 fixed flex items-center justify-center"
         >
           <img

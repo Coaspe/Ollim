@@ -277,7 +277,7 @@ export const SvgButton = ({ openDiagram, setOpenDiagram }) => {
         onClick={() => {
           setOpenDiagram((origin) => !origin);
         }}
-        style={{ fontSize: "18px" }}
+        style={{ width: "18px" }}
         className={`cursor-pointer hover:fill-slate-400`}
         fill={`${openDiagram ? "black" : "#ccc"}`}
       >
@@ -314,7 +314,7 @@ export const DictButton = ({ selectedProp }) => {
                 "width=450,height=600"
               );
         }}
-        style={{ fontSize: "18px", fill: "#ccc" }}
+        style={{ width: "18px", fill: "#ccc" }}
         className={`cursor-pointer ${
           selectedProp && "fill-slate-400"
         } hover:fill-slate-400`}
