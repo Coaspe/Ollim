@@ -71,6 +71,10 @@ const SlateEditor = ({
   // Selected commit key
   const [selectedKey, setSelectedKey] = useState("");
 
+  // commit modal
+  const [openCommitModal, setOpenCommitModal] = useState(false);
+  const [commitDescription, setCommitDescription] = useState("");
+
   // Render Slate element
   const renderElement = ({ element, attributes, children }) => {
     const elementKey = ReactEditor.findKey(editor, element);
@@ -118,7 +122,7 @@ const SlateEditor = ({
         contents: JSON.stringify(value),
         writingDocID,
         userUID: writingInfo.userUID,
-        memo: "memoemoem",
+        memo: commitDescription,
         genre: writingInfo.genre,
         title: writingInfo.title,
       })
@@ -373,7 +377,7 @@ const SlateEditor = ({
             <motion.button
               whileHover={{ y: "-10%" }}
               onClick={() => {
-                handleRequestCommit();
+                setOpenCommitModal(true);
               }}
               className="w-28 h-10 text-sm rounded-2xl border-2 border-blue-400 text-blue-400 bg-transparent"
             >
@@ -450,6 +454,70 @@ const SlateEditor = ({
             >
               {memo}
             </textarea>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Commit modal */}
+      <AnimatePresence>
+        {openCommitModal && (
+          <motion.div
+            animate={{
+              backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],
+            }}
+            transition={{ duration: 0.2 }}
+            style={{ zIndex: 10000 }}
+            className="fixed w-full h-full items-center justify-center top-0 left-0 flex"
+            onClick={() => {
+              setOpenCommitModal(false);
+            }}
+          >
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              className="flex flex-col w-1/3 h-1/2 bg-white justify-between px-7 py-7 font-noto"
+            >
+              <div className="flex items-center mb-5">
+                <span className="text-2xl font-bold">제출 메모</span>
+                <span className="ml-5 text-xs italic text-gray-500">
+                  오늘 작성한 작업물에 대한 간단한 설명을 기록하세요
+                </span>
+              </div>
+              <textarea
+                spellCheck={false}
+                value={commitDescription}
+                style={{ boxShadow: "0px 0px 5px 1px rgba(0,0,0,0.5)" }}
+                onChange={(e) => {
+                  setCommitDescription(e.target.value);
+                }}
+                className="text-sm text-gray-500 resize-none overflow-y-scroll w-full h-3/4 rounded-lg focus:outline-none px-3 py-2"
+              >
+                {commitDescription}
+              </textarea>
+              <div className="w-full flex items-center justify-center mt-5">
+                <span
+                  style={{ fontSize: "2rem" }}
+                  onClick={() => {
+                    handleRequestCommit();
+                    setCommitDescription("");
+                    setOpenCommitModal(false);
+                  }}
+                  className="mr-3 material-icons text-green-400 rounded-full cursor-pointer hover:bg-green-100"
+                >
+                  check_circle
+                </span>
+                <span
+                  style={{ fontSize: "2rem" }}
+                  onClick={() => {
+                    setOpenCommitModal(false);
+                  }}
+                  className="material-icons text-red-400 rounded-full cursor-pointer hover:bg-red-100"
+                >
+                  cancel
+                </span>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

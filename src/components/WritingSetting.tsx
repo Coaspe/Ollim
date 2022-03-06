@@ -125,7 +125,8 @@ const WritingSetting: React.FC<props> = ({
                                                     tmp.splice(index, 1)
                                                     return tmp
                                                 })
-                                            }} className="mx-4 material-icons text-red-400 rounded-full cursor-pointer hover:bg-red-100">
+                                            }} 
+                                            className="mx-4 material-icons text-red-400 rounded-full cursor-pointer hover:bg-red-100">
                                             highlight_off
                                             </span>
                                         </motion.div>
