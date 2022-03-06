@@ -92,3 +92,10 @@ export const getScenarioArrayInfo = (scenarioDocIDs: Array<string>) => {
 export const getDiagram = (writingDocID: string) => {
   return getDoc(doc(firestore, "diagram", writingDocID))
 }
+
+export const getFollowersInfinite = async (followersEmailArr: string[], key: number) => {
+  const tmp = followersEmailArr.slice(key, key + 5);
+  return await getDocs(
+    query(collection(firestore, "users"), where("__name__", "in", tmp))
+  );
+};

@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion"
-import { Profiler, useContext, useEffect, useState } from "react"
+import { Profiler, useCallback, useContext, useEffect, useReducer, useRef, useState } from "react"
 import MypageWriting from "../components/MypageWriting"
 import UserContext from "../context/user"
-import { getPoemArrayInfo, getUserWritings, getNovelArrayInfo, getScenarioArrayInfo, getUserByUID } from "../services/firebase"
+import { getPoemArrayInfo, getUserWritings, getNovelArrayInfo, getScenarioArrayInfo, getUserByUID, getFollowersInfinite } from "../services/firebase"
 import Compressor from "compressorjs";
 import { signOutAuth } from "../helpers/auth-OAuth2"
 import NewWritingModal from "../components/NewWritingModal"
@@ -24,9 +24,14 @@ const Mypage = () => {
     // profile ownser's firestore information
     const [profileOwnerInfo, setProfileOwnerInfo] = useState<getFirestoreUser>({} as getFirestoreUser)
     
+    const followersKey = useRef(0)
+    const [followers, setFollowers] = useState<getFirestoreUser[]>([])
+    const [followersModal, setFollowersModal] = useState(false)
+    const [followingsModal, setFolloweringsModal] = useState(false)
+    const [loading, setLoading] = useState(false)
+
     // context user
     const { user: contextUser } = useContext(UserContext)
-
     const [profileImage, setProfileImage] = useState("")
     const [userWritings, setUserWritings] = useState({} as getFirestoreUserWritings)
     // new Writing modal state
@@ -42,8 +47,10 @@ const Mypage = () => {
     const [scenarioes, setScenarioes] = useState<Array<getFirestoreScenario>>([])
     // Profile owner's total writings list
     const [totalWritings, setTotalWritings] = useState<Array<getFirestoreScenario | getFirestoreNovel | getFirestorePoem>>([])
-    const dispatch = useDispatch()
 
+    const [totalCommits, setTotalCommits] = useState({} as { [key: number]: string })
+    const dispatch = useDispatch()
+    
     // header context userInfo
     const setUserInfo = (userInfo: getFirestoreUser) => {
         dispatch(userInfoAction.setUserInfo({userInfo}))
@@ -56,6 +63,28 @@ const Mypage = () => {
 
     const navigator = useNavigate()
 
+    const handleMoreFollowers = useCallback(() => {
+        setLoading(true)
+        if (profileOwnerInfo.followers.length > 0 && followersKey.current < profileOwnerInfo.followers.length) {
+            getFollowersInfinite(profileOwnerInfo.followers, followersKey.current).then((res) => {
+                // Datecreated Descending
+                
+                let tmp = res.docs.map((doc: any) => ({...doc.data(), docID:doc.id}))
+                setFollowers((origin: any) => {
+                    return [...origin, ...tmp]
+                })
+                console.log(tmp);
+                followersKey.current += tmp.length
+            })
+        }
+    }, [profileOwnerInfo.followers])
+
+    useEffect(() => {
+        followers.length > 0 && setLoading(false)
+        console.log(followers);
+    }, [followers])
+    
+    // Get user Info
     useEffect(() => {
         if (uid) {
             getUserByUID(uid as string).then((res: any) => {
@@ -63,14 +92,20 @@ const Mypage = () => {
                 
                 setProfileOwnerInfo(data)
                 setProfileImage(data.profileImg)
-                getUserWritings(data.uid).then((writings) => {setUserWritings(writings as getFirestoreUserWritings)})
+                getUserWritings(data.uid).then((writings: any) => {
+                    setTotalCommits(writings.totalCommits)
+                    setUserWritings(writings as getFirestoreUserWritings)
+                })
             })
         } else {
             getUserByUID(contextUser.uid).then((res: any) => {
                 const data = res.docs[0].data();
                 
                 setProfileOwnerInfo(data)
-                getUserWritings(data.uid).then((writings) => {setUserWritings(writings as getFirestoreUserWritings)})
+                getUserWritings(data.uid).then((writings: any) => {
+                    setTotalCommits(writings.totalCommits)
+                    setUserWritings(writings as getFirestoreUserWritings)
+                })
                 setProfileImage(data.profileImg)
             })
         }
@@ -82,7 +117,7 @@ const Mypage = () => {
             setDoseUserFollow(data.followings.includes(uid))
         })
     }, [uid])
-
+    // get writings
     useEffect(() => {
         // get Writings informations from firestore
         const getWritings = async () => {
@@ -98,7 +133,7 @@ const Mypage = () => {
         if (Object.keys(userWritings).length !== 0) {
             getWritings()
         }
-    }, [userWritings])
+    }, [userWritings, uid])
 
     const handleFileOnChange = (event: any) => {
         const element = event.target.files[0]
@@ -164,6 +199,49 @@ const Mypage = () => {
     return (
         <>
         <AnimatePresence>
+            {followersModal && profileOwnerInfo && (
+            <motion.div
+                animate={{
+                backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],
+                }}
+                transition={{ duration: 0.2 }}
+                style={{ zIndex: 10000 }}
+                className="fixed w-full h-full items-center justify-center top-0 left-0 flex"
+                onClick={() => {
+                setFollowersModal(false);
+                }}
+            >
+                <div
+                onClick={(e) => {
+                    e.stopPropagation();
+                }}
+                className="flex flex-col w-1/3 h-1/2 bg-white justify-between px-7 py-7 font-noto gap-3"
+                >
+                    {!loading ? followers.map((follower)=>(
+                        <div key={follower.userEmail} className="flex items-center">
+                            <img className="w-7 rounded-full" src={follower.profileImg} alt="follower" />
+                            <span className="ml-3">{follower.username}</span>
+                        </div>
+                    ))                        
+                    :
+                        <div className="flex items-center">
+                            skeleton
+                        </div>
+                    }
+                 {followersKey.current < profileOwnerInfo.followers.length &&
+                <div
+                    onClick={() => {
+                        handleMoreFollowers()
+                    }}
+                    className={`${loading && "pointer-events-none"} font-semibold text-sm shadow-inner cursor-pointer w-1/2 bg-white h-10 flex items-center justify-center rounded-xl text-gray-500`}>
+                    {!loading ? "Load more..." : "Loading..."}
+                </div>}
+                </div>
+            </motion.div>
+            )}
+            </AnimatePresence>
+            
+        <AnimatePresence>
             {
                 alarm[2] &&
                 <motion.div
@@ -185,13 +263,15 @@ const Mypage = () => {
                 <div className="flex w-full items-center justify-between px-20">
                     {/* logo */}
                     <img className="h-28" src="logo/Ollim-logos_transparent.png" alt="header logo" />
-                    {userInfo ?
-                    <div onClick={()=>{
-                        navigator(`/${userInfo.uid}`)
-                    }} className="flex items-center cursor-pointer">
+                        {userInfo ?
+                        <div 
+                        onClick={()=>{
+                            navigator(`/${userInfo.uid}`)
+                        }}
+                        className="flex items-center cursor-pointer">
                         <img src={userInfo.profileImg} className="w-7 mr-3 rounded-full" alt="user profile" />
                         <span>{userInfo.username}</span>
-                    </div>
+                        </div>
                     : 
                     <div>
                         <svg
@@ -235,9 +315,7 @@ const Mypage = () => {
                                     setDoseUserFollow((origin) => {
                                         axios.post(`https://ollim.herokuapp.com/updateFollowing`, {
                                             followingUserEmail: userInfo.userEmail,
-                                            followingUserUID: userInfo.uid,
                                             followedUserEmail: profileOwnerInfo.userEmail,
-                                            followedUserUID: profileOwnerInfo.uid,
                                             followingState: doseUserFollow
                                         }).then((res) => {
                                         })
@@ -273,11 +351,11 @@ const Mypage = () => {
                                 <span className="font-bold text-gray-400 font-Nanum_Gothic">{totalWritings.length}</span>                            
                                 <span className="">글</span>                            
                             </div>
-                            <div className="flex flex-col items-center justify-center mx-5">
-                                    <span className="font-bold text-gray-400 font-Nanum_Gothic">{profileOwnerInfo.followers.length}</span>                            
+                            <div onClick={()=>{setFollowersModal(true)}} className="flex flex-col items-center justify-center mx-5 cursor-pointer">
+                                <span className="font-bold text-gray-400 font-Nanum_Gothic">{profileOwnerInfo.followers.length}</span>                            
                                 <span className="">팔로워</span>                            
                                 </div>
-                            <div className="flex flex-col items-center justify-center">
+                            <div className="flex flex-col items-center justify-center cursor-pointer">
                                 <span className="font-bold text-gray-400 font-Nanum_Gothic">{profileOwnerInfo.followings.length}</span>                           
                                 <span className="">팔로우</span>                            
                             </div>
@@ -293,7 +371,7 @@ const Mypage = () => {
 
                         {/* Calendar */}
                         <Profiler id="calendar" onRender={logTimes}>
-                            <Calendar totalCommits={userWritings.totalCommits}/>
+                            <Calendar totalCommits={totalCommits}/>
                         </Profiler>
 
                         {/* On writing, Done */}

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import CalendarElement from "./CalendarElement";
 
 interface props {
-    totalCommits: {[key:number] : string}
+    totalCommits: { [key: number]: string }
 }
 const Calendar: React.FC<props> = ({ totalCommits }) => {
     const [recent3MonthsCommits, setRecent3MonthsCommits] = useState<{[key:string]: number[]}>({})
@@ -44,10 +44,16 @@ const Calendar: React.FC<props> = ({ totalCommits }) => {
 
             setRecent3MonthsCommits(tmp2)
         }
+        console.log(totalCommits);
+        
         if (totalCommits) {
             initial()
         }
-    },[totalCommits])
+    }, [totalCommits])
+    useEffect(() => {
+    console.log(recent3MonthsCommits);
+    
+    }, [recent3MonthsCommits])
     return (
         <div className="w-2/3 my-10 grid grid-cols-3 gap-4">
             {recent3MonthsCommits &&
