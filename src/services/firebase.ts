@@ -25,7 +25,7 @@ export const singInWithGoogleInfoToFB = (info: any) => {
     username: info.user.displayName.toLowerCase(),
     followings: [],
     followers: [],
-    writingsDocId: [],
+    writingsDocID: [],
     dateCreated: Date.now(),
     profileImg: info.user.photoURL,
     profileCaption: "",

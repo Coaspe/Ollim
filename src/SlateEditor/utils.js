@@ -7,7 +7,7 @@ export const Leaf = ({ attributes, children, leaf }) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>;
   }
-
+  console.log(leaf);
   if (leaf.code) {
     children = <code>{children}</code>;
   }
@@ -21,7 +21,9 @@ export const Leaf = ({ attributes, children, leaf }) => {
   }
 
   if (leaf.fontSize) {
-    children = <span style={{ fontSize: leaf.fontSize }}>{children}</span>;
+    children = (
+      <span style={{ fontSize: `${leaf.fontSize}px` }}>{children}</span>
+    );
   }
 
   if (leaf.fontStyle) {
@@ -66,12 +68,13 @@ export const MarkButton = ({ format, icon }) => {
   );
 };
 
-export const fontSizeMark = (editor, size) => {
-  Editor.addMark(editor, "fontSize", size);
+export const fontSizeMark = (editor, sizeParam) => {
+  Editor.addMark(editor, "fontSize", sizeParam);
 };
 
 export const getFontSize = (editor) => {
   const value = Editor.marks(editor);
+  console.log(value);
   return value ? value.fontSize : 13.3;
 };
 
@@ -93,8 +96,6 @@ export const getFontStyle = (editor) => {
   return value ? value.fontStyle : "font-noto";
 };
 export const FontSize = () => {
-  const editor = useSlate();
-
   const size = {
     13.3: "10pt",
     14.7: "11pt",
@@ -103,6 +104,7 @@ export const FontSize = () => {
     18.7: "14pt",
     20: "15pt",
   };
+  const editor = useSlate();
 
   return (
     <div className="relative group cursor-pointer z-40 font-noto">
@@ -124,7 +126,7 @@ export const FontSize = () => {
             e.preventDefault();
             fontSizeMark(editor, e.target.value);
           }}
-          style={{ fontSize: "14.7" }}
+          style={{ fontSize: "14.7px" }}
           className=" w-14 hover:bg-gray-300 py-1"
           value={14.7}
         >
@@ -135,7 +137,7 @@ export const FontSize = () => {
             e.preventDefault();
             fontSizeMark(editor, e.target.value);
           }}
-          style={{ fontSize: "16" }}
+          style={{ fontSize: "16px" }}
           className="w-14 hover:bg-gray-300 py-1"
           value={16}
         >
@@ -146,7 +148,7 @@ export const FontSize = () => {
             e.preventDefault();
             fontSizeMark(editor, e.target.value);
           }}
-          style={{ fontSize: "17.3" }}
+          style={{ fontSize: "17.3px" }}
           className="w-14 hover:bg-gray-300 py-1"
           value={17.3}
         >
@@ -157,7 +159,7 @@ export const FontSize = () => {
             e.preventDefault();
             fontSizeMark(editor, e.target.value);
           }}
-          style={{ fontSize: "18.7" }}
+          style={{ fontSize: "18.7px" }}
           className="w-14 hover:bg-gray-300 py-1"
           value={18.7}
         >

@@ -48,7 +48,6 @@ const Mypage = () => {
     // Profile owner's total writings list
     const [totalWritings, setTotalWritings] = useState<Array<getFirestoreScenario | getFirestoreNovel | getFirestorePoem>>([])
 
-    const [totalCommits, setTotalCommits] = useState({} as { [key: number]: string })
     const dispatch = useDispatch()
     
     // header context userInfo
@@ -89,21 +88,17 @@ const Mypage = () => {
         if (uid) {
             getUserByUID(uid as string).then((res: any) => {
                 const data = res.docs[0].data();
-                
                 setProfileOwnerInfo(data)
                 setProfileImage(data.profileImg)
                 getUserWritings(data.uid).then((writings: any) => {
-                    setTotalCommits(writings.totalCommits)
                     setUserWritings(writings as getFirestoreUserWritings)
                 })
             })
         } else {
             getUserByUID(contextUser.uid).then((res: any) => {
                 const data = res.docs[0].data();
-                
                 setProfileOwnerInfo(data)
                 getUserWritings(data.uid).then((writings: any) => {
-                    setTotalCommits(writings.totalCommits)
                     setUserWritings(writings as getFirestoreUserWritings)
                 })
                 setProfileImage(data.profileImg)
@@ -371,7 +366,7 @@ const Mypage = () => {
 
                         {/* Calendar */}
                         <Profiler id="calendar" onRender={logTimes}>
-                            <Calendar totalCommits={totalCommits}/>
+                            <Calendar totalCommits={userWritings.totalCommits}/>
                         </Profiler>
 
                         {/* On writing, Done */}

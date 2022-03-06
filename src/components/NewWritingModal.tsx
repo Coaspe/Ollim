@@ -166,7 +166,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                 {/* Opening article div */}
                 <div className="mt-10 flex flex-col items-start w-3/4">
                     <span className="text-2xl font-bold">{genrn === 'POEM' ? "여는 말" : "시놉시스"}</span>
-                    <textarea style={{borderColor: "#e4d0ca"}} className="resize-none border-2 py-2 px-3 mt-5 rounded-xl h-28 w-full italic" placeholder={genrn === 'POEM' ? "전시될 여는말을 서술해주세요." : "전시될 시놉시스를 간략하게 서술해주세요."} value={synopsis} spellCheck="false" onChange={(e) => { setSynopsis(e.target.value) }} />
+                    <textarea style={{borderColor: "#e4d0ca"}} className="resize-none border-2 py-2 px-3 mt-5 rounded-xl h-28 w-full italic" placeholder={genrn === 'POEM' ? "전시될 여는 말을 서술해주세요." : "전시될 시놉시스를 간략하게 서술해주세요."} value={synopsis} spellCheck="false" onChange={(e) => { setSynopsis(e.target.value) }} />
                 </div>
             </div>}
 
