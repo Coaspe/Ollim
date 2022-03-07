@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion"
-import { Profiler, useCallback, useContext, useEffect, useReducer, useRef, useState } from "react"
+import { Profiler, useCallback, useContext, useEffect, useRef, useState } from "react"
 import MypageWriting from "../components/MypageWriting"
 import UserContext from "../context/user"
-import { getPoemArrayInfo, getUserWritings, getNovelArrayInfo, getScenarioArrayInfo, getUserByUID, getFollowersInfinite } from "../services/firebase"
+import { getPoemArrayInfo, getUserWritings, getNovelArrayInfo, getScenarioArrayInfo, getUserByUID, getFollowersInfinite, getFollowingsInfinite } from "../services/firebase"
 import Compressor from "compressorjs";
 import { signOutAuth } from "../helpers/auth-OAuth2"
 import NewWritingModal from "../components/NewWritingModal"
@@ -16,28 +16,46 @@ import { useNavigate, useParams } from "react-router-dom"
 import Calendar from "../components/Calendar"
 import { Alert } from "@mui/material"
 import axios from "axios"
+import FollowingRow from "../components/FollowingRow"
+import FollowerRow from "../components/FollowerRow"
+import FollowersFollowingsSkeleton from "../components/FollowersFollowingsSkeleton"
 
 const Mypage = () => {
 
-    // profile owner's uid
+    // Profile owner's uid
     const { uid } = useParams()
-    // profile ownser's firestore information
+    // Profile ownser's firestore information
     const [profileOwnerInfo, setProfileOwnerInfo] = useState<getFirestoreUser>({} as getFirestoreUser)
+    const [profileImage, setProfileImage] = useState("")
     
+    // To Prevent unnecessary re-rendering, use useRef
+    // Load 5 followers, followings every "Load More" request.
+    // Below two variables indicate how many followers, followings loaded now
     const followersKey = useRef(0)
+    const followingsKey = useRef(0)
+
+    // For more natural UI of the number of followers of followings, followers 
+    const followingsLength = useRef(0)
+    const followersLength = useRef(0)
+
+    // Indicates UID change
+    const uidChangeDetect = useRef(0)
+
+    // Profile owner's followers, followings datas and modal open states
     const [followers, setFollowers] = useState<getFirestoreUser[]>([])
+    const [followings, setFollowings] = useState<getFirestoreUser[]>([])
     const [followersModal, setFollowersModal] = useState(false)
-    const [followingsModal, setFolloweringsModal] = useState(false)
+    const [followingsModal, setFollowingsModal] = useState(false)
     const [loading, setLoading] = useState(false)
 
-    // context user
+    // Context user
     const { user: contextUser } = useContext(UserContext)
-    const [profileImage, setProfileImage] = useState("")
     const [userWritings, setUserWritings] = useState({} as getFirestoreUserWritings)
-    // new Writing modal state
+    // New Writing modal state
     const [newWritingModalOpen, setNewWritingModalOpen] = useState(false)
-    // category state
+    // Category state
     const [onWritingCategory, setOnWritingCategory] = useState("TOTAL")
+    // Does User Follow Profile Owner?
     const [doseUserFollow, setDoseUserFollow] = useState(false)
     // Profile owner's poems list
     const [poems, setPoems] = useState<Array<getFirestorePoem>>([])
@@ -50,7 +68,7 @@ const Mypage = () => {
 
     const dispatch = useDispatch()
     
-    // header context userInfo
+    // Header context userInfo
     const setUserInfo = (userInfo: getFirestoreUser) => {
         dispatch(userInfoAction.setUserInfo({userInfo}))
     }
@@ -62,28 +80,66 @@ const Mypage = () => {
 
     const navigator = useNavigate()
 
+    // Load more profile owner's followers, followings
     const handleMoreFollowers = useCallback(() => {
         setLoading(true)
         if (profileOwnerInfo.followers.length > 0 && followersKey.current < profileOwnerInfo.followers.length) {
             getFollowersInfinite(profileOwnerInfo.followers, followersKey.current).then((res) => {
-                // Datecreated Descending
-                
                 let tmp = res.docs.map((doc: any) => ({...doc.data(), docID:doc.id}))
                 setFollowers((origin: any) => {
                     return [...origin, ...tmp]
                 })
-                console.log(tmp);
                 followersKey.current += tmp.length
             })
         }
     }, [profileOwnerInfo.followers])
+    const handleMoreFollowings = useCallback(() => {
+        setLoading(true)
+        if (profileOwnerInfo.followings.length > 0 && followingsKey.current < profileOwnerInfo.followings.length) {
+            getFollowingsInfinite(profileOwnerInfo.followings, followingsKey.current).then((res) => {
+                let tmp = res.docs.map((doc: any) => ({...doc.data(), docID:doc.id}))
+                setFollowings((origin: any) => {
+                    return [...origin, ...tmp]
+                })
+                followingsKey.current += tmp.length
+            })
+        }
+    }, [profileOwnerInfo.followings])
 
+
+    // Loading more followers, followings completed, set loading false 
     useEffect(() => {
         followers.length > 0 && setLoading(false)
-        console.log(followers);
     }, [followers])
+    useEffect(() => {
+        followings.length > 0 && setLoading(false)
+    }, [followings])
     
-    // Get user Info
+    // When modal closed, reset followers, followings keys and list
+    useEffect(() => {
+        if (!followersModal && followersKey.current !== 0) {
+            followersKey.current = 0
+            setFollowers([])
+        }
+    }, [followersModal])
+    useEffect(() => {
+        if (!followingsModal && followingsKey.current !== 0) {
+            followingsKey.current = 0
+            setFollowings([])
+        }
+    }, [followingsModal])
+
+    // Uid param change detection
+    useEffect(() => {
+        if (uidChangeDetect.current === 0) {
+            uidChangeDetect.current += 1
+        } else {
+            followingsLength.current = 0
+            followersLength.current = 0
+        }
+    }, [uid])
+
+    // Get profileOwner's user Info
     useEffect(() => {
         if (uid) {
             getUserByUID(uid as string).then((res: any) => {
@@ -93,8 +149,11 @@ const Mypage = () => {
                 getUserWritings(data.uid).then((writings: any) => {
                     setUserWritings(writings as getFirestoreUserWritings)
                 })
+                followersLength.current = data.followers.length
+                followingsLength.current = data.followings.length
             })
         } else {
+            // If uid is undefined, go to context user's mypage
             getUserByUID(contextUser.uid).then((res: any) => {
                 const data = res.docs[0].data();
                 setProfileOwnerInfo(data)
@@ -102,19 +161,23 @@ const Mypage = () => {
                     setUserWritings(writings as getFirestoreUserWritings)
                 })
                 setProfileImage(data.profileImg)
+                followersLength.current = data.followers.length
+                followingsLength.current = data.followings.length
             })
         }
+    }, [uid, contextUser.uid])
 
-        // get context user's information
-        getUserByUID(contextUser.uid).then((res: any) => {
+    // Get context user's information
+    useEffect(() => {
+        profileOwnerInfo && getUserByUID(contextUser.uid).then((res: any) => {
             const data = res.docs[0].data()
             setUserInfo(data)
-            setDoseUserFollow(data.followings.includes(uid))
+            setDoseUserFollow(data.followings.includes(profileOwnerInfo.userEmail))
         })
-    }, [uid])
-    // get writings
+    }, [profileOwnerInfo])
+    
+    // Get writings information from firestore
     useEffect(() => {
-        // get Writings informations from firestore
         const getWritings = async () => {
             const poems = await getPoemArrayInfo(userWritings.poemDocID)
             const novel = await getNovelArrayInfo(userWritings.novelDocID)
@@ -130,6 +193,7 @@ const Mypage = () => {
         }
     }, [userWritings, uid])
 
+    // Image Compress process
     const handleFileOnChange = (event: any) => {
         const element = event.target.files[0]
         
@@ -193,6 +257,7 @@ const Mypage = () => {
 
     return (
         <>
+        {/* Followers Modal */}
         <AnimatePresence>
             {followersModal && profileOwnerInfo && (
             <motion.div
@@ -201,41 +266,77 @@ const Mypage = () => {
                 }}
                 transition={{ duration: 0.2 }}
                 style={{ zIndex: 10000 }}
-                className="fixed w-full h-full items-center justify-center top-0 left-0 flex"
-                onClick={() => {
-                setFollowersModal(false);
-                }}
+                className="font-noto fixed w-full h-full items-center justify-center top-0 left-0 flex"
+                onClick={() => {setFollowersModal(false)}}
             >
-                <div
-                onClick={(e) => {
-                    e.stopPropagation();
-                }}
-                className="flex flex-col w-1/3 h-1/2 bg-white justify-between px-7 py-7 font-noto gap-3"
-                >
-                    {!loading ? followers.map((follower)=>(
-                        <div key={follower.userEmail} className="flex items-center">
-                            <img className="w-7 rounded-full" src={follower.profileImg} alt="follower" />
-                            <span className="ml-3">{follower.username}</span>
-                        </div>
-                    ))                        
-                    :
-                        <div className="flex items-center">
-                            skeleton
-                        </div>
-                    }
-                 {followersKey.current < profileOwnerInfo.followers.length &&
-                <div
-                    onClick={() => {
-                        handleMoreFollowers()
-                    }}
-                    className={`${loading && "pointer-events-none"} font-semibold text-sm shadow-inner cursor-pointer w-1/2 bg-white h-10 flex items-center justify-center rounded-xl text-gray-500`}>
-                    {!loading ? "Load more..." : "Loading..."}
-                </div>}
+                <div className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg">
+                    <span className="text-xl font-bold text-gray-500 mb-5">팔로워</span>
+                    <div
+                    onClick={(e) => {e.stopPropagation()} }
+                    className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scrolll"
+                    >
+                        {!loading ? followers.map((data)=>(
+                            <FollowerRow data={data} setFollowersModal={setFollowersModal} />
+                        ))                        
+                        :
+                            // Skeleton
+                            <FollowersFollowingsSkeleton />
+                        }
+                        {/* Load more followers button */}
+                        {followersKey.current < profileOwnerInfo.followers.length &&
+                            <div
+                                onClick={handleMoreFollowers}
+                                className={`${loading && "pointer-events-none"} font-semibold text-sm shadow-inner cursor-pointer w-1/2 bg-white h-10 flex items-center justify-center rounded-xl text-gray-500`}>
+                                {!loading && "Load more..."}
+                            </div>
+                        }
+                    </div>
                 </div>
             </motion.div>
             )}
-            </AnimatePresence>
-            
+        </AnimatePresence>
+        
+        {/* Followings Modal */}
+        <AnimatePresence>
+            {followingsModal && profileOwnerInfo && (
+            <motion.div
+                animate={{
+                backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],
+                }}
+                transition={{ duration: 0.2 }}
+                style={{ zIndex: 10000 }}
+                className="font-noto fixed w-full h-full items-center justify-center top-0 left-0 flex"
+                onClick={() => {setFollowingsModal(false)}}
+            >
+                <div className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg">
+                    <span className="text-xl font-bold text-gray-500 mb-5">팔로우</span>
+                    <div
+                    onClick={(e) => {e.stopPropagation()}}
+                    className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scroll"
+                    >
+                        {/* Followings list */}
+                        {!loading ? 
+                        followings.map((data)=>(
+                            <FollowingRow data={data} setFollowingsModal={setFollowingsModal} />
+                        ))                        
+                        :
+                            // Skeleton
+                            <FollowersFollowingsSkeleton />
+                        }
+                        {/* Load more followings button */}
+                        {followingsKey.current < profileOwnerInfo.followings.length &&
+                        <div
+                            onClick={handleMoreFollowings}
+                            className={`${loading && "pointer-events-none"} font-semibold text-sm shadow-inner cursor-pointer w-1/2 bg-white h-10 flex items-center justify-center rounded-xl text-gray-500`}>
+                            {!loading && "Load more..."}
+                        </div>}
+                    </div>
+                </div>
+            </motion.div>
+            )}
+        </AnimatePresence>
+        
+        {/* Alarm */}
         <AnimatePresence>
             {
                 alarm[2] &&
@@ -260,9 +361,7 @@ const Mypage = () => {
                     <img className="h-28" src="logo/Ollim-logos_transparent.png" alt="header logo" />
                         {userInfo ?
                         <div 
-                        onClick={()=>{
-                            navigator(`/${userInfo.uid}`)
-                        }}
+                        onClick={()=>{navigator(`/${userInfo.uid}`)}}
                         className="flex items-center cursor-pointer">
                         <img src={userInfo.profileImg} className="w-7 mr-3 rounded-full" alt="user profile" />
                         <span>{userInfo.username}</span>
@@ -287,6 +386,7 @@ const Mypage = () => {
                     </div>
                     }
                 </div> 
+                
                 <div className="w-full flex">
                     
                     {/* Profile div */}
@@ -307,17 +407,17 @@ const Mypage = () => {
                             <span className="text-2xl font-bold my-7 mr-3">{profileOwnerInfo.username}</span>
                             {uid && contextUser.uid !== uid && 
                                 <button onClick={() => {
-                                    setDoseUserFollow((origin) => {
+                                        setDoseUserFollow((origin) => {
+                                        origin ? followersLength.current -= 1 : followersLength.current += 1
                                         axios.post(`https://ollim.herokuapp.com/updateFollowing`, {
                                             followingUserEmail: userInfo.userEmail,
                                             followedUserEmail: profileOwnerInfo.userEmail,
-                                            followingState: doseUserFollow
-                                        }).then((res) => {
+                                            followingState: origin
                                         })
                                         return !origin
                                     })
                                 }
-                                } className={`${doseUserFollow ? "bg-blue-400" : "bg-gray-300"} px-2 py-1 rounded-xl text-xs font-Nanum_Gothic font-bold text-gray-700`}>팔로우</button>
+                                } className={`${!doseUserFollow ? "bg-blue-400" : "bg-gray-300"} px-2 py-1 rounded-xl text-xs font-Nanum_Gothic font-bold text-gray-700`}>팔로우</button>
                             }
                             {(!uid || contextUser.uid === uid) && 
                             <svg
@@ -340,18 +440,23 @@ const Mypage = () => {
                         </div>
                         
                         {/* Posts, Followers, Followings */}
-                        {
-                        <div className="flex w-full items-center justify-center text-sm">
+                        {<div className="flex w-full items-center justify-center text-sm">
                             <div className="flex flex-col items-center justify-center">
                                 <span className="font-bold text-gray-400 font-Nanum_Gothic">{totalWritings.length}</span>                            
                                 <span className="">글</span>                            
                             </div>
-                            <div onClick={()=>{setFollowersModal(true)}} className="flex flex-col items-center justify-center mx-5 cursor-pointer">
-                                <span className="font-bold text-gray-400 font-Nanum_Gothic">{profileOwnerInfo.followers.length}</span>                            
+                            <div onClick={() => {
+                                handleMoreFollowers()
+                                followersLength.current && setFollowersModal(true)
+                            }} className="flex flex-col items-center justify-center mx-5 cursor-pointer">
+                                <span className="font-bold text-gray-400 font-Nanum_Gothic">{followersLength.current}</span>                            
                                 <span className="">팔로워</span>                            
-                                </div>
-                            <div className="flex flex-col items-center justify-center cursor-pointer">
-                                <span className="font-bold text-gray-400 font-Nanum_Gothic">{profileOwnerInfo.followings.length}</span>                           
+                            </div>
+                            <div onClick={() => {
+                                handleMoreFollowings()
+                                followingsLength.current && setFollowingsModal(true)
+                            }} className="flex flex-col items-center justify-center cursor-pointer">
+                                <span className="font-bold text-gray-400 font-Nanum_Gothic">{followingsLength.current}</span>                           
                                 <span className="">팔로우</span>                            
                             </div>
                         </div>}
@@ -374,10 +479,10 @@ const Mypage = () => {
                             <div className="w-full grid grid-cols-3 items-center mb-20">
                                 <span className="text-2xl font-bold justify-center col-start-2 w-full text-center">작성중인 글</span>
                                 <div className="grid grid-cols-4 col-start-3 gap-4 text-sm">
-                                    <button className={`rounded-xl hover:bg-gray-300 py-1 ${onWritingCategory === "NOVEL" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("NOVEL")}}>소설</button>
-                                    <button className={`rounded-xl hover:bg-gray-300 py-1 ${onWritingCategory === "POEM" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("POEM")}}>시</button>
-                                    <button className={`rounded-xl hover:bg-gray-300 py-1 ${onWritingCategory === "SCENARIO" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("SCENARIO")}}>시나리오</button>
-                                    <button className={`rounded-xl hover:bg-gray-300 py-1 ${onWritingCategory === "TOTAL" && "bg-gray-400"}`} onClick={()=>{setOnWritingCategory("TOTAL")}}>전체</button>
+                                    <button className={`shadow-lg border-2 border-writingSettingBorder rounded-xl hover:bg-writingSettingHoverBG py-1 ${onWritingCategory === "NOVEL" && "bg-genreSelectedBG"}`} onClick={()=>{setOnWritingCategory("NOVEL")}}>소설</button>
+                                    <button className={`shadow-lg border-2 border-writingSettingBorder rounded-xl hover:bg-writingSettingHoverBG py-1 ${onWritingCategory === "POEM" && "bg-genreSelectedBG"}`} onClick={()=>{setOnWritingCategory("POEM")}}>시</button>
+                                    <button className={`shadow-lg border-2 border-writingSettingBorder rounded-xl hover:bg-writingSettingHoverBG py-1 ${onWritingCategory === "SCENARIO" && "bg-genreSelectedBG"}`} onClick={()=>{setOnWritingCategory("SCENARIO")}}>시나리오</button>
+                                    <button className={`shadow-lg border-2 border-writingSettingBorder rounded-xl hover:bg-writingSettingHoverBG py-1 ${onWritingCategory === "TOTAL" && "bg-genreSelectedBG"}`} onClick={()=>{setOnWritingCategory("TOTAL")}}>전체</button>
                                 </div>
                             </div>
                             
@@ -404,6 +509,7 @@ const Mypage = () => {
                 </div>
             </div>
             :
+            // Loading Page
             <div className="w-screen h-screen flex items-center justify-center bg-opacity-30">
                 <img src="/logo/Ollim-logos_black.png" className="w-32 opacity-50" alt="loading" />
             </div>

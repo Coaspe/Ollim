@@ -99,3 +99,10 @@ export const getFollowersInfinite = async (followersEmailArr: string[], key: num
     query(collection(firestore, "users"), where("__name__", "in", tmp))
   );
 };
+
+export const getFollowingsInfinite = async (followingsEmailArr: string[], key: number) => {
+  const tmp = followingsEmailArr.slice(key, key + 5);
+  return await getDocs(
+    query(collection(firestore, "users"), where("__name__", "in", tmp))
+  );
+};

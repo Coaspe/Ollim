@@ -37,7 +37,7 @@ const MypageWritingSetting: React.FC<props> = ({ title, genre, killingVerse, syn
                                 <span className="text-xl font-black">{title}</span>
                                 <span className="text-sm text-gray-700 font-black ml-3">{gerneType[genre]}</span>
                             </div>
-                            <textarea value={synopsis} readOnly className="text-sm text-gray-400 mb-3 font-semibold resize-none bg-transparent overflow-y-hidden">{synopsis}</textarea>
+                            <textarea value={synopsis} readOnly className="cursor-pointer pointer-event-none text-sm text-gray-400 mb-3 font-semibold resize-none bg-transparent overflow-y-hidden">{synopsis}</textarea>
                         </motion.div>
                     <AnimatePresence>
                         {hoverExpandDetail && killingVerse &&
