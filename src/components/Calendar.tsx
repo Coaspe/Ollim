@@ -44,7 +44,6 @@ const Calendar: React.FC<props> = ({ totalCommits }) => {
 
             setRecent3MonthsCommits(tmp2)
         }
-        console.log(totalCommits);
         
         if (totalCommits) {
             initial()

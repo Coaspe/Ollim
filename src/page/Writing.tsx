@@ -15,6 +15,7 @@ import { Alert } from "@mui/material"
 import { Elements } from "react-flow-renderer"
 import { initialValue } from "../SlateEditor/utils"
 import WritingSetting from "../components/WritingSetting"
+import Header from "../components/Header"
 
 const Writing = () => {
 
@@ -123,7 +124,7 @@ const Writing = () => {
     return (
         <>
         { Object.keys(writingInfo).length > 0 && uid && genre && writingDocID &&
-        <div className=" w-full bg-opacity-30 relative writing-container">
+        <div className=" w-full bg-opacity-30 relative writing-container font-noto">
 
             {/* Alarm */}
             <AnimatePresence>
@@ -141,20 +142,10 @@ const Writing = () => {
                 }
             </AnimatePresence>
             
-            {table !== "WRITE" && 
-                <div onClick={()=>{navigate(`/`)}} className="cursor-pointer flex w-full font-noto items-center justify-between px-20">
-                    {/* logo */}
-                    <img className="h-28" src="/logo/Ollim-logos_transparent.png" alt="header logo" />
-                    {contextUserInfo.profileImg && 
-                    <div className="flex items-center">
-                        <img className="rounded-full w-7" src={contextUserInfo.profileImg} alt="header profile" />
-                        <span className="ml-3 font-noto_sans">{contextUserInfo.username}</span>
-                    </div>}
-                </div>
-            }
+            {table !== "WRITE" && <Header userInfo={contextUserInfo} />}
             
             {/* Writing title, genre, owner's name,  */}
-            <div className="flex font-noto flex-col items-start px-20">
+            <div className="flex flex-col items-start px-20">
                 <div className="flex flex-col items-start justify-center font-bold mb-10">
                     <div onClick={()=>{navigator(`/${writingOwnerInfo.uid}`)}} className="flex items-center justify-between mb-5 cursor-pointer">
                         <img className="w-7 rounded-full mr-2" src={writingOwnerInfo.profileImg} alt="writing owner" />
@@ -190,7 +181,7 @@ const Writing = () => {
                 table === "OVERVIEW" &&
                     (genre?.toLocaleLowerCase() === "poem" ?
                     (
-                        <div className="w-full h-screen font-noto flex flex-col items-start px-20 mt-20">
+                        <div className="w-full h-screen flex flex-col items-start px-20 mt-20">
                             {/* Synopsis div */}
                             <div className="flex flex-col w-2/3">
                                 <span className="text-2xl font-bold mb-10">여는 말</span>
@@ -199,7 +190,7 @@ const Writing = () => {
                         </div>
                     ) : (
                     diagram &&
-                        <div className="w-full font-noto flex flex-col items-start px-20 mt-20">
+                        <div className="w-full flex flex-col items-start px-20 mt-20">
                             {/* Synopsis div */}
                             <div className="flex flex-col w-2/3">
                                 <span className="text-2xl font-bold mb-10">시놉시스</span>

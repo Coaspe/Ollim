@@ -49,6 +49,12 @@ const SlateEditor = ({
   // Writing Info loading state
   const [loading, setLoading] = useState(false);
 
+  // Commit sccess
+  const commitSccess = useRef(false);
+  // To prevent thoughtless commit, temporary save
+  const commitButtonEnable = useRef(true);
+  const temporarySaveButtonEnable = useRef(true);
+
   // Render Slate leaf nodes
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
@@ -66,8 +72,6 @@ const SlateEditor = ({
   const [openModal, setOpenModal] = useState(false);
   // Memo open state
   const [openMemo, setOpenMemo] = useState(false);
-  // Whether commit contents loading completed
-  const [contentLoading, setContentLoading] = useState(true);
   // Selected commit key
   const [selectedKey, setSelectedKey] = useState("");
 
@@ -110,6 +114,7 @@ const SlateEditor = ({
         genre: writingInfo.genre,
       })
       .then((res) => {
+        temporarySaveButtonEnable.current = true;
         setAlarm(res.data);
         setTimeout(() => {
           setAlarm(["", "success", false]);
@@ -127,6 +132,8 @@ const SlateEditor = ({
         title: writingInfo.title,
       })
       .then((res) => {
+        commitSccess.current = !commitSccess.current;
+        commitButtonEnable.current = true;
         setAlarm(res.data);
         setTimeout(() => {
           setAlarm(["", "success", false]);
@@ -142,7 +149,7 @@ const SlateEditor = ({
     return () => {
       setOpenDiagram(false);
     };
-  }, []);
+  }, [commitSccess.current]);
 
   useEffect(() => {
     // Check is writingInfo empty
@@ -179,7 +186,8 @@ const SlateEditor = ({
   // If value changed (ex. selected commit changed)
   // If value changed is caused by typing something, there is no change with contentLoading
   useEffect(() => {
-    value.length > 0 && setContentLoading(true);
+    console.log(value);
+    value.length > 0 && setLoading(true);
   }, [value]);
 
   const memoVariants = {
@@ -224,7 +232,7 @@ const SlateEditor = ({
                     <button
                       onClick={() => {
                         // if (selectedKey !== key) {
-                        setContentLoading(false);
+                        setLoading(false);
                         setSelectedKey(key);
                         setValue(data[key]);
                         // }
@@ -305,60 +313,58 @@ const SlateEditor = ({
             </Tooltip>
           </Toolbar>
 
-          {contentLoading && (
-            <div
-              style={{
-                boxShadow: "0px 0px 10px rgba(0,0,0,0.3)",
-                backgroundColor: "#FAF6F5",
-              }}
+          <div
+            style={{
+              boxShadow: "0px 0px 10px rgba(0,0,0,0.3)",
+              backgroundColor: "#FAF6F5",
+            }}
+            className={cx(
+              "z-50 editor-inner",
+              css`
+                width: 210mm;
+                height: 297mm;
+                overflow-y: scroll;
+              `
+            )}
+          >
+            <Editable
               className={cx(
-                "z-50 editor-inner",
+                "w-full",
                 css`
-                  width: 210mm;
-                  height: 297mm;
-                  overflow-y: scroll;
+                  padding-top: 20px;
+                  p {
+                    cursor: text;
+                  }
                 `
               )}
-            >
-              <Editable
-                className={cx(
-                  "w-full",
-                  css`
-                    padding-top: 20px;
-                    p {
-                      cursor: text;
-                    }
-                  `
-                )}
-                onMouseUp={(e) => {
-                  let seleted = Editor.string(editor, editor.selection);
-                  setSelected(seleted);
-                }}
-                onBlur={() => {
-                  setSelected("");
-                }}
-                renderElement={renderElement}
-                renderLeaf={renderLeaf}
-                spellCheck="false"
-                autoFocus
-                onKeyDown={(event) => {
-                  for (const hotkey in HOTKEYS) {
-                    if (isHotkey(hotkey, event)) {
-                      event.preventDefault();
-                      const mark = HOTKEYS[hotkey];
-                      if (mark === "diagram") {
-                        setOpenDiagram((origin) => !origin);
-                      } else if (mark === "tempSave") {
-                        handleRequestTempSave();
-                      } else {
-                        toggleMark(editor, mark);
-                      }
+              onMouseUp={(e) => {
+                let seleted = Editor.string(editor, editor.selection);
+                setSelected(seleted);
+              }}
+              onBlur={() => {
+                setSelected("");
+              }}
+              renderElement={renderElement}
+              renderLeaf={renderLeaf}
+              spellCheck="false"
+              autoFocus
+              onKeyDown={(event) => {
+                for (const hotkey in HOTKEYS) {
+                  if (isHotkey(hotkey, event)) {
+                    event.preventDefault();
+                    const mark = HOTKEYS[hotkey];
+                    if (mark === "diagram") {
+                      setOpenDiagram((origin) => !origin);
+                    } else if (mark === "tempSave") {
+                      handleRequestTempSave();
+                    } else {
+                      toggleMark(editor, mark);
                     }
                   }
-                }}
-              />
-            </div>
-          )}
+                }
+              }}
+            />
+          </div>
 
           {/* Save Div */}
           <div
@@ -370,6 +376,7 @@ const SlateEditor = ({
               onClick={() => {
                 handleRequestTempSave();
               }}
+              disabled={!temporarySaveButtonEnable.current}
               className="w-28 h-10 text-sm rounded-2xl mr-5 border-2 border-blue-400 text-blue-400 bg-transparent"
             >
               임시 저장
@@ -377,8 +384,11 @@ const SlateEditor = ({
             <motion.button
               whileHover={{ y: "-10%" }}
               onClick={() => {
+                temporarySaveButtonEnable.current = false;
                 setOpenCommitModal(true);
+                commitButtonEnable.current = false;
               }}
+              disabled={!commitButtonEnable.current}
               className="w-28 h-10 text-sm rounded-2xl border-2 border-blue-400 text-blue-400 bg-transparent"
             >
               제출

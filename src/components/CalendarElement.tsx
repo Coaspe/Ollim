@@ -12,7 +12,6 @@ const CalendarElement: React.FC<props> = ({ yearMonth, keys, totalCommits }) => 
 
     useEffect(() => {
         if (yearMonth && keys && totalCommits) {
-            console.log("CalendarElement", totalCommits);
             const tmp: { [key: number]: string[] } = {}
     
             Array.from(Array(moment(yearMonth, "YYYY-MM").daysInMonth()).keys()).forEach((date)=>(tmp[date+1] = []))

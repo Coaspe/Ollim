@@ -20,6 +20,8 @@ module.exports = {
         writingSettingBorder: "#e4d0ca",
         writingSettingHoverBG: "#f2e3de",
         hoverSpanMenu: "#c69e92",
+        writingButton: "#e6cec8",
+        wirtingButtonHover: "#f5ebe9",
       },
       fontSize: {
         xs: ".55rem",

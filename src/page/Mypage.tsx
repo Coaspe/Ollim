@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "../redux/store"
 import { alarmType, getFirestoreNovel, getFirestorePoem, getFirestoreScenario, getFirestoreUser, getFirestoreUserWritings } from "../type"
 import { alarmAction, userInfoAction } from "../redux"
-import { useNavigate, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 
 import Calendar from "../components/Calendar"
 import { Alert } from "@mui/material"
@@ -19,6 +19,7 @@ import axios from "axios"
 import FollowingRow from "../components/FollowingRow"
 import FollowerRow from "../components/FollowerRow"
 import FollowersFollowingsSkeleton from "../components/FollowersFollowingsSkeleton"
+import Header from "../components/Header"
 
 const Mypage = () => {
 
@@ -77,8 +78,6 @@ const Mypage = () => {
     const setAlarm = (alarm: [string ,alarmType, boolean]) => {
         dispatch(alarmAction.setAlarm({alarm}))
     }
-
-    const navigator = useNavigate()
 
     // Load more profile owner's followers, followings
     const handleMoreFollowers = useCallback(() => {
@@ -139,8 +138,20 @@ const Mypage = () => {
         }
     }, [uid])
 
-    // Get profileOwner's user Info
+    // Get profileOwner's user info and user's writings info
     useEffect(() => {
+
+        const getWritings = async (userWritings: getFirestoreUserWritings) => {
+            const poems = userWritings.poemDocID ? await getPoemArrayInfo(userWritings.poemDocID) : []
+            const novel = userWritings.novelDocID ? await getNovelArrayInfo(userWritings.novelDocID) : []
+            const scenario = userWritings.scenarioDocID ? await getScenarioArrayInfo(userWritings.scenarioDocID) : []
+
+            setPoems((poems as Array<getFirestorePoem>).sort((a, b) => (b.dateCreated - a.dateCreated)))
+            setNovels((novel as Array<getFirestoreNovel>).sort((a, b) => (b.dateCreated - a.dateCreated)))
+            setScenarioes((scenario as Array<getFirestoreScenario>).sort((a, b) => (b.dateCreated - a.dateCreated)))
+            setTotalWritings(Array.prototype.concat(poems, novel, scenario).sort((a, b) => (b.dateCreated - a.dateCreated)))
+        }
+
         if (uid) {
             getUserByUID(uid as string).then((res: any) => {
                 const data = res.docs[0].data();
@@ -148,6 +159,7 @@ const Mypage = () => {
                 setProfileImage(data.profileImg)
                 getUserWritings(data.uid).then((writings: any) => {
                     setUserWritings(writings as getFirestoreUserWritings)
+                    getWritings(writings)
                 })
                 followersLength.current = data.followers.length
                 followingsLength.current = data.followings.length
@@ -159,12 +171,14 @@ const Mypage = () => {
                 setProfileOwnerInfo(data)
                 getUserWritings(data.uid).then((writings: any) => {
                     setUserWritings(writings as getFirestoreUserWritings)
+                    getWritings(writings)
                 })
                 setProfileImage(data.profileImg)
                 followersLength.current = data.followers.length
                 followingsLength.current = data.followings.length
             })
         }
+
     }, [uid, contextUser.uid])
 
     // Get context user's information
@@ -175,23 +189,6 @@ const Mypage = () => {
             setDoseUserFollow(data.followings.includes(profileOwnerInfo.userEmail))
         })
     }, [profileOwnerInfo])
-    
-    // Get writings information from firestore
-    useEffect(() => {
-        const getWritings = async () => {
-            const poems = await getPoemArrayInfo(userWritings.poemDocID)
-            const novel = await getNovelArrayInfo(userWritings.novelDocID)
-            const scenario = await getScenarioArrayInfo(userWritings.scenarioDocID)
-
-            setPoems((poems as Array<getFirestorePoem>).sort((a, b) => (b.dateCreated - a.dateCreated)))
-            setNovels((novel as Array<getFirestoreNovel>).sort((a, b) => (b.dateCreated - a.dateCreated)))
-            setScenarioes((scenario as Array<getFirestoreScenario>).sort((a, b) => (b.dateCreated - a.dateCreated)))
-            setTotalWritings(Array.prototype.concat(poems, novel, scenario).sort((a, b) => (b.dateCreated - a.dateCreated)))
-        }
-        if (Object.keys(userWritings).length !== 0) {
-            getWritings()
-        }
-    }, [userWritings, uid])
 
     // Image Compress process
     const handleFileOnChange = (event: any) => {
@@ -356,36 +353,9 @@ const Mypage = () => {
             <div className="relative w-full font-noto bg-opacity-30">
                 {/* New Writing Modal */}
                 {newWritingModalOpen && <NewWritingModal setNewWritingModalOpen={setNewWritingModalOpen}/>}
-                <div className="flex w-full items-center justify-between px-20">
-                    {/* logo */}
-                    <img className="h-28" src="logo/Ollim-logos_transparent.png" alt="header logo" />
-                        {userInfo ?
-                        <div 
-                        onClick={()=>{navigator(`/${userInfo.uid}`)}}
-                        className="flex items-center cursor-pointer">
-                        <img src={userInfo.profileImg} className="w-7 mr-3 rounded-full" alt="user profile" />
-                        <span>{userInfo.username}</span>
-                        </div>
-                    : 
-                    <div>
-                        <svg
-                            className="w-7 rounded-full"
-                            x="0px" y="0px"
-                            viewBox="0 0 481.5 481.5">
-                        <g>
-                            <g>
-                                <path d="M0,240.7c0,7.5,6,13.5,13.5,13.5h326.1l-69.9,69.9c-5.3,5.3-5.3,13.8,0,19.1c2.6,2.6,6.1,4,9.5,4s6.9-1.3,9.5-4l93-93
-                                    c5.3-5.3,5.3-13.8,0-19.1l-93-93c-5.3-5.3-13.8-5.3-19.1,0c-5.3,5.3-5.3,13.8,0,19.1l69.9,69.9h-326C6,227.2,0,233.2,0,240.7z"/>
-                                <path d="M382.4,0H99C44.4,0,0,44.4,0,99v58.2c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5V99c0-39.7,32.3-72,72-72h283.5
-                                    c39.7,0,72,32.3,72,72v283.5c0,39.7-32.3,72-72,72H99c-39.7,0-72-32.3-72-72V325c0-7.5-6-13.5-13.5-13.5S0,317.5,0,325v57.5
-                                    c0,54.6,44.4,99,99,99h283.5c54.6,0,99-44.4,99-99V99C481.4,44.4,437,0,382.4,0z"/>
-                            </g>
-                        </g>
-                        </svg>
-
-                    </div>
-                    }
-                </div> 
+                
+                {/* Header */}
+                <Header userInfo={userInfo} />
                 
                 <div className="w-full flex">
                     
@@ -479,18 +449,18 @@ const Mypage = () => {
                             <div className="w-full grid grid-cols-3 items-center mb-20">
                                 <span className="text-2xl font-bold justify-center col-start-2 w-full text-center">작성중인 글</span>
                                 <div className="grid grid-cols-4 col-start-3 gap-4 text-sm">
-                                    <button className={`shadow-lg border-2 border-writingSettingBorder rounded-xl hover:bg-writingSettingHoverBG py-1 ${onWritingCategory === "NOVEL" && "bg-genreSelectedBG"}`} onClick={()=>{setOnWritingCategory("NOVEL")}}>소설</button>
-                                    <button className={`shadow-lg border-2 border-writingSettingBorder rounded-xl hover:bg-writingSettingHoverBG py-1 ${onWritingCategory === "POEM" && "bg-genreSelectedBG"}`} onClick={()=>{setOnWritingCategory("POEM")}}>시</button>
-                                    <button className={`shadow-lg border-2 border-writingSettingBorder rounded-xl hover:bg-writingSettingHoverBG py-1 ${onWritingCategory === "SCENARIO" && "bg-genreSelectedBG"}`} onClick={()=>{setOnWritingCategory("SCENARIO")}}>시나리오</button>
-                                    <button className={`shadow-lg border-2 border-writingSettingBorder rounded-xl hover:bg-writingSettingHoverBG py-1 ${onWritingCategory === "TOTAL" && "bg-genreSelectedBG"}`} onClick={()=>{setOnWritingCategory("TOTAL")}}>전체</button>
+                                    <button className={`text-gray-700 font-semibold shadow border border-writingButton rounded-2xl hover:bg-wirtingButtonHover py-1 ${onWritingCategory === "NOVEL" && "bg-writingButton"}`} onClick={()=>{setOnWritingCategory("NOVEL")}}>소설</button>
+                                    <button className={`text-gray-700 font-semibold shadow border border-writingButton rounded-2xl hover:bg-wirtingButtonHover py-1 ${onWritingCategory === "POEM" && "bg-writingButton"}`} onClick={()=>{setOnWritingCategory("POEM")}}>시</button>
+                                    <button className={`text-gray-700 font-semibold shadow border border-writingButton rounded-2xl hover:bg-wirtingButtonHover py-1 ${onWritingCategory === "SCENARIO" && "bg-writingButton"}`} onClick={()=>{setOnWritingCategory("SCENARIO")}}>시나리오</button>
+                                    <button className={`text-gray-700 font-semibold shadow border border-writingButton rounded-2xl hover:bg-wirtingButtonHover py-1 ${onWritingCategory === "TOTAL" && "bg-writingButton"}`} onClick={()=>{setOnWritingCategory("TOTAL")}}>전체</button>
                                 </div>
                             </div>
                             
                             <div className="grid grid-cols-3 items-center justify-between w-full gap-5">
-                                {onWritingCategory === "NOVEL" && novels.map((data) => (<MypageWriting key={data.dateCreated} data={data} />))}
-                                {onWritingCategory === "POEM" && poems.map((data) => (<MypageWriting key={data.dateCreated} data={data} />))}
-                                {onWritingCategory === "SCENARIO" && scenarioes.map((data) => (<MypageWriting key={data.dateCreated} data={data} />))}
-                                {onWritingCategory === "TOTAL" && totalWritings.map((data) => (<MypageWriting key={data.dateCreated} data={data} />))}
+                                {onWritingCategory === "NOVEL" && novels && novels.map((data) => (<MypageWriting key={data.dateCreated} data={data} />))}
+                                {onWritingCategory === "POEM" && poems && poems.map((data) => (<MypageWriting key={data.dateCreated} data={data} />))}
+                                {onWritingCategory === "SCENARIO" && scenarioes && scenarioes.map((data) => (<MypageWriting key={data.dateCreated} data={data} />))}
+                                {onWritingCategory === "TOTAL" && totalWritings && totalWritings.map((data) => (<MypageWriting key={data.dateCreated} data={data} />))}
                             </div>
                         </div>
                         <motion.div layout className="flex items-center flex-col my-20 w-2/3">

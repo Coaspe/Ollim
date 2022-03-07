@@ -74,7 +74,6 @@ export const fontSizeMark = (editor, sizeParam) => {
 
 export const getFontSize = (editor) => {
   const value = Editor.marks(editor);
-  console.log(value);
   return value ? value.fontSize : 13.3;
 };
 
