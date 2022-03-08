@@ -185,7 +185,7 @@ const Writing = () => {
                             {/* Synopsis div */}
                             <div className="flex flex-col w-2/3">
                                 <span className="text-2xl font-bold mb-10">여는 말</span>
-                                <p className="px-3 py-3 border border-opacity-5 border-black shadow-lg w-full h-72 overflow-y-scroll">{writingInfo.synopsis}</p>
+                                <textarea value={writingInfo.synopsis} style={{backgroundColor: "#FAF6F5"}} disabled className="border-opacity-5 border-black shadow-lg px-3 py-3 resize-none border w-full h-72 overflow-y-scroll focus:outline-none">{writingInfo.synopsis}</textarea>
                             </div>
                         </div>
                     ) : (

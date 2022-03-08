@@ -273,7 +273,7 @@ const Mypage = () => {
                     className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scrolll"
                     >
                         {!loading ? followers.map((data)=>(
-                            <FollowerRow data={data} setFollowersModal={setFollowersModal} />
+                            <FollowerRow key={data.userEmail} data={data} setFollowersModal={setFollowersModal} />
                         ))                        
                         :
                             // Skeleton
@@ -314,7 +314,7 @@ const Mypage = () => {
                         {/* Followings list */}
                         {!loading ? 
                         followings.map((data)=>(
-                            <FollowingRow data={data} setFollowingsModal={setFollowingsModal} />
+                            <FollowingRow key={data.userEmail} data={data} setFollowingsModal={setFollowingsModal} />
                         ))                        
                         :
                             // Skeleton

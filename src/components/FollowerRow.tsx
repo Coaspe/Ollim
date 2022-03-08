@@ -13,7 +13,7 @@ const FollowerRow: React.FC<props> = ({data, setFollowersModal}) => {
         <motion.div whileHover={{y: "-10%"}} onClick={() => {
                 setFollowersModal(false)
                 navigator(`/${data.uid}`)
-            }} key={data.userEmail} className="w-full flex items-center cursor-pointer shadow-lg px-2 py-1 rounded-2xl">
+            }} className="w-full flex items-center cursor-pointer shadow-lg px-2 py-1 rounded-2xl">
             <img className="w-7 rounded-full" src={data.profileImg} alt="follower" />
             <span className="ml-3">{data.username}</span>
         </motion.div>
