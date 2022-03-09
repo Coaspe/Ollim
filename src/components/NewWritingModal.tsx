@@ -40,6 +40,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
             setElements([])
         }
     }, [])
+
     const handleGenrnError = () => {
         genrnError && setGenrnError(false)
     }
@@ -63,7 +64,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
             
             {/* First page: Decide Gerne, Title, Synopsis*/}
             {page === "MAIN" && userInfo &&
-            <div onClick={(e) => { e.stopPropagation() }} style={{backgroundColor: "#faf6f5"}} className="relative w-1/2 h-3/4 py-5 px-5 flex flex-col items-center rounded-xl">
+            <div onClick={(e) => { e.stopPropagation() }} style={{backgroundColor: "#faf6f5"}} className="relative w-1/2 h-3/4 py-5 flex flex-col items-center justify-center rounded-xl">
 
                 {/* right arrow (scenario, novel) or confirm svg (poem) */}
                 {genrn !== 'POEM' ?
@@ -120,7 +121,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                 {/* Genrn div */}
                 <div className="flex flex-col items-start justify-between w-3/4">
                     <div className="flex items-center">
-                        <span className="text-2xl font-bold">장르</span>
+                        <span className="text-xl font-bold">장르</span>
                         {genrnError && <motion.span className="text-sm ml-2 font-bold text-red-400" animate={{ opacity: [0, 1] }} transition={{ duration: 0.1 }}>장르를 선택해주세요!</motion.span>}
                     </div>
                     <div className="flex items-center justify-between mt-5 w-1/2">
@@ -146,7 +147,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                 <div className="mt-10 flex w-3/4 items-center">
                     <div className="flex flex-col items-start w-1/2 h-full">
                         <div className="flex items-center">
-                            <span className="text-2xl font-bold">제목</span>
+                            <span className="text-xl font-bold">제목</span>
                             {titleError && <motion.span className="text-sm ml-2 font-bold text-red-400" animate={{ opacity: [0, 1] }} transition={{ duration: 0.1 }}>제목을 입력해주세요!</motion.span>}
                         </div>
                         <input style={{borderColor: "#e4d0ca"}} className="text-lg font-md border-2 py-2 px-3 mt-5 rounded-xl w-full placeholder:italic"
@@ -158,9 +159,9 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                                 e.target.value && handleTitleError()
                             }} />
                         </div>
-                        <div className="flex flex-col items-start w-1/2 h-full">
-                            <span className="text-2xl font-bold">공개 범위</span>
-                            <div className="w-full flex items-center justify-between mt-5 py-2 px-3">
+                        <div className="flex flex-col items-start w-1/2 h-full ml-3 px-3">
+                            <span className="text-xl font-bold">공개 범위</span>
+                            <div className="w-full flex items-center justify-between mt-5 py-2">
                                 <button style={{borderColor: "#e4d0ca"}} className={`text-md font-bold border py-2 px-3 rounded-full hover:bg-hoverBGColor ${disclosure === "PUBLIC" && "bg-genreSelectedBG"}`} onClick={()=>{setDisclosure("PUBLIC")}}>모두</button>
                                 <button style={{borderColor: "#e4d0ca"}} className={`text-md font-bold border py-2 px-3 rounded-full hover:bg-hoverBGColor ${disclosure === "FOLLOWERS" && "bg-genreSelectedBG"}`} onClick={()=>{setDisclosure("FOLLOWERS")}}>팔로워</button>
                                 <button style={{borderColor: "#e4d0ca"}} className={`text-md font-bold border py-2 px-3 rounded-full hover:bg-hoverBGColor ${disclosure === "PRIVATE" && "bg-genreSelectedBG"}`} onClick={()=>{setDisclosure("PRIVATE")}}>비공개</button>
@@ -170,8 +171,8 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
 
                 {/* Opening article div */}
                 <div className="mt-10 flex flex-col items-start w-3/4">
-                    <span className="text-2xl font-bold">{genrn === 'POEM' ? "여는 말" : "시놉시스"}</span>
-                    <textarea style={{borderColor: "#e4d0ca"}} className="resize-none border-2 py-2 px-3 mt-5 rounded-xl h-28 w-full italic" placeholder={genrn === 'POEM' ? "전시될 여는 말을 서술해주세요." : "전시될 시놉시스를 간략하게 서술해주세요."} value={synopsis} spellCheck="false" onChange={(e) => { setSynopsis(e.target.value) }} />
+                    <span className="text-xl font-bold">{genrn === 'POEM' ? "여는 말" : "시놉시스"}</span>
+                    <textarea style={{borderColor: "#e4d0ca"}} className="resize-none border-2 pt-2 px-3 mt-5 rounded-xl h-28 w-full italic" placeholder={genrn === 'POEM' ? "전시될 여는 말을 서술해주세요." : "전시될 시놉시스를 간략하게 서술해주세요."} value={synopsis} spellCheck="false" onChange={(e) => { setSynopsis(e.target.value) }} />
                 </div>
             </div>}
 
