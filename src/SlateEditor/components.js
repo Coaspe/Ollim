@@ -143,7 +143,7 @@ export const Toolbar = React.forwardRef(
       isFullScreen={isFullScreen}
       ref={ref}
       style={{
-        backgroundColor: "#f6f6f6",
+        backgroundColor: "#FAF6F5",
         padding: "12px 18px",
         zIndex: 1000,
       }}

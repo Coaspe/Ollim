@@ -318,14 +318,9 @@ const SlateEditor = ({
               boxShadow: "0px 0px 10px rgba(0,0,0,0.3)",
               backgroundColor: "#FAF6F5",
             }}
-            className={cx(
-              "z-50 editor-inner",
-              css`
-                width: 210mm;
-                height: 297mm;
-                overflow-y: scroll;
-              `
-            )}
+            className={
+              "z-50 editor-inner overflow-y-scroll w-noneFullScreenMenu h-a4Height GalaxyS20Ultra:mx-10 GalaxyS20Ultra:w-20"
+            }
           >
             <Editable
               className={cx(

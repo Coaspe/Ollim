@@ -1,12 +1,11 @@
 import axios from "axios";
 import { motion } from "framer-motion"
-import { useEffect, useState } from "react"
-import { Elements } from "react-flow-renderer";
+import { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import DiagramNewWritings from "../diagram/RelationShipDiagramNewWritings";
-import { alarmAction } from "../redux";
+import { alarmAction, elementsAction } from "../redux";
 import { RootState } from "../redux/store";
-import { addNovelScenarioArg, addPoemArg, genre, page, disclosure, alarmType, toObjectElements } from "../type";
+import { addNovelScenarioArg, addPoemArg, genre, page, disclosure, alarmType } from "../type";
 
 interface NewWritingProps {
     setNewWritingModalOpen:React.Dispatch<React.SetStateAction<boolean>>
@@ -22,8 +21,14 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
     const [disclosure, setDisclosure] = useState<disclosure>("PUBLIC")
     const dispatch = useDispatch()
 
-    const [elements, setElements] = useState<Elements<any>>([])
-    const [diagram, setDiagram] = useState<toObjectElements>({} as toObjectElements)
+    const setElements = useCallback(
+        (elements) => {
+        dispatch(elementsAction.setElements({ elements: elements }));
+        },
+        [dispatch]
+    );
+
+    const diagram = useSelector((state:RootState)=> state.setDiagram.diagram)
 
     const userInfo = useSelector((state: RootState) => state.setUserInfo.userInfo)
 
@@ -210,7 +215,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                 
                 {/* Characters relationships diagram*/}
                 <span className="abosolute left-1/2 top-5 font-bold text-2xl">인물관계도</span>
-                <DiagramNewWritings elements={elements} setElements={setElements} diagram={diagram} setDiagram={setDiagram} />
+                <DiagramNewWritings />
             </div>}
             
             {/* {page === 3 &&} */}

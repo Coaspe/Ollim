@@ -30,6 +30,12 @@ module.exports = {
         fullScreenMenu: "90mm",
         noneFullScreenMenu: "210mm",
       },
+      height: {
+        a4Height: "297mm",
+      },
+      screens: {
+        GalaxyS20Ultra: "400px",
+      },
     },
   },
   plugins: [],

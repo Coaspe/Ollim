@@ -111,7 +111,7 @@ const WritingSetting: React.FC<props> = ({
                             <MypageWritingSetting title={writingInfo.title} genre={writingInfo.genre as genre} killingVerse={killingVerse} synopsis={synopsis} /> 
                         </div>
                         <div style={{borderLeft: "3px"}} className="h-36 mx-10"></div>
-                        <div className="flex flex-col justify-between w-1/3 h-72 border-black border border-opacity-5 shadow-lg rounded-lg px-10 py-5">
+                        <div style={{backgroundColor: "#FAF6F5"}} className="flex flex-col justify-between w-1/3 h-72 border-black border border-opacity-5 shadow-lg rounded-lg px-10 py-5">
                             <AnimatePresence>
                                 <motion.div layout className="flex flex-col gap-2">
                                     {killingVerse.map((verse, index) => (

@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import ReactFlow, {
   addEdge,
   MiniMap,
   Controls,
   ControlButton,
-  Elements,
   Background,
 } from 'react-flow-renderer';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,8 +11,7 @@ import ColorSelectorNode from './RelationShipDiagramNode';
 import { diagramAction, elementsAction } from '../redux';
 import { RootState } from '../redux/store';
 import ButtonEdge from './ButtonEdge';
-import { toObjectElements, alarmType } from '../type';
-import axios from 'axios';
+
 const initBgColor = '#faf6f5';
 const edgeTypes = {
   buttonedge: ButtonEdge,
@@ -23,16 +21,27 @@ const snapGrid = [20, 20];
 const nodeTypes = {
   selectorNode: ColorSelectorNode,
 };
-interface props {
-  elements: Elements<any>
-  setElements: React.Dispatch<React.SetStateAction<Elements<any>>>
-  diagram: toObjectElements
-  setDiagram: React.Dispatch<React.SetStateAction<toObjectElements>>
-}
-const DiagramNewWritings:React.FC<props> = ({elements, setElements, diagram, setDiagram}) => {
+
+const DiagramNewWritings= () => {
   const [reactflowInstance, setReactflowInstance] = useState<any>(null);
   const pos = useRef([10, 10])
 
+  const dispatch = useDispatch();
+  const elements = useSelector((state: RootState) => state.setElements.elements);
+  const setElements = useCallback(
+    (elements) => {
+      dispatch(elementsAction.setElements({ elements: elements }));
+    },
+    [dispatch]
+  );
+  const setDiagram = useCallback(
+      (diagram) => {
+      dispatch(diagramAction.setDiagram({ diagram }));
+      },
+      [dispatch]
+  );
+  const diagram = useSelector((state: RootState) => state.setDiagram.diagram)
+  
   const onLoad = useCallback(
     (rfi) => {
       if (!reactflowInstance) {
@@ -58,11 +67,13 @@ const DiagramNewWritings:React.FC<props> = ({elements, setElements, diagram, set
     pos.current[1] += 10
     setElements([...elements, addedNode])
   }
+
   const onConnect = (params: any) => {
       setElements(
         [...addEdge({ ...params, type: 'buttonedge', data: { label: "" } }, elements)]
       )
   }
+
   const onNodeDragStop = (event: any, node: any) => {
     let elementsTmp = diagram.elements.slice()
     elementsTmp[(parseInt(node.id) - 1)] = node
@@ -74,6 +85,7 @@ const DiagramNewWritings:React.FC<props> = ({elements, setElements, diagram, set
         reactflowInstance.fitView();
       }
     }, [reactflowInstance]);
+  
   useEffect(() => {
       if (reactflowInstance) {
         setDiagram(reactflowInstance.toObject());
