@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion"
-import { useCallback, useContext, useEffect, useRef, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import UserContext from "../context/user"
 import CustomNodeFlowRDOnly from "../diagram/RelationShipDiagramReadOnly"
@@ -77,7 +77,6 @@ const Writing = () => {
             setDiagram({} as toObjectElements)
         }
     }, [contextUser.email])
-
     // useEffect to get writing's owner's information
     useEffect(() => {
         if (uid) {
@@ -118,6 +117,7 @@ const Writing = () => {
             y:-10
         }
     }
+
     return (
         <>
         { Object.keys(writingInfo).length > 0 && uid && genre && writingDocID &&
@@ -239,7 +239,7 @@ const Writing = () => {
                             `
                                 )}
                             >
-                            <SlateEditorRDOnly openDiagram={openDiagram} setOpenDiagram={setOpenDiagram} writingDocID={writingDocID} genre={writingInfo.genre}/>
+                            <SlateEditorRDOnly writingDocID={writingDocID} genre={writingInfo.genre}/>
                     </div>
             }
             

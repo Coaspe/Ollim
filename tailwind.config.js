@@ -1,4 +1,5 @@
 module.exports = {
+  // important: true,
   content: [
     "./public/**/*.html",
     "./src/**/*.{js,jsx,ts,tsx}",
@@ -28,7 +29,7 @@ module.exports = {
       },
       width: {
         fullScreenMenu: "90mm",
-        noneFullScreenMenu: "210mm",
+        noneFullScreenMenu: "220mm",
       },
       height: {
         a4Height: "297mm",

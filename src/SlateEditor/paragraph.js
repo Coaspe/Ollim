@@ -4,15 +4,15 @@ const Paragraph = (props) => {
   return (
     <p
       tabIndex={-1}
-      className="relative flex items-center group focus:outline-none"
+      className="flex items-center group focus:outline-none"
       {...props.attributes}
     >
       <span
         className={cx(
-          "select-none inline-block w-5 h-full text-right text-xs mr-5 text-gray-300 font-semibold group-focus:text-red-500",
+          "pointer-events-none select-none block h-full text-center text-xs w-5 text-gray-300 font-semibold group-focus:text-red-500",
           css`
             -moz-user-modify: read-only;
-            -webkit-user-focus: normal;
+            -webkit-user-focus: ignore;
             -webkit-user-modify: read-only;
           `
         )}

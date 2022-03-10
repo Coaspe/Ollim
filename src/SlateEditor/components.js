@@ -112,17 +112,16 @@ export const Menu = React.forwardRef(
       ref={ref}
       className={cx(
         className,
-        `${
-          isFullScreen ? "absolute" : "sticky"
-        } drop-shadow-md border-t border-black border-opacity-5`,
+        `drop-shadow-md border-t border-black border-opacity-5 justify-start flex items-center ${
+          isFullScreen
+            ? "absolute grid grid-cols-3 place-items-center gap-2 w-60"
+            : "sticky space-x-3.5 > * + *"
+        }`,
         css`
           border-radius: 10px;
           margin-bottom: 10px;
           & > * {
             display: inline-block;
-          }
-          & > * + * {
-            margin-left: 15px;
           }
         `
       )}
@@ -144,7 +143,7 @@ export const Toolbar = React.forwardRef(
       ref={ref}
       style={{
         backgroundColor: "#FAF6F5",
-        padding: "12px 18px",
+        padding: isFullScreen ? "10px 0px" : "12px 18px",
         zIndex: 1000,
       }}
       className={cx(

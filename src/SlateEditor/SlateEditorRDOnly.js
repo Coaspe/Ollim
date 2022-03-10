@@ -3,17 +3,12 @@ import { Editable, withReact, Slate, ReactEditor } from "slate-react";
 import { createEditor } from "slate";
 import { withHistory } from "slate-history";
 import { cx, css } from "@emotion/css";
-import Paragraph from "./paragraph";
 import { getWritingInfo } from "../services/firebase";
 import { motion } from "framer-motion";
 import { Leaf } from "./utils";
+import ParagraphWithoutNum from "./paragraphWithoutNum";
 
-const SlateEditorRDOnly = ({
-  openDiagram,
-  setOpenDiagram,
-  writingDocID,
-  genre,
-}) => {
+const SlateEditorRDOnly = ({ writingDocID, genre }) => {
   const [value, setValue] = useState([]);
   const [selectedKey, setSelectedKey] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,7 +30,7 @@ const SlateEditorRDOnly = ({
       }
     }
     return (
-      <Paragraph
+      <ParagraphWithoutNum
         element={element}
         attributes={attributes}
         children={children}
@@ -129,7 +124,7 @@ const SlateEditorRDOnly = ({
             backgroundColor: "#FAF6F5",
           }}
           className={cx(
-            "editor-inner",
+            "z-50 editor-inner overflow-y-scroll w-noneFullScreenMenu h-a4Height overflow-x-hidden",
             css`
               width: 210mm;
               height: 297mm;
@@ -147,9 +142,20 @@ const SlateEditorRDOnly = ({
             >
               <Editable
                 className={cx(
-                  "w-full",
+                  "whitespace-pre-wrap break-all",
                   css`
                     padding-top: 20px;
+                    padding-bottom: 20px;
+                    width: 220mm;
+                    p {
+                      cursor: text;
+                      width: 210mm;
+                      padding-right: 20px;
+                      padding-left: 20px;
+                    }
+                    span {
+                      max-width: 210mm;
+                    }
                   `
                 )}
                 renderElement={renderElement}
@@ -157,12 +163,13 @@ const SlateEditorRDOnly = ({
                 spellCheck="false"
                 readOnly
               />
-              <motion.div
+              <div
                 whileHover={{ y: "-10%" }}
                 style={{ bottom: "5%", right: "5%" }}
                 className="fixed font-noto flex"
               >
-                <span
+                <motion.span
+                  whileHover={{ y: "-10%" }}
                   onClick={() => {
                     const doc = document.querySelector(".editor-container");
                     if (doc) {
@@ -172,23 +179,24 @@ const SlateEditorRDOnly = ({
                       setIsFullScreen(!document.fullscreenElement);
                     }
                   }}
-                  style={{ fontSize: "50px" }}
+                  style={{ fontSize: "2rem" }}
                   className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-middle bg-white rounded-full inline-block px-2 py-2"
                 >
                   {isFullScreen ? "fullscreen_exit" : "fullscreen"}
-                </span>
-                <span
+                </motion.span>
+                <motion.span
+                  whileHover={{ y: "-10%" }}
                   onClick={() => {
                     if (writingInfo.commits.length !== 0) {
                       setOpenModal(true);
                     }
                   }}
-                  style={{ fontSize: "50px" }}
+                  style={{ fontSize: "2rem" }}
                   className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
                 >
                   update
-                </span>
-              </motion.div>
+                </motion.span>
+              </div>
             </Slate>
           )}
         </div>

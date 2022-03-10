@@ -5,7 +5,6 @@ import { Editor, createEditor } from "slate";
 import { withHistory } from "slate-history";
 import { Toolbar } from "./components";
 import { cx, css } from "@emotion/css";
-import Paragraph from "./paragraph";
 import { alarmAction } from "../redux";
 import { getWritingInfo } from "../services/firebase";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,7 +22,8 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { Tooltip } from "@mui/material";
 import "../style/Slate.css";
-
+import ResizeObserver from "rc-resize-observer";
+import ParagraphWithoutNum from "./paragraphWithoutNum";
 const HOTKEYS = {
   "mod+b": "bold",
   "mod+i": "italic",
@@ -40,8 +40,9 @@ const SlateEditor = ({
   value,
   setValue,
 }) => {
-  const dispatch = useDispatch();
+  const [percentage, setPercentage] = useState(0);
 
+  const dispatch = useDispatch();
   const isInitialMount = useRef(0);
 
   // Writing Info loading state
@@ -93,7 +94,7 @@ const SlateEditor = ({
       }
     }
     return (
-      <Paragraph
+      <ParagraphWithoutNum
         element={element}
         attributes={attributes}
         children={children}
@@ -195,6 +196,13 @@ const SlateEditor = ({
   //   return confirmationMessage; //Webkit, Safari, Chrome
   // });
 
+  const convertPXtoPercent = (px) => {
+    const numberPX = parseInt(px.split("px")[0]) - 20;
+    const pixel = 0.2645833333 * numberPX;
+
+    return (pixel / 297) * 100;
+  };
+
   const memoVariants = {
     initial: {
       x: "100%",
@@ -206,6 +214,16 @@ const SlateEditor = ({
       x: "100%",
     },
   };
+
+  // useEffect(() => {
+  //   if (slideTrackRef && slideTrackRef.current) {
+  //     const resizeObserver = new ResizeObserver((entries) =>
+  //       console.log("Body height changed:", entries[0].target.clientHeight)
+  //     );
+  //     resizeObserver.observe(document.querySelector(".editable-container"));
+  //   }
+  // }, [slideTrackRef]);
+
   return (
     <>
       {openModal && (
@@ -281,7 +299,15 @@ const SlateEditor = ({
             <MarkButton format="underline" icon="format_underlined" />
             <FontSize />
             <FontStyle />
-
+            {!isFullScreen && (
+              <div
+                style={{
+                  width: "1px",
+                  height: "2rem",
+                }}
+                className="bg-slate-300"
+              />
+            )}
             {/* Diagram */}
             {genre !== "POEM" && (
               <SvgButton
@@ -293,24 +319,6 @@ const SlateEditor = ({
               selectedProp={selected}
               setIsFullScreen={setIsFullScreen}
             />
-            {/* Full Screen */}
-            <Tooltip placement="top" title="전체 화면" arrow>
-              <span
-                onClick={() => {
-                  const doc = document.querySelector(".editor-container");
-                  if (doc) {
-                    document.fullscreenElement
-                      ? document.exitFullscreen()
-                      : doc.requestFullscreen({ navigationUI: "show" });
-                    setIsFullScreen(!document.fullscreenElement);
-                  }
-                }}
-                style={{ fontSize: "20px" }}
-                className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-middle"
-              >
-                {isFullScreen ? "fullscreen_exit" : "fullscreen"}
-              </span>
-            </Tooltip>
             {/* Memo */}
             <Tooltip placement="top" title="메모" arrow>
               <span
@@ -335,6 +343,53 @@ const SlateEditor = ({
                 storage
               </span>
             </Tooltip>
+            {/* Full Screen */}
+            <Tooltip placement="top" title="전체 화면" arrow>
+              <span
+                onClick={() => {
+                  const doc = document.querySelector(".editor-container");
+                  if (doc) {
+                    document.fullscreenElement
+                      ? document.exitFullscreen()
+                      : doc.requestFullscreen({ navigationUI: "show" });
+                    setIsFullScreen(!document.fullscreenElement);
+                  }
+                }}
+                style={{ fontSize: "18px" }}
+                className="h-fit material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-bottom"
+              >
+                {isFullScreen ? "fullscreen_exit" : "fullscreen"}
+              </span>
+            </Tooltip>
+            {!isFullScreen && (
+              <div
+                style={{ width: "1px", height: "2rem" }}
+                className="bg-slate-300"
+              />
+            )}
+            {/* percentage */}
+            <Tooltip
+              placement="top"
+              title={`${Math.round(percentage % 100)}% - A4`}
+              arrow
+            >
+              <div className="">
+                <div className="flex items-center">
+                  <div className="h-3 w-10 rounded-2xl border flex items-center">
+                    <div
+                      className="h-full rounded-2xl bg-logoBrown bg-opacity-50"
+                      style={{ width: `${percentage % 100}%` }}
+                    />
+                  </div>
+                  <span
+                    style={{ fontSize: "0.8rem" }}
+                    className="ml-2 font-bold text-gray-500"
+                  >
+                    {parseInt(percentage / 100)} 매
+                  </span>
+                </div>
+              </div>
+            </Tooltip>
           </Toolbar>
 
           <div
@@ -342,54 +397,69 @@ const SlateEditor = ({
               boxShadow: "0px 0px 10px rgba(0,0,0,0.3)",
               backgroundColor: "#FAF6F5",
             }}
-            className={
-              "z-50 editor-inner overflow-y-scroll w-noneFullScreenMenu h-a4Height break-all"
-            }
+            className={`z-50 editor-inner overflow-y-scroll w-noneFullScreenMenu h-a4Height overflow-x-hidden ${
+              isFullScreen && "my-5"
+            }`}
           >
-            <Editable
-              className={cx(
-                "whitespace-pre-wrap break-all w-full",
-                css`
-                  padding-top: 20px;
-                  p {
-                    cursor: text;
-                    display: block;
-                    position: relative;
-                  }
-                `
-              )}
-              onMouseUp={(e) => {
-                let seleted = Editor.string(editor, editor.selection);
-                setSelected(seleted);
+            <ResizeObserver
+              onResize={() => {
+                const doc = document.querySelector(".editable-container");
+                setPercentage(convertPXtoPercent(getComputedStyle(doc).height));
               }}
-              onBlur={() => {
-                setSelected("");
-              }}
-              renderElement={renderElement}
-              renderLeaf={renderLeaf}
-              spellCheck="false"
-              autoFocus
-              onKeyDown={(event) => {
-                for (const hotkey in HOTKEYS) {
-                  if (isHotkey(hotkey, event)) {
-                    event.preventDefault();
-                    const mark = HOTKEYS[hotkey];
-                    if (mark === "diagram") {
-                      setOpenDiagram((origin) => !origin);
-                    } else if (mark === "tempSave") {
-                      handleRequestTempSave();
-                    } else {
-                      toggleMark(editor, mark);
+            >
+              <div className="editable-container">
+                <Editable
+                  className={cx(
+                    "whitespace-pre-wrap break-all",
+                    css`
+                      padding-top: 20px;
+                      padding-bottom: 20px;
+                      width: 220mm;
+                      p {
+                        cursor: text;
+                        width: 210mm;
+                        padding-right: 20px;
+                        padding-left: 20px;
+                      }
+                      span {
+                        max-width: 210mm;
+                      }
+                    `
+                  )}
+                  onMouseUp={(e) => {
+                    let seleted = Editor.string(editor, editor.selection);
+                    setSelected(seleted);
+                  }}
+                  onBlur={() => {
+                    setSelected("");
+                  }}
+                  renderElement={renderElement}
+                  renderLeaf={renderLeaf}
+                  spellCheck="false"
+                  autoFocus
+                  onKeyDown={(event) => {
+                    for (const hotkey in HOTKEYS) {
+                      if (isHotkey(hotkey, event)) {
+                        event.preventDefault();
+                        const mark = HOTKEYS[hotkey];
+                        if (mark === "diagram") {
+                          setOpenDiagram((origin) => !origin);
+                        } else if (mark === "tempSave") {
+                          handleRequestTempSave();
+                        } else {
+                          toggleMark(editor, mark);
+                        }
+                      }
                     }
-                  }
-                }
-              }}
-            />
+                  }}
+                />
+              </div>
+            </ResizeObserver>
           </div>
 
           {/* Save Div */}
           <div
-            style={{ bottom: "3%", right: "2%" }}
+            style={{ bottom: "5%", right: "5%" }}
             className="fixed font-noto"
           >
             <motion.button
@@ -398,7 +468,8 @@ const SlateEditor = ({
                 handleRequestTempSave();
               }}
               disabled={!temporarySaveButtonEnable.current}
-              className="w-28 h-10 text-sm rounded-2xl mr-5 border-2 border-blue-400 text-blue-400 bg-transparent"
+              style={{ fontSize: "0.8rem" }}
+              className="w-20 h-8 rounded-2xl mr-5 border-2 border-blue-400 text-blue-400 bg-transparent"
             >
               임시 저장
             </motion.button>
@@ -410,7 +481,8 @@ const SlateEditor = ({
                 commitButtonEnable.current = false;
               }}
               disabled={!commitButtonEnable.current}
-              className="w-28 h-10 text-sm rounded-2xl border-2 border-blue-400 text-blue-400 bg-transparent"
+              style={{ fontSize: "0.8rem" }}
+              className="w-20 h-8 rounded-2xl border-2 border-blue-400 text-blue-400 bg-transparent"
             >
               제출
             </motion.button>
@@ -419,7 +491,7 @@ const SlateEditor = ({
           {/* Commit load Div */}
           <motion.div
             whileHover={{ y: "-10%" }}
-            style={{ bottom: "5%", left: "5%", fontSize: "50px" }}
+            style={{ bottom: "5%", left: "5%" }}
             className="fixed font-noto flex"
           >
             <span
@@ -428,6 +500,7 @@ const SlateEditor = ({
                   setOpenModal(true);
                 }
               }}
+              style={{ fontSize: "2rem" }}
               className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
             >
               update
@@ -491,7 +564,6 @@ const SlateEditor = ({
               className="rounded-l-xl px-4 py-4 resize-none overflow-y-scroll w-full h-full font-noto focus:outline-none"
             >
               {memo}
-              {/* {localStorage.getItem(`${writingDocID}_memo`)} */}
             </textarea>
           </motion.div>
         )}
