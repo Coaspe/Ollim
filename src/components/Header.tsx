@@ -16,9 +16,9 @@ const Header: React.FC<props> = ({ userInfo }) => {
         {userInfo ?
             <div 
             onClick={()=>{navigator(`/${userInfo.uid}`)}}
-            className="flex items-center cursor-pointer">
-            <img src={userInfo.profileImg} className="w-7 mr-3 rounded-full" alt="user profile" />
-            <span>{userInfo.username}</span>
+            className="flex items-center cursor-pointer border border-writingSettingBorder px-4 py-2 rounded-3xl">
+                <img src={userInfo.profileImg} className="w-7 mr-3 rounded-full" alt="user profile" />
+                <span>{userInfo.username}</span>
             </div>
             : 
             <div>

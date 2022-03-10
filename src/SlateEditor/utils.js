@@ -291,7 +291,7 @@ export const SvgButton = ({ openDiagram, setOpenDiagram }) => {
   );
 };
 
-export const DictButton = ({ selectedProp }) => {
+export const DictButton = ({ selectedProp, setIsFullScreen }) => {
   const editor = useSlate();
   return (
     <Tooltip placement="top" title="사전 검색" arrow>
@@ -300,7 +300,12 @@ export const DictButton = ({ selectedProp }) => {
           // To keep focus on selected word
           e.preventDefault();
         }}
-        onClick={(e) => {
+        onClick={() => {
+          setIsFullScreen((origin) => {
+            if (origin) {
+              return !origin;
+            }
+          });
           // seleted text
           const seleted = Editor.string(editor, editor.selection);
           seleted

@@ -24,7 +24,6 @@ const Writing = () => {
         POEM: "시",
         SCENARIO: "시나리오"
     }
-    const navigate = useNavigate()
     // User Info Variables
     const { uid, genre, writingDocID } = useParams()
     const { user: contextUser } = useContext(UserContext)
@@ -42,8 +41,7 @@ const Writing = () => {
     const [synopsis, setSynopsis] = useState<string>("")
     // KillingVerse State
     const [killingVerse, setKillingVerse] = useState<string[]>([])
-    // Memo State
-    const [memo, setMemo] = useState("")
+
     const dispatch = useDispatch()
 
     const navigator = useNavigate()
@@ -102,7 +100,6 @@ const Writing = () => {
                 setKillingVerse(res.killingVerse)
                 setSynopsis(res.synopsis)
                 setDisclosure(res.disclosure)
-                setMemo(res.memo)
             })
         }
     }, [table])
@@ -221,7 +218,7 @@ const Writing = () => {
                             }
                         `
                         )}>
-                            <SlateEditor memo={memo} setMemo={setMemo} openDiagram={openDiagram} setOpenDiagram={setOpenDiagram} writingDocID={writingDocID} genre={writingInfo.genre} value={value} setValue={setValue}/>
+                            <SlateEditor openDiagram={openDiagram} setOpenDiagram={setOpenDiagram} writingDocID={writingDocID} genre={writingInfo.genre} value={value} setValue={setValue}/>
                     </div>
             }
             

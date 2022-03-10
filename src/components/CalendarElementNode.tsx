@@ -6,6 +6,8 @@ interface props {
     elementCommits: { [key: number]: string[] }
 }
 const CalendarElementNode: React.FC<props> = ({ date, elementCommits }) => {
+    console.log(elementCommits[parseInt(date)]);
+    
     type bgColorType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
     const bgColor = {
         1: "rgb(251 207 232)",
@@ -19,9 +21,14 @@ const CalendarElementNode: React.FC<props> = ({ date, elementCommits }) => {
     }
 
     return (
-        <Tooltip title={`${parseInt(date)}일 ${elementCommits[parseInt(date)].length > 0 ? `- ${elementCommits[parseInt(date)]}` : "" }`} placement="top" arrow TransitionComponent={Zoom} TransitionProps={{ timeout: 300 }}>
-            <div style={{backgroundColor: bgColor[elementCommits[parseInt(date)].length as bgColorType]}} className={`text-sm w-5 h-5 border border-gray-400 shadow-sm rounded-md flex items-center justify-center`} />
-        </Tooltip>
+    <>
+        {elementCommits[parseInt(date)].length > 0 ? 
+        <Tooltip title={`${parseInt(date)}일 ${`- ${elementCommits[parseInt(date)]}`}`} placement="top" arrow TransitionComponent={Zoom} TransitionProps={{ timeout: 300 }}>
+            <div style={{backgroundColor: elementCommits[parseInt(date)].length <= 8 ? bgColor[elementCommits[parseInt(date)].length as bgColorType] : bgColor[8]}} className={`text-sm w-5 h-5 border border-gray-400 shadow-sm rounded-md flex items-center justify-center`} />
+        </Tooltip> :
+        <div style={{backgroundColor: elementCommits[parseInt(date)].length <= 8 ? bgColor[elementCommits[parseInt(date)].length as bgColorType] : bgColor[8]}} className={`text-sm w-5 h-5 border border-gray-400 shadow-sm rounded-md flex items-center justify-center`} />
+        }
+    </>
     )
 }
 

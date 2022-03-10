@@ -39,18 +39,16 @@ const SlateEditor = ({
   genre,
   value,
   setValue,
-  memo,
-  setMemo,
 }) => {
   const dispatch = useDispatch();
 
   const isInitialMount = useRef(0);
-  const isInitMemo = useRef(memo);
+
   // Writing Info loading state
   const [loading, setLoading] = useState(false);
 
   // Commit sccess
-  const commitSccess = useRef(false);
+  const commitSuccess = useRef(false);
   // To prevent thoughtless commit, temporary save
   const commitButtonEnable = useRef(true);
   const temporarySaveButtonEnable = useRef(true);
@@ -72,6 +70,10 @@ const SlateEditor = ({
   const [openModal, setOpenModal] = useState(false);
   // Memo open state
   const [openMemo, setOpenMemo] = useState(false);
+
+  const [memo, setMemo] = useState(
+    localStorage.getItem(`${writingDocID}_memo`)
+  );
   // Selected commit key
   const [selectedKey, setSelectedKey] = useState("");
 
@@ -132,7 +134,7 @@ const SlateEditor = ({
         title: writingInfo.title,
       })
       .then((res) => {
-        commitSccess.current = !commitSccess.current;
+        commitSuccess.current = !commitSuccess.current;
         commitButtonEnable.current = true;
         setAlarm(res.data);
         setTimeout(() => {
@@ -146,10 +148,7 @@ const SlateEditor = ({
     getWritingInfo(writingDocID, genre).then((res) => {
       setWritingInfo(res);
     });
-    return () => {
-      setOpenDiagram(false);
-    };
-  }, [commitSccess.current]);
+  }, [commitSuccess.current]);
 
   useEffect(() => {
     // Check is writingInfo empty
@@ -186,9 +185,15 @@ const SlateEditor = ({
   // If value changed (ex. selected commit changed)
   // If value changed is caused by typing something, there is no change with contentLoading
   useEffect(() => {
-    console.log(value);
     value.length > 0 && setLoading(true);
   }, [value]);
+
+  // window.addEventListener("beforeunload", function (e) {
+  //   var confirmationMessage = "o/";
+
+  //   (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+  //   return confirmationMessage; //Webkit, Safari, Chrome
+  // });
 
   const memoVariants = {
     initial: {
@@ -217,34 +222,45 @@ const SlateEditor = ({
           }}
         >
           {writingInfo && writingInfo.commits && (
-            <div className="flex flex-col items-start justify-center bg-white">
-              {writingInfo.commits.map((data) => {
-                const tmpData = Object.keys(data);
-                const key = "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
-                const date = new Date(parseInt(key)).toLocaleString();
-                return (
-                  <div
-                    key={key}
-                    className={`w-full cursor-pointer flex items-center justify-start ${
-                      selectedKey === key && "bg-slate-500"
-                    } hover:bg-slate-400`}
-                  >
-                    <button
-                      onClick={() => {
-                        // if (selectedKey !== key) {
-                        setLoading(false);
-                        setSelectedKey(key);
-                        setValue(data[key]);
-                        // }
-                      }}
-                      className="mr-5"
+            <div className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg">
+              <span className="text-xl font-bold text-gray-500 mb-5">
+                제출 기록
+              </span>
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scroll"
+              >
+                {writingInfo.commits.reverse().map((data) => {
+                  const tmpData = Object.keys(data);
+                  const key = "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
+                  const date = new Date(parseInt(key)).toLocaleString();
+                  return (
+                    <div
+                      key={key}
+                      className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${
+                        selectedKey === key && "bg-genreSelectedBG"
+                      } hover:bg-wirtingButtonHover`}
                     >
-                      {date}
-                    </button>
-                    <span>{data.memo}</span>
-                  </div>
-                );
-              })}
+                      <button
+                        onClick={() => {
+                          if (selectedKey !== key) {
+                            setLoading(false);
+                            setSelectedKey(key);
+                            setValue(data[key]);
+                            setOpenModal(false);
+                          }
+                        }}
+                        className="mr-5"
+                      >
+                        {date}
+                      </button>
+                      <span>{data.memo}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </motion.div>
@@ -273,7 +289,10 @@ const SlateEditor = ({
                 setOpenDiagram={setOpenDiagram}
               />
             )}
-            <DictButton selectedProp={selected} />
+            <DictButton
+              selectedProp={selected}
+              setIsFullScreen={setIsFullScreen}
+            />
             {/* Full Screen */}
             <Tooltip placement="top" title="전체 화면" arrow>
               <span
@@ -296,14 +315,19 @@ const SlateEditor = ({
             <Tooltip placement="top" title="메모" arrow>
               <span
                 onClick={() => {
-                  if (openMemo && isInitMemo.current !== memo) {
-                    axios.post(`https://ollim.herokuapp.com/updateMemo`, {
-                      genre: writingInfo.genre,
-                      writingDocID,
-                      memo,
-                    });
+                  if (
+                    openMemo &&
+                    localStorage.getItem(`${writingDocID}_memo`) !== memo
+                  ) {
+                    localStorage.setItem(`${writingDocID}_memo`, memo);
                   }
-                  setOpenMemo((origin) => !origin);
+                  setOpenMemo((origin) => {
+                    localStorage.setItem(
+                      `${writingDocID}_doseMemoModalOpen`,
+                      !origin
+                    );
+                    return !origin;
+                  });
                 }}
                 style={{ fontSize: "20px" }}
                 className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-middle"
@@ -319,16 +343,18 @@ const SlateEditor = ({
               backgroundColor: "#FAF6F5",
             }}
             className={
-              "z-50 editor-inner overflow-y-scroll w-noneFullScreenMenu h-a4Height"
+              "z-50 editor-inner overflow-y-scroll w-noneFullScreenMenu h-a4Height break-all"
             }
           >
             <Editable
               className={cx(
-                "w-full",
+                "whitespace-pre-wrap break-all w-full",
                 css`
                   padding-top: 20px;
                   p {
                     cursor: text;
+                    display: block;
+                    position: relative;
                   }
                 `
               )}
@@ -449,15 +475,23 @@ const SlateEditor = ({
             style={{ zIndex: 51 }}
             className="fixed w-72 h-96 right-0 top-1/3 drop-shadow-lg"
           >
+            {/* <span
+              style={{ bottom: "5%", left: "6.6%" }}
+              className="material-icons absolute cursor-pointer text-gray-300 hover:text-slate-400 align-middle bg-gray-100 px-2 py-2 rounded-full inline-block"
+            >
+              save
+            </span> */}
             <textarea
               spellCheck={false}
               value={memo}
               onChange={(e) => {
                 setMemo(e.target.value);
+                localStorage.setItem(`${writingDocID}_memo`, e.target.value);
               }}
               className="rounded-l-xl px-4 py-4 resize-none overflow-y-scroll w-full h-full font-noto focus:outline-none"
             >
               {memo}
+              {/* {localStorage.getItem(`${writingDocID}_memo`)} */}
             </textarea>
           </motion.div>
         )}

@@ -277,7 +277,7 @@ const Mypage = () => {
                         ))                        
                         :
                             // Skeleton
-                            <FollowersFollowingsSkeleton />
+                            <FollowersFollowingsSkeleton lengthProp={followersLength.current} />
                         }
                         {/* Load more followers button */}
                         {followersKey.current < profileOwnerInfo.followers.length &&
@@ -318,7 +318,7 @@ const Mypage = () => {
                         ))                        
                         :
                             // Skeleton
-                            <FollowersFollowingsSkeleton />
+                            <FollowersFollowingsSkeleton lengthProp={followingsLength.current} />
                         }
                         {/* Load more followings button */}
                         {followingsKey.current < profileOwnerInfo.followings.length &&
@@ -444,7 +444,7 @@ const Mypage = () => {
                             <Calendar totalCommits={userWritings.totalCommits}/>
                         </Profiler>
 
-                        {/* On writing, Done */}
+                        {/* On writing */}
                         <div className="flex items-center flex-col mt-20 w-2/3">
                             <div className="w-full grid grid-cols-3 items-center mb-20">
                                 <span className="text-2xl font-bold justify-center col-start-2 w-full text-center">작성중인 글</span>
@@ -463,6 +463,8 @@ const Mypage = () => {
                                 {onWritingCategory === "TOTAL" && totalWritings && totalWritings.map((data) => (<MypageWriting key={data.dateCreated} data={data} />))}
                             </div>
                         </div>
+                        
+                        {/* Done */}
                         <motion.div layout className="flex items-center flex-col my-20 w-2/3">
                             <div className="w-full grid grid-cols-3 items-center mb-20">
                                 <span className="text-2xl font-bold justify-center col-start-2 w-full text-center">완결된 글</span>
