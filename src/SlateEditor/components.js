@@ -114,7 +114,7 @@ export const Menu = React.forwardRef(
         className,
         `drop-shadow-md border-t border-black border-opacity-5 justify-start flex items-center ${
           isFullScreen
-            ? "absolute grid grid-cols-3 place-items-center gap-2 w-72"
+            ? "absolute grid grid-cols-3 place-items-center gap-2"
             : "sticky space-x-3.5 > * + *"
         }`,
         css`
@@ -148,11 +148,7 @@ export const Toolbar = React.forwardRef(
       }}
       className={cx(
         className,
-        `${
-          isFullScreen
-            ? "w-fullScreenMenu top-1/2 left-4"
-            : "w-noneFullScreenMenu top-0"
-        }`
+        `${isFullScreen ? "w-72 top-1/2 left-4" : "w-noneFullScreenMenu top-0"}`
       )}
     />
   )
