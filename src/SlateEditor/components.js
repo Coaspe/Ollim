@@ -114,7 +114,7 @@ export const Menu = React.forwardRef(
         className,
         `drop-shadow-md border-t border-black border-opacity-5 justify-start flex items-center ${
           isFullScreen
-            ? "absolute grid grid-cols-3 place-items-center gap-2 w-60"
+            ? "absolute grid grid-cols-3 place-items-center gap-2 w-72"
             : "sticky space-x-3.5 > * + *"
         }`,
         css`

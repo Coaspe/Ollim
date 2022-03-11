@@ -18,6 +18,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
   const [writingInfo, setWritingInfo] = useState({});
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const [openCommentsModal, setOpenCommentsModal] = useState(false);
 
   const renderElement = ({ element, attributes, children }) => {
     const elementKey = ReactEditor.findKey(editor, element);
@@ -68,9 +69,30 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
   useEffect(() => {
     value.length > 0 && setContentLoading(true);
   }, [value]);
-
+  const commentsModalVariants = {
+    initial: {
+      x: "100%",
+    },
+    animate: {
+      x: "0%",
+    },
+    exit: {
+      x: "100%",
+    },
+  };
   return (
     <>
+      {openCommentsModal && (
+        <motion.div
+          variants={commentsModalVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          className="fixed top-1/2 right-0 w-1/3 h-1/2 bg-white"
+        >
+          sd
+        </motion.div>
+      )}
       {openModal && (
         <motion.div
           animate={{
@@ -85,38 +107,50 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
           }}
         >
           {writingInfo && writingInfo.commits && (
-            <div className="flex flex-col items-start justify-center bg-white">
-              {writingInfo.commits.map((data) => {
-                const tmpData = Object.keys(data);
-                const key = "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
-                const date = new Date(parseInt(key)).toLocaleString();
-                return (
-                  <div
-                    key={key}
-                    className={`w-full cursor-pointer flex items-center justify-start ${
-                      selectedKey === key && "bg-slate-500"
-                    } hover:bg-slate-400`}
-                  >
-                    <button
-                      onClick={() => {
-                        if (selectedKey !== key) {
-                          setContentLoading(false);
-                          setSelectedKey(key);
-                          setValue(data[key]);
-                        }
-                      }}
-                      className="mr-5"
+            <div className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg">
+              <span className="text-xl font-bold text-gray-500 mb-5">
+                제출 기록
+              </span>
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scroll"
+              >
+                {writingInfo.commits.reverse().map((data) => {
+                  const tmpData = Object.keys(data);
+                  const key = "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
+                  const date = new Date(parseInt(key)).toLocaleString();
+                  return (
+                    <div
+                      key={key}
+                      className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${
+                        selectedKey === key && "bg-genreSelectedBG"
+                      } hover:bg-wirtingButtonHover`}
                     >
-                      {date}
-                    </button>
-                    <span>{data.memo}</span>
-                  </div>
-                );
-              })}
+                      <button
+                        onClick={() => {
+                          if (selectedKey !== key) {
+                            setLoading(false);
+                            setSelectedKey(key);
+                            setValue(data[key]);
+                            setOpenModal(false);
+                          }
+                        }}
+                        className="mr-5"
+                      >
+                        {date}
+                      </button>
+                      <span>{data.memo}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </motion.div>
       )}
+
       {loading ? (
         <div
           style={{
@@ -195,6 +229,16 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
                   className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
                 >
                   update
+                </motion.span>
+                <motion.span
+                  whileHover={{ y: "-10%" }}
+                  onClick={() => {
+                    setOpenCommentsModal((origin) => !origin);
+                  }}
+                  style={{ fontSize: "2rem" }}
+                  className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
+                >
+                  chat
                 </motion.span>
               </div>
             </Slate>
