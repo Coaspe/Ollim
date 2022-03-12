@@ -282,7 +282,7 @@ const Writing = () => {
                 table === "BROWSE" && 
                     <div
                         className={cx(
-                            "w-full h-full mt-10 flex flex-col items-center justify-center pb-32 relative",
+                            "w-full h-full mt-10 flex flex-col items-center justify-center pb-32 relative editor-container-browse",
                             css`
                                 :fullscreen {
                                     background-color: #e6ddda;

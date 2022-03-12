@@ -270,36 +270,28 @@ const SlateEditor = ({
               <span className="text-xl font-bold text-gray-500 mb-5">
                 제출 기록
               </span>
-              <div
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scroll"
-              >
-                {writingInfo.commits.reverse().map((data) => {
+              <div className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scroll">
+                {writingInfo.commits.map((data) => {
                   const tmpData = Object.keys(data);
                   const key = "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
                   const date = new Date(parseInt(key)).toLocaleString();
                   return (
                     <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (selectedKey !== key) {
+                          setLoading(false);
+                          setSelectedKey(key);
+                          setValue(data[key]);
+                          setOpenModal(false);
+                        }
+                      }}
                       key={key}
                       className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${
                         selectedKey === key && "bg-genreSelectedBG"
                       } hover:bg-wirtingButtonHover`}
                     >
-                      <button
-                        onClick={() => {
-                          if (selectedKey !== key) {
-                            setLoading(false);
-                            setSelectedKey(key);
-                            setValue(data[key]);
-                            setOpenModal(false);
-                          }
-                        }}
-                        className="mr-5"
-                      >
-                        {date}
-                      </button>
+                      <span className="mr-5">{date}</span>
                       <span>{data.memo}</span>
                     </div>
                   );
@@ -364,7 +356,7 @@ const SlateEditor = ({
                   });
                 }}
                 style={{ fontSize: "20px" }}
-                className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-middle"
+                className="material-icons cursor-pointer text-gray-300 hover:text-slate-500 align-middle"
               >
                 storage
               </span>
@@ -487,7 +479,7 @@ const SlateEditor = ({
           {/* Save Div */}
           {writingInfo && (
             <div
-              style={{ bottom: "5%", right: "5%" }}
+              style={{ bottom: "5%", right: "5%", zIndex: 52 }}
               className="fixed flex items-center font-noto"
             >
               <motion.button
@@ -511,7 +503,7 @@ const SlateEditor = ({
                     >
                       <motion.button
                         whileHover={{ y: "-10%" }}
-                        className="px-1 py-1 flex items-center justify-center rounded-full border-2 border-blue-400 text-blue-400 bg-transparent"
+                        className="shadow-md px-1 py-1 flex items-center justify-center rounded-full border-2 border-blue-400 text-blue-400 bg-transparent"
                         onClick={(e) => {
                           e.stopPropagation();
                           setTempSaveModal(false);
@@ -548,7 +540,7 @@ const SlateEditor = ({
                 }}
                 disabled={!commitButtonEnable}
                 style={{ fontSize: "0.8rem" }}
-                className="flex items-center justify-center w-20 h-8 rounded-2xl border-2 border-blue-400 text-blue-400 bg-transparent"
+                className="flex items-center justify-center w-20 h-8 shadow-md rounded-2xl border-2 border-blue-400 text-blue-400 bg-transparent"
               >
                 {commitButtonEnable ? "제출" : <SpinningSvg />}
               </motion.button>
@@ -558,7 +550,7 @@ const SlateEditor = ({
           {/* Commit load Div */}
           <motion.div
             whileHover={{ y: "-10%" }}
-            style={{ bottom: "5%", left: "5%" }}
+            style={{ bottom: "5%", left: "5%", zIndex: 52 }}
             className="fixed font-noto flex"
           >
             <span
@@ -568,7 +560,7 @@ const SlateEditor = ({
                 }
               }}
               style={{ fontSize: "2rem" }}
-              className="material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
+              className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
             >
               update
             </span>
