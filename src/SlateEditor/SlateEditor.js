@@ -24,6 +24,8 @@ import { Tooltip } from "@mui/material";
 import "../style/Slate.css";
 import ResizeObserver from "rc-resize-observer";
 import ParagraphWithoutNum from "./paragraphWithoutNum";
+import SpinningSvg from "../components/SpinningSvg";
+
 const HOTKEYS = {
   "mod+b": "bold",
   "mod+i": "italic",
@@ -41,7 +43,7 @@ const SlateEditor = ({
   setValue,
 }) => {
   const [percentage, setPercentage] = useState(0);
-
+  const [tempSaveModal, setTempSaveModal] = useState(false);
   const dispatch = useDispatch();
   const isInitialMount = useRef(0);
 
@@ -50,9 +52,10 @@ const SlateEditor = ({
 
   // Commit sccess
   const commitSuccess = useRef(false);
-  // To prevent thoughtless commit, temporary save
-  const commitButtonEnable = useRef(true);
-  const temporarySaveButtonEnable = useRef(true);
+
+  const [commitButtonEnable, setCommitButtonEnable] = useState(true);
+  const [temporarySaveButtonEnable, setTemporarySaveButtonEnable] =
+    useState(true);
 
   // Render Slate leaf nodes
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
@@ -81,6 +84,7 @@ const SlateEditor = ({
   // commit modal
   const [openCommitModal, setOpenCommitModal] = useState(false);
   const [commitDescription, setCommitDescription] = useState("");
+  const [tempSaveState, setTempSaveState] = useState({});
 
   // Render Slate element
   const renderElement = ({ element, attributes, children }) => {
@@ -107,9 +111,9 @@ const SlateEditor = ({
   const setAlarm = (alarm) => {
     dispatch(alarmAction.setAlarm({ alarm }));
   };
-
   // Save fuctions
   const handleRequestTempSave = () => {
+    const date = new Date().getTime();
     axios
       .post(`https://ollim.herokuapp.com/temporarySave`, {
         contents: JSON.stringify(value),
@@ -117,8 +121,25 @@ const SlateEditor = ({
         genre: writingInfo.genre,
       })
       .then((res) => {
-        temporarySaveButtonEnable.current = true;
+        setTemporarySaveButtonEnable(true);
         setAlarm(res.data);
+        res.data[1] === "success" &&
+          setTempSaveState({ date, contents: value });
+        setTimeout(() => {
+          setAlarm(["", "success", false]);
+        }, 2000);
+      });
+  };
+  const handleRequestTempSaveRemove = () => {
+    axios
+      .post(`https://ollim.herokuapp.com/removeTempSave`, {
+        writingDocID,
+        genre: writingInfo.genre,
+      })
+      .then((res) => {
+        setTemporarySaveButtonEnable(true);
+        setAlarm(res.data);
+        res.data[1] === "success" && setTempSaveState({});
         setTimeout(() => {
           setAlarm(["", "success", false]);
         }, 2000);
@@ -136,7 +157,7 @@ const SlateEditor = ({
       })
       .then((res) => {
         commitSuccess.current = !commitSuccess.current;
-        commitButtonEnable.current = true;
+        setCommitButtonEnable(true);
         setAlarm(res.data);
         setTimeout(() => {
           setAlarm(["", "success", false]);
@@ -148,6 +169,7 @@ const SlateEditor = ({
   useEffect(() => {
     getWritingInfo(writingDocID, genre).then((res) => {
       setWritingInfo(res);
+      setTempSaveState(res.tempSave);
     });
   }, [commitSuccess.current]);
 
@@ -214,15 +236,20 @@ const SlateEditor = ({
       x: "100%",
     },
   };
-
-  // useEffect(() => {
-  //   if (slideTrackRef && slideTrackRef.current) {
-  //     const resizeObserver = new ResizeObserver((entries) =>
-  //       console.log("Body height changed:", entries[0].target.clientHeight)
-  //     );
-  //     resizeObserver.observe(document.querySelector(".editable-container"));
-  //   }
-  // }, [slideTrackRef]);
+  const tempSaveDivVariants = {
+    initial: {
+      y: "100%",
+      opacity: "0%",
+    },
+    animate: {
+      y: "0%",
+      opacity: "100%",
+    },
+    exit: {
+      y: "100%",
+      opacity: "0%",
+    },
+  };
 
   return (
     <>
@@ -392,6 +419,7 @@ const SlateEditor = ({
             </Tooltip>
           </Toolbar>
 
+          {/* Editable div */}
           <div
             style={{
               boxShadow: "0px 0px 10px rgba(0,0,0,0.3)",
@@ -458,35 +486,73 @@ const SlateEditor = ({
           </div>
 
           {/* Save Div */}
-          <div
-            style={{ bottom: "5%", right: "5%" }}
-            className="fixed font-noto"
-          >
-            <motion.button
-              whileHover={{ y: "-10%" }}
-              onClick={() => {
-                handleRequestTempSave();
-              }}
-              disabled={!temporarySaveButtonEnable.current}
-              style={{ fontSize: "0.8rem" }}
-              className="w-20 h-8 rounded-2xl mr-5 border-2 border-blue-400 text-blue-400 bg-transparent"
+          {writingInfo && (
+            <div
+              style={{ bottom: "5%", right: "5%" }}
+              className="fixed flex items-center font-noto"
             >
-              임시 저장
-            </motion.button>
-            <motion.button
-              whileHover={{ y: "-10%" }}
-              onClick={() => {
-                temporarySaveButtonEnable.current = false;
-                setOpenCommitModal(true);
-                commitButtonEnable.current = false;
-              }}
-              disabled={!commitButtonEnable.current}
-              style={{ fontSize: "0.8rem" }}
-              className="w-20 h-8 rounded-2xl border-2 border-blue-400 text-blue-400 bg-transparent"
-            >
-              제출
-            </motion.button>
-          </div>
+              <motion.button
+                whileHover={{ y: "-10%" }}
+                onClick={() => {
+                  setTempSaveModal((origin) => !origin);
+                }}
+                disabled={!temporarySaveButtonEnable}
+                style={{ fontSize: "0.8rem" }}
+                className="cursor-pointer relative w-20 h-8 rounded-2xl mr-5 border-2 border-blue-400 text-blue-400 bg-transparent flex items-center justify-center"
+              >
+                {tempSaveModal && (
+                  <motion.div
+                    variants={tempSaveDivVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    style={{ top: "-200%" }}
+                    className="absolute w-fit h-10 flex items-center justify-center"
+                  >
+                    <motion.button
+                      whileHover={{ y: "-10%" }}
+                      className="px-1 py-1 flex items-center justify-center rounded-full border-2 border-blue-400 text-blue-400 bg-transparent"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setTempSaveModal(false);
+                        setTemporarySaveButtonEnable(false);
+                        handleRequestTempSave();
+                      }}
+                    >
+                      <span className="material-icons">save</span>
+                    </motion.button>
+                    {Object.keys(tempSaveState).length !== 0 && (
+                      <motion.button
+                        whileHover={{ y: "-10%" }}
+                        className="px-1 py-1 ml-5 flex items-center justify-center rounded-full border-2 border-blue-400 text-blue-400 bg-transparent"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setTempSaveModal(false);
+                          setTemporarySaveButtonEnable(false);
+                          handleRequestTempSaveRemove();
+                        }}
+                      >
+                        <span class="material-icons">delete</span>
+                      </motion.button>
+                    )}
+                  </motion.div>
+                )}
+                {temporarySaveButtonEnable ? "임시 저장" : <SpinningSvg />}
+              </motion.button>
+
+              <motion.button
+                whileHover={{ y: "-10%" }}
+                onClick={() => {
+                  setOpenCommitModal(true);
+                }}
+                disabled={!commitButtonEnable}
+                style={{ fontSize: "0.8rem" }}
+                className="flex items-center justify-center w-20 h-8 rounded-2xl border-2 border-blue-400 text-blue-400 bg-transparent"
+              >
+                {commitButtonEnable ? "제출" : <SpinningSvg />}
+              </motion.button>
+            </div>
+          )}
 
           {/* Commit load Div */}
           <motion.div
@@ -612,6 +678,7 @@ const SlateEditor = ({
                   onClick={() => {
                     handleRequestCommit();
                     setCommitDescription("");
+                    setCommitButtonEnable(false);
                     setOpenCommitModal(false);
                   }}
                   className="mr-3 material-icons text-green-400 rounded-full cursor-pointer hover:bg-green-100"

@@ -106,3 +106,10 @@ export const getFollowingsInfinite = async (followingsEmailArr: string[], key: n
     query(collection(firestore, "users"), where("__name__", "in", tmp))
   );
 };
+
+export const getComments = (commentsDocID: string[]) => {
+
+  return getDocs(
+    query(collection(firestore, "comments"), where("__name__", "in", commentsDocID))
+  )
+}

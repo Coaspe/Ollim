@@ -6,11 +6,14 @@ import { alarmAction } from "../redux";
 import { alarmType, writingType, disclosure, genre } from "../type";
 import { motion, AnimatePresence } from 'framer-motion'
 import MypageWritingSetting from "./MypageWritingSetting";
+import SpinningSvg from "./SpinningSvg";
 
 interface props {
     writingInfo: writingType
     synopsis: string
     setSynopsis: React.Dispatch<React.SetStateAction<string>>
+    title: string
+    setTitle: React.Dispatch<React.SetStateAction<string>>
     writingDocID: string
     disclosure: string
     setDisclosure: React.Dispatch<React.SetStateAction<disclosure>>
@@ -20,6 +23,8 @@ interface props {
 
 const WritingSetting: React.FC<props> = ({
     writingInfo,
+    title,
+    setTitle,
     synopsis,
     setSynopsis, 
     writingDocID, 
@@ -36,7 +41,13 @@ const WritingSetting: React.FC<props> = ({
     const setAlarm = (alarm: [string, alarmType, boolean]) => {
         dispatch(alarmAction.setAlarm({alarm}))
     }
+
+    const [titleSaveButtonDisabled, setTitleSaveButtonDisabled] = useState(false)
+    const [synopsisSaveButtonDisabled, setSynopsisSaveButtonDisabled] = useState(false)
+    const [coverSaveButtonDisabled, setCoverSaveButtonDisabled] = useState(false)
+    const [disclosureSaveButtonDisabled, setDisclosureSaveButtonDisabled] = useState(false)
     const [newVerse, setNewVerse] = useState("")
+
     const variants = {
         initial: {
             opacity: 0
@@ -57,17 +68,51 @@ const WritingSetting: React.FC<props> = ({
 
     return (
             <div className="w-full font-noto flex flex-col items-start px-20 mt-20">
-                {/* Synopsis div */}
+                {/* Title div */}
                 <div className="flex flex-col w-2/3">
+                    <div className="flex items-center mb-10">
+                        <span className="text-2xl font-bold mr-10">제목</span>
+                        <button 
+                            disabled={titleSaveButtonDisabled}
+                            style={{fontSize: "0.75rem"}}
+                            onClick={()=>{
+                                if (writingInfo.title !== title) {
+                                    setTitleSaveButtonDisabled(true)
+                                    axios.post(`https://ollim.herokuapp.com/updateTitle`, { genre: writingInfo.genre, writingDocID, title })
+                                        .then((res) => {
+                                            setAlarm(res.data)
+                                            setTitleSaveButtonDisabled(false)
+                                            setTimeout(() => {
+                                            setAlarm(["", "success", false]);
+                                            }, 2000);
+                                    })
+                                }
+                            }}
+                            className="flex items-center justify-center border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100">
+                            {titleSaveButtonDisabled ? <SpinningSvg /> : "저장"}
+                        </button>
+                    </div>
+                    <input 
+                    style={{backgroundColor: "#FAF6F5",}}
+                    value={title}
+                    onChange={(e)=>{setTitle(e.target.value)}} 
+                    className="border-opacity-5 shadow-lg px-3 py-2 border border-black w-fit overflow-x-scroll focus:outline-none" />
+                </div>
+                
+                {/* Synopsis div */}
+                <div className="flex flex-col w-2/3 mt-20">
                     <div className="flex items-center mb-10">
                         <span className="text-2xl font-bold mr-10">{writingInfo.genre !== "POEM" ? "시놉시스" : "여는 말"}</span>
                     <button 
                         style={{fontSize: "0.75rem"}}
+                        disabled={synopsisSaveButtonDisabled}
                         onClick={()=>{
-                            if (writingInfo.synopsis !== synopsis ) {
+                            if (writingInfo.synopsis !== synopsis) {
+                                setSynopsisSaveButtonDisabled(true)
                                 axios.post(`https://ollim.herokuapp.com/updateSynopsis`, { genre: writingInfo.genre, writingDocID, synopsis })
                                     .then((res) => {
                                         setAlarm(res.data)
+                                        setSynopsisSaveButtonDisabled(false)
                                         setTimeout(() => {
                                         setAlarm(["", "success", false]);
                                         }, 2000);
@@ -90,12 +135,15 @@ const WritingSetting: React.FC<props> = ({
                     <div className="flex items-center mb-10">
                         <span className="text-2xl font-bold mr-10">표지</span>
                         <button 
+                        disabled={coverSaveButtonDisabled}
                         style={{fontSize: "0.75rem"}}
                         onClick={()=>{
                             if (writingInfo.killingVerse !== killingVerse) {
+                                setCoverSaveButtonDisabled(true)
                                 axios.post(`https://ollim.herokuapp.com/updateKillingVerse`, { genre: writingInfo.genre, writingDocID, killingVerse: JSON.stringify(killingVerse) })
                                     .then((res) => {
                                         setAlarm(res.data)
+                                        setCoverSaveButtonDisabled(false)
                                         setTimeout(() => {
                                         setAlarm(["", "success", false]);
                                         }, 2000);
@@ -158,12 +206,15 @@ const WritingSetting: React.FC<props> = ({
                     <div className="flex items-center">
                         <span className="text-2xl font-bold mr-10">공개 범위</span>
                         <button 
+                        disabled={disclosureSaveButtonDisabled}
                         style={{fontSize: "0.75rem"}}
                         onClick={()=>{
                             if (writingInfo.disclosure !== disclosure ) {
+                                setDisclosureSaveButtonDisabled(true)
                                 axios.post(`https://ollim.herokuapp.com/updateDisclosure`, { genre:writingInfo.genre, writingDocID, disclosure })
                                     .then((res) => {
                                         setAlarm(res.data)
+                                        setDisclosureSaveButtonDisabled(false)
                                         setTimeout(() => {
                                         setAlarm(["", "success", false]);
                                         }, 2000);

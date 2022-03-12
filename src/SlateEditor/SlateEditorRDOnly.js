@@ -1,12 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Editable, withReact, Slate, ReactEditor } from "slate-react";
 import { createEditor } from "slate";
 import { withHistory } from "slate-history";
 import { cx, css } from "@emotion/css";
-import { getWritingInfo } from "../services/firebase";
-import { motion } from "framer-motion";
+import { getComments, getWritingInfo } from "../services/firebase";
+import { AnimatePresence, motion } from "framer-motion";
 import { Leaf } from "./utils";
 import ParagraphWithoutNum from "./paragraphWithoutNum";
+import CommentRow from "../components/CommentRow";
+import axios from "axios";
+import UserContext from "../context/user";
+import SpinningSvg from "../components/SpinningSvg";
 
 const SlateEditorRDOnly = ({ writingDocID, genre }) => {
   const [value, setValue] = useState([]);
@@ -20,6 +24,12 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
   const [openModal, setOpenModal] = useState(false);
   const [openCommentsModal, setOpenCommentsModal] = useState(false);
 
+  const [comments, setComments] = useState([]);
+  const [commentsDocID, setCommentsDocID] = useState([]);
+  const [commentButtonDisabled, setCommentButtonDisabled] = useState(false);
+
+  const [commentText, setCommentText] = useState("");
+  const { user } = useContext(UserContext);
   const renderElement = ({ element, attributes, children }) => {
     const elementKey = ReactEditor.findKey(editor, element);
     let target = 0;
@@ -43,13 +53,19 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
   useEffect(() => {
     getWritingInfo(writingDocID, genre).then((res) => {
       setWritingInfo(res);
+      setCommentsDocID(Object.values(res.comments));
     });
   }, []);
-
+  useEffect(() => {
+    if (commentsDocID.length !== 0) {
+      getComments(commentsDocID).then((res) => {
+        setComments(res.docs.map((data) => data.data()));
+      });
+    }
+  }, [commentsDocID]);
   useEffect(() => {
     if (Object.keys(writingInfo).length !== 0) {
       if (writingInfo.commits.length !== 0) {
-        console.log(writingInfo);
         // Get lastest commit
         const keys = Object.keys(writingInfo.commits);
         const lastestCommit = writingInfo.commits[keys[keys.length - 1]];
@@ -69,6 +85,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
   useEffect(() => {
     value.length > 0 && setContentLoading(true);
   }, [value]);
+
   const commentsModalVariants = {
     initial: {
       x: "100%",
@@ -80,19 +97,74 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
       x: "100%",
     },
   };
+  const handleAddComment = () => {
+    setCommentText("");
+    setCommentButtonDisabled(true);
+    const dateCreated = new Date().getTime();
+    const commentInfo = {
+      replies: {},
+      content: commentText,
+      commentOwnerUID: user.uid,
+      likes: [],
+      dateCreated,
+    };
+    axios
+      .post("https://ollim.herokuapp.com/addComment", {
+        writingDocID,
+        genre,
+        commentInfo: JSON.stringify(commentInfo),
+      })
+      .then((res) => {
+        if (res.data[1] === "success") {
+          setComments((origin) => [commentInfo, ...origin]);
+        }
+        setCommentButtonDisabled(false);
+      });
+  };
   return (
     <>
-      {openCommentsModal && (
-        <motion.div
-          variants={commentsModalVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          className="fixed top-1/2 right-0 w-1/3 h-1/2 bg-white"
-        >
-          sd
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {openCommentsModal && (
+          <motion.div
+            variants={commentsModalVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{ zIndex: 51, top: "20%" }}
+            className="fixed right-0 w-1/3 h-2/3 bg-white flex flex-col items-center border-opacity-50 border"
+          >
+            <div className="w-full h-full grid gap-5 overflow-y-scroll py-2 px-4">
+              {comments &&
+                comments.map((comment) => (
+                  <CommentRow key={comment.dateCreated} commentInfo={comment} />
+                ))}
+            </div>
+            <div className="w-full shadow-inner h-1/5 border-opacity-50 flex items-center justify-between py-4 px-4">
+              <textarea
+                value={commentText}
+                onChange={(e) => {
+                  setCommentText(e.target.value);
+                }}
+                placeholder="댓글을 입력하세요"
+                rows={1}
+                className="w-full border mr-4 rounded-xl px-3 py-3 focus:outline-none max-h-full resize-none"
+              />
+              <motion.button
+                whileHover={{ y: "-10%" }}
+                onClick={handleAddComment}
+                disabled={commentButtonDisabled}
+                className="border rounded-full px-2 py-2 flex items-center justify-center"
+              >
+                {commentButtonDisabled ? (
+                  <SpinningSvg />
+                ) : (
+                  <span className="material-icons">maps_ugc</span>
+                )}
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {openModal && (
         <motion.div
           animate={{

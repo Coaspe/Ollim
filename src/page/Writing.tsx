@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import UserContext from "../context/user"
 import CustomNodeFlowRDOnly from "../diagram/RelationShipDiagramReadOnly"
 import { getUserByEmail, getUserByUID, getWritingInfo } from "../services/firebase"
-import {writingType, tableType, gerneType, getFirestorePoem, disclosure, getFirestoreNovel, getFirestoreUser, toObjectElements, alarmType } from "../type"
+import {writingType, tableType, gerneType, getFirestorePoem, disclosure, getFirestoreNovel, getFirestoreUser, toObjectElements, alarmType, commentType } from "../type"
 import SlateEditor from "../SlateEditor/SlateEditor"
 import { cx, css } from "@emotion/css";
 import SlateEditorRDOnly from "../SlateEditor/SlateEditorRDOnly"
@@ -16,6 +16,7 @@ import { Elements } from "react-flow-renderer"
 import { initialValue } from "../SlateEditor/utils"
 import WritingSetting from "../components/WritingSetting"
 import Header from "../components/Header"
+import CommentRow from "../components/CommentRow"
 
 const Writing = () => {
 
@@ -41,6 +42,8 @@ const Writing = () => {
     const [synopsis, setSynopsis] = useState<string>("")
     // KillingVerse State
     const [killingVerse, setKillingVerse] = useState<string[]>([])
+    // Title
+    const [title, setTitle] = useState<string>("")
 
     const dispatch = useDispatch()
 
@@ -77,6 +80,7 @@ const Writing = () => {
             setDiagram({} as toObjectElements)
         }
     }, [contextUser.email])
+
     // useEffect to get writing's owner's information
     useEffect(() => {
         if (uid) {
@@ -86,7 +90,7 @@ const Writing = () => {
         }
     }, [uid])
     useEffect(() => {
-        if (writingDocID && genre && table === "OVERVIEW") {
+        if (writingDocID && genre && (table === "OVERVIEW" || table === "WRITE")) {
             getWritingInfo(writingDocID, genre).then((res: any) => {
                 if (res.genre.toLocaleLowerCase() !== "poem") {
                     setWritingInfo(res as getFirestoreNovel)
@@ -99,9 +103,10 @@ const Writing = () => {
                 setKillingVerse(res.killingVerse)
                 setSynopsis(res.synopsis)
                 setDisclosure(res.disclosure)
+                setTitle(res.title)
             })
         }
-    }, [table])
+    }, [table, writingDocID])
 
     const alertVariants = {
         initial: {
@@ -117,11 +122,18 @@ const Writing = () => {
             y:-10
         }
     }
+    const test: commentType = {
+        content: "asdfasdfsdf  sefsefsef sfsdfses",
+        likes: [],
+        commentOwnerUID: "hK1HkY5cEMbloHjzFnjLkaTYqg82",
+        dateCreated: 0,
+        replies: {},
+    }
 
     return (
         <>
         { Object.keys(writingInfo).length > 0 && uid && genre && writingDocID &&
-        <div className=" w-full bg-opacity-30 relative writing-container font-noto">
+        <div className="w-full bg-opacity-30 relative writing-container font-noto">
 
             {/* Alarm */}
             <AnimatePresence>
@@ -247,6 +259,8 @@ const Writing = () => {
             {writingDocID && table === "SETTING" && writingInfo.userUID === contextUser.uid && 
             <WritingSetting
                 writingInfo={writingInfo}
+                title={title}
+                setTitle={setTitle}
                 synopsis={synopsis}
                 setSynopsis={setSynopsis}
                 killingVerse={killingVerse}

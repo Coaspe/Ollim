@@ -106,3 +106,11 @@ export type contentType = {
         fontStyle: string;
     }[];
 }
+
+export type commentType = {
+  content: string
+  likes: string[]
+  commentOwnerUID: string
+  dateCreated: number
+  replies: { [key:number]: string }
+}
