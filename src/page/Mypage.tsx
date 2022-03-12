@@ -20,6 +20,7 @@ import FollowingRow from "../components/FollowingRow"
 import FollowerRow from "../components/FollowerRow"
 import FollowersFollowingsSkeleton from "../components/FollowersFollowingsSkeleton"
 import Header from "../components/Header"
+import SpinningSvg from "../components/SpinningSvg"
 
 const Mypage = () => {
 
@@ -68,7 +69,7 @@ const Mypage = () => {
     const [totalWritings, setTotalWritings] = useState<Array<getFirestoreScenario | getFirestoreNovel | getFirestorePoem>>([])
 
     const dispatch = useDispatch()
-    
+
     // Header context userInfo
     const setUserInfo = (userInfo: getFirestoreUser) => {
         dispatch(userInfoAction.setUserInfo({userInfo}))
@@ -104,7 +105,6 @@ const Mypage = () => {
             })
         }
     }, [profileOwnerInfo.followings])
-
 
     // Loading more followers, followings completed, set loading false 
     useEffect(() => {
@@ -413,21 +413,21 @@ const Mypage = () => {
                         {<div className="flex w-full items-center justify-center text-sm">
                             <div className="flex flex-col items-center justify-center">
                                 <span className="font-bold text-gray-400 font-Nanum_Gothic">{totalWritings.length}</span>                            
-                                <span className="">글</span>                            
+                                <span >글</span>                            
                             </div>
                             <div onClick={() => {
                                 handleMoreFollowers()
                                 followersLength.current && setFollowersModal(true)
                             }} className="flex flex-col items-center justify-center mx-5 cursor-pointer">
                                 <span className="font-bold text-gray-400 font-Nanum_Gothic">{followersLength.current}</span>                            
-                                <span className="">팔로워</span>                            
+                                <span >팔로워</span>                            
                             </div>
                             <div onClick={() => {
                                 handleMoreFollowings()
                                 followingsLength.current && setFollowingsModal(true)
                             }} className="flex flex-col items-center justify-center cursor-pointer">
                                 <span className="font-bold text-gray-400 font-Nanum_Gothic">{followingsLength.current}</span>                           
-                                <span className="">팔로우</span>                            
+                                <span >팔로우</span>                            
                             </div>
                         </div>}
                         <div className="flex w-full items-center justify-center my-10">

@@ -17,6 +17,8 @@ import { initialValue } from "../SlateEditor/utils"
 import WritingSetting from "../components/WritingSetting"
 import Header from "../components/Header"
 import CommentRow from "../components/CommentRow"
+import axios from "axios"
+import SpinningSvg from "../components/SpinningSvg"
 
 const Writing = () => {
 
@@ -122,13 +124,47 @@ const Writing = () => {
             y:-10
         }
     }
-    const test: commentType = {
-        content: "asdfasdfsdf  sefsefsef sfsdfses",
-        likes: [],
-        commentOwnerUID: "hK1HkY5cEMbloHjzFnjLkaTYqg82",
-        dateCreated: 0,
-        replies: {},
+
+    // Server check
+    const [isServerClosedBtnDisable, setIsServerClosedDisable] = useState(false)
+    const [isServerClosedComment, setIsServerClosedComment] = useState("서버 확인")
+
+    const isOpened = () => {
+        setIsServerClosedDisable(true)
+        axios.get("https://ollim.herokuapp.com/isOpened")
+            .then(() => {
+                setIsServerClosedComment("서버 열림")
+                setIsServerClosedDisable(false)
+                setTimeout(() => {
+                    setIsServerClosedComment("서버 확인")
+                }, 5000)
+            })
+            .catch(function (error) {
+            setIsServerClosedComment("서버 닫힘")
+            setIsServerClosedDisable(false)
+            setTimeout(() => {
+                setIsServerClosedComment("서버 확인")
+            }, 5000)
+            if (error.response) {
+            // 요청이 이루어졌으며 서버가 2xx의 범위를 벗어나는 상태 코드로 응답했습니다.
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+            }
+            else if (error.request) {
+            // 요청이 이루어 졌으나 응답을 받지 못했습니다.
+            // `error.request`는 브라우저의 XMLHttpRequest 인스턴스 또는
+            // Node.js의 http.ClientRequest 인스턴스입니다.
+            console.log(error.request);
+            }
+            else {
+            // 오류를 발생시킨 요청을 설정하는 중에 문제가 발생했습니다.
+            console.log('Error', error.message);
+            }
+            console.log(error.config);
+        });
     }
+
 
     return (
         <>
@@ -181,6 +217,14 @@ const Writing = () => {
                         <span onClick={()=>{setTable("SETTING")}} className={`material-icons shadow cursor-pointer px-1 py-1 rounded-full ${table === "SETTING" && "text-hoverSpanMenu shadow-hoverSpanMenu"} hover:text-hoverSpanMenu`}>
                         settings
                         </span>
+                        <button disabled={isServerClosedBtnDisable || isServerClosedComment === "서버 열림" || isServerClosedComment === "서버 닫힘"} onClick={isOpened} 
+                            className={`text-white flex flex-col items-center justify-center cursor-pointer ml-5 h-8 rounded-2xl px-2 
+                            ${isServerClosedComment === "서버 닫힘" && "bg-red-400"}
+                            ${isServerClosedComment === "서버 열림" && "bg-green-400"}
+                            ${isServerClosedComment === "서버 확인" && "bg-gray-400"}
+                        `}>
+                        {isServerClosedBtnDisable ? <SpinningSvg /> : isServerClosedComment}   
+                        </button>
                     </>}
                 </div>
             </div>

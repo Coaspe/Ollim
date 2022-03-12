@@ -246,7 +246,6 @@ const SlateEditor = ({
       opacity: "100%",
     },
     exit: {
-      y: "100%",
       opacity: "0%",
     },
   };
@@ -500,43 +499,45 @@ const SlateEditor = ({
                 style={{ fontSize: "0.8rem" }}
                 className="cursor-pointer relative w-20 h-8 rounded-2xl mr-5 border-2 border-blue-400 text-blue-400 bg-transparent flex items-center justify-center"
               >
-                {tempSaveModal && (
-                  <motion.div
-                    variants={tempSaveDivVariants}
-                    initial="initial"
-                    animate="animate"
-                    exit="exit"
-                    style={{ top: "-200%" }}
-                    className="absolute w-fit h-10 flex items-center justify-center"
-                  >
-                    <motion.button
-                      whileHover={{ y: "-10%" }}
-                      className="px-1 py-1 flex items-center justify-center rounded-full border-2 border-blue-400 text-blue-400 bg-transparent"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setTempSaveModal(false);
-                        setTemporarySaveButtonEnable(false);
-                        handleRequestTempSave();
-                      }}
+                <AnimatePresence>
+                  {tempSaveModal && (
+                    <motion.div
+                      variants={tempSaveDivVariants}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      style={{ top: "-200%" }}
+                      className="absolute w-fit h-10 flex items-center justify-center"
                     >
-                      <span className="material-icons">save</span>
-                    </motion.button>
-                    {Object.keys(tempSaveState).length !== 0 && (
                       <motion.button
                         whileHover={{ y: "-10%" }}
-                        className="px-1 py-1 ml-5 flex items-center justify-center rounded-full border-2 border-blue-400 text-blue-400 bg-transparent"
+                        className="px-1 py-1 flex items-center justify-center rounded-full border-2 border-blue-400 text-blue-400 bg-transparent"
                         onClick={(e) => {
                           e.stopPropagation();
                           setTempSaveModal(false);
                           setTemporarySaveButtonEnable(false);
-                          handleRequestTempSaveRemove();
+                          handleRequestTempSave();
                         }}
                       >
-                        <span class="material-icons">delete</span>
+                        <span className="material-icons">save</span>
                       </motion.button>
-                    )}
-                  </motion.div>
-                )}
+                      {Object.keys(tempSaveState).length !== 0 && (
+                        <motion.button
+                          whileHover={{ y: "-10%" }}
+                          className="px-1 py-1 ml-5 flex items-center justify-center rounded-full border-2 border-blue-400 text-blue-400 bg-transparent"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setTempSaveModal(false);
+                            setTemporarySaveButtonEnable(false);
+                            handleRequestTempSaveRemove();
+                          }}
+                        >
+                          <span class="material-icons">delete</span>
+                        </motion.button>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
                 {temporarySaveButtonEnable ? "임시 저장" : <SpinningSvg />}
               </motion.button>
 
