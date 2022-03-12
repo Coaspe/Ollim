@@ -104,6 +104,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
   const handleAddComment = () => {
     setCommentText("");
     setCommentButtonDisabled(true);
+
     const dateCreated = new Date().getTime();
     const commentInfo = {
       replies: {},
@@ -119,7 +120,10 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
         commentInfo: JSON.stringify(commentInfo),
       })
       .then((res) => {
+        console.log(res);
+
         if (res.data[1] === "success") {
+          commentInfo["docID"] = res.data[3];
           setComments((origin) => [commentInfo, ...origin]);
         }
         setCommentButtonDisabled(false);
@@ -135,12 +139,17 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
             animate="animate"
             exit="exit"
             style={{ zIndex: 51, top: "20%" }}
-            className="fixed right-0 w-1/3 h-2/3 bg-white flex flex-col items-center border-opacity-50 border"
+            className="fixed right-0 w-1/3 h-2/3 bg-white flex flex-col items-center border border-opacity-20 border-black"
           >
-            <div className="w-full h-full grid gap-5 overflow-y-scroll py-2 px-4">
-              {comments &&
-                comments.map((comment) => (
+            <motion.div
+              layout
+              className="w-full h-full gap-5 overflow-y-scroll py-2 px-4 flex flex-col items-center"
+            >
+              {comments.length !== 0 ? (
+                comments.map((comment, index) => (
                   <CommentRow
+                    genre={genre}
+                    writingDocID={writingDocID}
                     key={comment.dateCreated}
                     replies={comment.replies}
                     content={comment.content}
@@ -148,9 +157,16 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
                     likes={comment.likes}
                     dateCreated={comment.dateCreated}
                     docID={comment.docID}
+                    index={index}
+                    setComments={setComments}
                   />
-                ))}
-            </div>
+                ))
+              ) : (
+                <p className="text-2xl font-bold text-gray-400 font-Nanum_Gothic mt-5">
+                  댓글이 없습니다. ㅠㅠ
+                </p>
+              )}
+            </motion.div>
             <div className="w-full shadow-inner h-1/5 border-opacity-50 flex items-center justify-between py-4 px-4">
               <textarea
                 value={commentText}
@@ -282,7 +298,6 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
                 readOnly
               />
               <div
-                whileHover={{ y: "-10%" }}
                 style={{ bottom: "5%", right: "5%" }}
                 className="fixed font-noto flex"
               >

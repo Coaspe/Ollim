@@ -111,6 +111,7 @@ export interface commentType {
   content: string
   likes: string[]
   commentOwnerUID: string
+  docID: string
   dateCreated: number
   replies: { [key:number]: string }
 }

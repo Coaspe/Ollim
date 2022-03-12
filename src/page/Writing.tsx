@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import UserContext from "../context/user"
 import CustomNodeFlowRDOnly from "../diagram/RelationShipDiagramReadOnly"
 import { getUserByEmail, getUserByUID, getWritingInfo } from "../services/firebase"
-import {writingType, tableType, gerneType, getFirestorePoem, disclosure, getFirestoreNovel, getFirestoreUser, toObjectElements, alarmType, commentType } from "../type"
+import {writingType, tableType, gerneType, getFirestorePoem, disclosure, getFirestoreNovel, getFirestoreUser, toObjectElements  } from "../type"
 import SlateEditor from "../SlateEditor/SlateEditor"
 import { cx, css } from "@emotion/css";
 import SlateEditorRDOnly from "../SlateEditor/SlateEditorRDOnly"

@@ -90,7 +90,7 @@ const Intro = () => {
                             로그인
                             </motion.button>
                             <motion.button
-                            style={{backgroundColor: "#c69e92"}}
+                                style={{backgroundColor: "#c69e92"}}
                                 onClick={()=>{navigator("/community")}}
                                 whileHover={{ y: "-10%" }}
                                 className="px-5 py-3 rounded-2xl shadow-md font-semibold">

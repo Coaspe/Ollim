@@ -24,9 +24,9 @@ const CalendarElementNode: React.FC<props> = ({ date, elementCommits }) => {
     <>
         {elementCommits[parseInt(date)].length > 0 ? 
         <Tooltip title={`${parseInt(date)}일 ${`- ${elementCommits[parseInt(date)]}`}`} placement="top" arrow TransitionComponent={Zoom} TransitionProps={{ timeout: 300 }}>
-            <div style={{backgroundColor: elementCommits[parseInt(date)].length <= 8 ? bgColor[elementCommits[parseInt(date)].length as bgColorType] : bgColor[8]}} className={`text-sm w-5 h-5 border border-gray-400 shadow-sm rounded-md flex items-center justify-center`} />
+            <div style={{backgroundColor: elementCommits[parseInt(date)].length <= 8 ? bgColor[elementCommits[parseInt(date)].length as bgColorType] : bgColor[8], width: "80%", aspectRatio: "1/1"}} className={`text-sm border border-gray-400 shadow-sm rounded-md flex items-center justify-center`} />
         </Tooltip> :
-        <div style={{backgroundColor: elementCommits[parseInt(date)].length <= 8 ? bgColor[elementCommits[parseInt(date)].length as bgColorType] : bgColor[8]}} className={`text-sm w-5 h-5 border border-gray-400 shadow-sm rounded-md flex items-center justify-center`} />
+        <div style={{backgroundColor: elementCommits[parseInt(date)].length <= 8 ? bgColor[elementCommits[parseInt(date)].length as bgColorType] : bgColor[8], width: "80%", aspectRatio: "1/1"}} className={`text-sm border border-gray-400 shadow-sm rounded-md flex items-center justify-center`} />
         }
     </>
     )
