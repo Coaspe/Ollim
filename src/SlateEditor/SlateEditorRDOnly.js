@@ -56,13 +56,17 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
       setCommentsDocID(Object.values(res.comments));
     });
   }, []);
+
   useEffect(() => {
     if (commentsDocID.length !== 0) {
       getComments(commentsDocID).then((res) => {
-        setComments(res.docs.map((data) => data.data()));
+        setComments(
+          res.docs.map((data) => ({ ...data.data(), docID: data.id }))
+        );
       });
     }
   }, [commentsDocID]);
+
   useEffect(() => {
     if (Object.keys(writingInfo).length !== 0) {
       if (writingInfo.commits.length !== 0) {
@@ -136,7 +140,15 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
             <div className="w-full h-full grid gap-5 overflow-y-scroll py-2 px-4">
               {comments &&
                 comments.map((comment) => (
-                  <CommentRow key={comment.dateCreated} commentInfo={comment} />
+                  <CommentRow
+                    key={comment.dateCreated}
+                    replies={comment.replies}
+                    content={comment.content}
+                    commentOwnerUID={comment.commentOwnerUID}
+                    likes={comment.likes}
+                    dateCreated={comment.dateCreated}
+                    docID={comment.docID}
+                  />
                 ))}
             </div>
             <div className="w-full shadow-inner h-1/5 border-opacity-50 flex items-center justify-between py-4 px-4">

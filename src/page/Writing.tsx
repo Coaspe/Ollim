@@ -16,7 +16,6 @@ import { Elements } from "react-flow-renderer"
 import { initialValue } from "../SlateEditor/utils"
 import WritingSetting from "../components/WritingSetting"
 import Header from "../components/Header"
-import CommentRow from "../components/CommentRow"
 import axios from "axios"
 import SpinningSvg from "../components/SpinningSvg"
 

@@ -12,7 +12,7 @@ viewBox="0 0 24 24"
     cy="12"
     r="10"
     stroke="#000"
-    stroke-width="4"
+    strokeWidth="4"
 ></circle>
 <path
     className="opacity-75"

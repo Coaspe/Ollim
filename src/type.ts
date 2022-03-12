@@ -107,7 +107,7 @@ export type contentType = {
     }[];
 }
 
-export type commentType = {
+export interface commentType {
   content: string
   likes: string[]
   commentOwnerUID: string
