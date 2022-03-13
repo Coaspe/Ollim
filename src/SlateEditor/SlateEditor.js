@@ -41,6 +41,12 @@ const SlateEditor = ({
   genre,
   value,
   setValue,
+  setSlateCompareValue,
+  setSlateCompareOpen,
+  setSelectedCompareKey,
+  selectedCompareKey,
+  isFullScreen,
+  setIsFullScreen
 }) => {
   const [percentage, setPercentage] = useState(0);
   const [tempSaveModal, setTempSaveModal] = useState(false);
@@ -67,9 +73,6 @@ const SlateEditor = ({
   // Overall Writing Information
   const [writingInfo, setWritingInfo] = useState({});
 
-  // Is Full Screen?
-  const [isFullScreen, setIsFullScreen] = useState(false);
-
   // Diagram open state
   const [openModal, setOpenModal] = useState(false);
   // Memo open state
@@ -85,6 +88,9 @@ const SlateEditor = ({
   const [openCommitModal, setOpenCommitModal] = useState(false);
   const [commitDescription, setCommitDescription] = useState("");
   const [tempSaveState, setTempSaveState] = useState({});
+
+  // Compare modal
+  const [compareModalOpen, setCompareModalOpen] = useState(false);
 
   // Render Slate element
   const renderElement = ({ element, attributes, children }) => {
@@ -111,7 +117,7 @@ const SlateEditor = ({
   const setAlarm = (alarm) => {
     dispatch(alarmAction.setAlarm({ alarm }));
   };
-  // Save fuctions
+  // Handle Save fuctions
   const handleRequestTempSave = () => {
     const date = new Date().getTime();
     axios
@@ -130,6 +136,7 @@ const SlateEditor = ({
         }, 2000);
       });
   };
+  // Handle Remove Temporary save function
   const handleRequestTempSaveRemove = () => {
     axios
       .post(`https://ollim.herokuapp.com/removeTempSave`, {
@@ -145,6 +152,7 @@ const SlateEditor = ({
         }, 2000);
       });
   };
+  // Handle Commit function
   const handleRequestCommit = () => {
     axios
       .post("https://ollim.herokuapp.com/commit", {
@@ -266,7 +274,10 @@ const SlateEditor = ({
           }}
         >
           {writingInfo && writingInfo.commits && (
-            <div className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg">
+            <div
+              style={{ backgroundColor: "#f7f7f7" }}
+              className="flex flex-col items-center w-1/4 h-1/2 py-5 rounded-lg"
+            >
               <span className="text-xl font-bold text-gray-500 mb-5">
                 제출 기록
               </span>
@@ -275,6 +286,7 @@ const SlateEditor = ({
                   const tmpData = Object.keys(data);
                   const key = "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
                   const date = new Date(parseInt(key)).toLocaleString();
+                  const DateNight = date.includes("오전") ? "오전" : "오후";
                   return (
                     <div
                       onClick={(e) => {
@@ -291,8 +303,22 @@ const SlateEditor = ({
                         selectedKey === key && "bg-genreSelectedBG"
                       } hover:bg-wirtingButtonHover`}
                     >
-                      <span className="mr-5">{date}</span>
-                      <span>{data.memo}</span>
+                      <div className="flex items-center w-5/6 justify-between">
+                        <div className="flex flex-col items-center text-sm">
+                          <span>{date.split(DateNight)[0]}</span>
+                          <span>
+                            {`${DateNight} `}
+                            {date.split(DateNight)[1]}
+                          </span>
+                        </div>
+                        <textarea
+                          value={data.memo}
+                          readOnly
+                          className="w-1/2 text-sm resize-none cursor-pointer focus:outline-none bg-transparent"
+                        >
+                          {data.memo}
+                        </textarea>
+                      </div>
                     </div>
                   );
                 })}
@@ -301,271 +327,369 @@ const SlateEditor = ({
           )}
         </motion.div>
       )}
-
-      {loading ? (
-        <Slate
-          editor={editor}
-          value={value}
-          onChange={(value) => {
-            setValue(value);
+      {compareModalOpen && (
+        <motion.div
+          animate={{
+            backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],
+          }}
+          transition={{ duration: 0.2 }}
+          style={{ zIndex: 10000 }}
+          className="fixed w-full h-full items-center justify-center top-0 left-0 flex"
+          onClick={(e) => {
+            e.stopPropagation();
+            setCompareModalOpen(false);
           }}
         >
-          {/* Tools */}
-          <Toolbar isFullScreen={isFullScreen}>
-            <MarkButton format="bold" icon="format_bold" />
-            <MarkButton format="italic" icon="format_italic" />
-            <MarkButton format="underline" icon="format_underlined" />
-            <FontSize />
-            <FontStyle />
-            {!isFullScreen && (
+          {writingInfo && writingInfo.commits && (
+            <div
+              style={{ backgroundColor: "#f7f7f7" }}
+              className="flex flex-col items-center w-1/4 h-1/2 py-5 rounded-lg"
+            >
+              <span className="text-xl font-bold text-gray-500 mb-5">
+                비교 창 열기
+              </span>
+              <div className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scroll">
+                {writingInfo.commits.map((data) => {
+                  const tmpData = Object.keys(data);
+                  const key = "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
+                  const date = new Date(parseInt(key)).toLocaleString();
+                  const DateNight = date.includes("오전") ? "오전" : "오후";
+
+                  return (
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (selectedCompareKey !== key) {
+                          setSelectedCompareKey(key);
+                          setSlateCompareValue(data[key]);
+                          setSlateCompareOpen(true);
+                          setCompareModalOpen(false);
+                        }
+                      }}
+                      key={key}
+                      className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${
+                        selectedCompareKey === key && "bg-genreSelectedBG"
+                      } hover:bg-wirtingButtonHover`}
+                    >
+                      <div className="flex items-center w-5/6 justify-between">
+                        <div className="flex flex-col items-center text-sm">
+                          <span>{date.split(DateNight)[0]}</span>
+                          <span>
+                            {`${DateNight} `}
+                            {date.split(DateNight)[1]}
+                          </span>
+                        </div>
+                        <textarea
+                          value={data.memo}
+                          readOnly
+                          className="w-1/2 text-sm resize-none cursor-pointer focus:outline-none bg-transparent"
+                        >
+                          {data.memo}
+                        </textarea>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </motion.div>
+      )}
+      {loading ? (
+        <motion.div layout>
+          <Slate
+            editor={editor}
+            value={value}
+            onChange={(value) => {
+              setValue(value);
+            }}
+          >
+            <div className="flex flex-col items-center">
+              {/* Tools */}
+              <Toolbar isFullScreen={isFullScreen}>
+                <MarkButton format="bold" icon="format_bold" />
+                <MarkButton format="italic" icon="format_italic" />
+                <MarkButton format="underline" icon="format_underlined" />
+                <FontSize />
+                <FontStyle />
+                {!isFullScreen && (
+                  <div
+                    style={{
+                      width: "1px",
+                      height: "2rem",
+                    }}
+                    className="bg-slate-300"
+                  />
+                )}
+                {/* Diagram */}
+                {genre !== "POEM" && (
+                  <SvgButton
+                    openDiagram={openDiagram}
+                    setOpenDiagram={setOpenDiagram}
+                  />
+                )}
+                <DictButton
+                  selectedProp={selected}
+                  setIsFullScreen={setIsFullScreen}
+                />
+                {/* Memo */}
+                <Tooltip placement="top" title="메모" arrow>
+                  <span
+                    onClick={() => {
+                      if (
+                        openMemo &&
+                        localStorage.getItem(`${writingDocID}_memo`) !== memo
+                      ) {
+                        localStorage.setItem(`${writingDocID}_memo`, memo);
+                      }
+                      setOpenMemo((origin) => {
+                        localStorage.setItem(
+                          `${writingDocID}_doseMemoModalOpen`,
+                          !origin
+                        );
+                        return !origin;
+                      });
+                    }}
+                    style={{ fontSize: "20px" }}
+                    className="material-icons cursor-pointer text-gray-300 hover:text-slate-500 align-middle"
+                  >
+                    storage
+                  </span>
+                </Tooltip>
+                {/* Full Screen */}
+                <Tooltip placement="top" title="전체 화면" arrow>
+                  <span
+                    onClick={() => {
+                      const doc = document.querySelector(".editor-container");
+                      if (doc) {
+                        document.fullscreenElement
+                          ? document.exitFullscreen()
+                          : doc.requestFullscreen({ navigationUI: "show" });
+                        setIsFullScreen(!document.fullscreenElement);
+                      }
+                    }}
+                    style={{ fontSize: "18px" }}
+                    className="h-fit material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-bottom"
+                  >
+                    {isFullScreen ? "fullscreen_exit" : "fullscreen"}
+                  </span>
+                </Tooltip>
+                {!isFullScreen && (
+                  <div
+                    style={{ width: "1px", height: "2rem" }}
+                    className="bg-slate-300"
+                  />
+                )}
+                {/* percentage */}
+                <Tooltip
+                  placement="top"
+                  title={`${Math.round(percentage % 100)}% - A4`}
+                  arrow
+                >
+                  <div className="">
+                    <div className="flex items-center">
+                      <div className="h-3 w-10 rounded-2xl border flex items-center">
+                        <div
+                          className="h-full rounded-2xl bg-logoBrown bg-opacity-50"
+                          style={{ width: `${percentage % 100}%` }}
+                        />
+                      </div>
+                      <span
+                        style={{ fontSize: "0.8rem" }}
+                        className="ml-2 font-bold text-gray-500"
+                      >
+                        {parseInt(percentage / 100)} 매
+                      </span>
+                    </div>
+                  </div>
+                </Tooltip>
+              </Toolbar>
+
+              {/* Editable div */}
               <div
                 style={{
-                  width: "1px",
-                  height: "2rem",
+                  boxShadow: "0px 0px 10px rgba(0,0,0,0.3)",
+                  backgroundColor: "#FAF6F5",
                 }}
-                className="bg-slate-300"
-              />
-            )}
-            {/* Diagram */}
-            {genre !== "POEM" && (
-              <SvgButton
-                openDiagram={openDiagram}
-                setOpenDiagram={setOpenDiagram}
-              />
-            )}
-            <DictButton
-              selectedProp={selected}
-              setIsFullScreen={setIsFullScreen}
-            />
-            {/* Memo */}
-            <Tooltip placement="top" title="메모" arrow>
-              <span
-                onClick={() => {
-                  if (
-                    openMemo &&
-                    localStorage.getItem(`${writingDocID}_memo`) !== memo
-                  ) {
-                    localStorage.setItem(`${writingDocID}_memo`, memo);
-                  }
-                  setOpenMemo((origin) => {
-                    localStorage.setItem(
-                      `${writingDocID}_doseMemoModalOpen`,
-                      !origin
+                className={`z-50 editor-inner overflow-y-scroll w-noneFullScreenMenu h-a4Height overflow-x-hidden ${
+                  isFullScreen && "my-5"
+                }`}
+              >
+                <ResizeObserver
+                  onResize={() => {
+                    const doc = document.querySelector(".editable-container");
+                    setPercentage(
+                      convertPXtoPercent(getComputedStyle(doc).height)
                     );
-                    return !origin;
-                  });
-                }}
-                style={{ fontSize: "20px" }}
-                className="material-icons cursor-pointer text-gray-300 hover:text-slate-500 align-middle"
-              >
-                storage
-              </span>
-            </Tooltip>
-            {/* Full Screen */}
-            <Tooltip placement="top" title="전체 화면" arrow>
-              <span
-                onClick={() => {
-                  const doc = document.querySelector(".editor-container");
-                  if (doc) {
-                    document.fullscreenElement
-                      ? document.exitFullscreen()
-                      : doc.requestFullscreen({ navigationUI: "show" });
-                    setIsFullScreen(!document.fullscreenElement);
-                  }
-                }}
-                style={{ fontSize: "18px" }}
-                className="h-fit material-icons cursor-pointer text-gray-300 hover:text-slate-400 align-bottom"
-              >
-                {isFullScreen ? "fullscreen_exit" : "fullscreen"}
-              </span>
-            </Tooltip>
-            {!isFullScreen && (
-              <div
-                style={{ width: "1px", height: "2rem" }}
-                className="bg-slate-300"
-              />
-            )}
-            {/* percentage */}
-            <Tooltip
-              placement="top"
-              title={`${Math.round(percentage % 100)}% - A4`}
-              arrow
-            >
-              <div className="">
-                <div className="flex items-center">
-                  <div className="h-3 w-10 rounded-2xl border flex items-center">
-                    <div
-                      className="h-full rounded-2xl bg-logoBrown bg-opacity-50"
-                      style={{ width: `${percentage % 100}%` }}
+                  }}
+                >
+                  <div className="editable-container">
+                    <Editable
+                      className={cx(
+                        "whitespace-pre-wrap break-all",
+                        css`
+                          padding-top: 20px;
+                          padding-bottom: 20px;
+                          width: 220mm;
+                          p {
+                            cursor: text;
+                            width: 210mm;
+                            padding-right: 20px;
+                            padding-left: 20px;
+                          }
+                          span {
+                            max-width: 210mm;
+                          }
+                        `
+                      )}
+                      onMouseUp={(e) => {
+                        let seleted = Editor.string(editor, editor.selection);
+                        setSelected(seleted);
+                      }}
+                      onBlur={() => {
+                        setSelected("");
+                      }}
+                      renderElement={renderElement}
+                      renderLeaf={renderLeaf}
+                      spellCheck="false"
+                      autoFocus
+                      onKeyDown={(event) => {
+                        for (const hotkey in HOTKEYS) {
+                          if (isHotkey(hotkey, event)) {
+                            event.preventDefault();
+                            const mark = HOTKEYS[hotkey];
+                            if (mark === "diagram") {
+                              setOpenDiagram((origin) => !origin);
+                            } else if (mark === "tempSave") {
+                              handleRequestTempSave();
+                            } else {
+                              toggleMark(editor, mark);
+                            }
+                          }
+                        }
+                      }}
                     />
                   </div>
-                  <span
-                    style={{ fontSize: "0.8rem" }}
-                    className="ml-2 font-bold text-gray-500"
-                  >
-                    {parseInt(percentage / 100)} 매
-                  </span>
-                </div>
+                </ResizeObserver>
               </div>
-            </Tooltip>
-          </Toolbar>
+            </div>
 
-          {/* Editable div */}
-          <div
-            style={{
-              boxShadow: "0px 0px 10px rgba(0,0,0,0.3)",
-              backgroundColor: "#FAF6F5",
-            }}
-            className={`z-50 editor-inner overflow-y-scroll w-noneFullScreenMenu h-a4Height overflow-x-hidden ${
-              isFullScreen && "my-5"
-            }`}
-          >
-            <ResizeObserver
-              onResize={() => {
-                const doc = document.querySelector(".editable-container");
-                setPercentage(convertPXtoPercent(getComputedStyle(doc).height));
-              }}
-            >
-              <div className="editable-container">
-                <Editable
-                  className={cx(
-                    "whitespace-pre-wrap break-all",
-                    css`
-                      padding-top: 20px;
-                      padding-bottom: 20px;
-                      width: 220mm;
-                      p {
-                        cursor: text;
-                        width: 210mm;
-                        padding-right: 20px;
-                        padding-left: 20px;
-                      }
-                      span {
-                        max-width: 210mm;
-                      }
-                    `
-                  )}
-                  onMouseUp={(e) => {
-                    let seleted = Editor.string(editor, editor.selection);
-                    setSelected(seleted);
-                  }}
-                  onBlur={() => {
-                    setSelected("");
-                  }}
-                  renderElement={renderElement}
-                  renderLeaf={renderLeaf}
-                  spellCheck="false"
-                  autoFocus
-                  onKeyDown={(event) => {
-                    for (const hotkey in HOTKEYS) {
-                      if (isHotkey(hotkey, event)) {
-                        event.preventDefault();
-                        const mark = HOTKEYS[hotkey];
-                        if (mark === "diagram") {
-                          setOpenDiagram((origin) => !origin);
-                        } else if (mark === "tempSave") {
-                          handleRequestTempSave();
-                        } else {
-                          toggleMark(editor, mark);
-                        }
-                      }
-                    }
-                  }}
-                />
-              </div>
-            </ResizeObserver>
-          </div>
-
-          {/* Save Div */}
-          {writingInfo && (
-            <div
-              style={{ bottom: "5%", right: "5%", zIndex: 52 }}
-              className="fixed flex items-center font-noto"
-            >
-              <motion.button
-                whileHover={{ y: "-10%" }}
-                onClick={() => {
-                  setTempSaveModal((origin) => !origin);
-                }}
-                disabled={!temporarySaveButtonEnable}
-                style={{ fontSize: "0.8rem" }}
-                className="cursor-pointer relative w-20 h-8 rounded-2xl mr-5 border-2 border-blue-400 text-blue-400 bg-transparent flex items-center justify-center"
+            {/* Save Div */}
+            {writingInfo && (
+              <div
+                style={{ bottom: "5%", right: "5%", zIndex: 52 }}
+                className="fixed flex items-center font-noto"
               >
-                <AnimatePresence>
-                  {tempSaveModal && (
-                    <motion.div
-                      variants={tempSaveDivVariants}
-                      initial="initial"
-                      animate="animate"
-                      exit="exit"
-                      style={{ top: "-200%" }}
-                      className="absolute w-fit h-10 flex items-center justify-center"
-                    >
-                      <motion.button
-                        whileHover={{ y: "-10%" }}
-                        className="shadow-md px-1 py-1 flex items-center justify-center rounded-full border-2 border-blue-400 text-blue-400 bg-transparent"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setTempSaveModal(false);
-                          setTemporarySaveButtonEnable(false);
-                          handleRequestTempSave();
-                        }}
+                <motion.button
+                  whileHover={{ y: "-10%" }}
+                  onClick={() => {
+                    setTempSaveModal((origin) => !origin);
+                  }}
+                  disabled={!temporarySaveButtonEnable}
+                  style={{ fontSize: "0.8rem" }}
+                  className="cursor-pointer relative w-20 h-8 rounded-2xl mr-5 border-2 border-blue-400 text-blue-400 bg-transparent flex items-center justify-center"
+                >
+                  <AnimatePresence>
+                    {tempSaveModal && (
+                      <motion.div
+                        variants={tempSaveDivVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        style={{ top: "-200%" }}
+                        className="absolute w-fit h-10 flex items-center justify-center"
                       >
-                        <span className="material-icons">save</span>
-                      </motion.button>
-                      {Object.keys(tempSaveState).length !== 0 && (
                         <motion.button
                           whileHover={{ y: "-10%" }}
-                          className="px-1 py-1 ml-5 flex items-center justify-center rounded-full border-2 border-blue-400 text-blue-400 bg-transparent"
+                          className="shadow-md px-1 py-1 flex items-center justify-center rounded-full border-2 border-blue-400 text-blue-400 bg-transparent"
                           onClick={(e) => {
                             e.stopPropagation();
                             setTempSaveModal(false);
                             setTemporarySaveButtonEnable(false);
-                            handleRequestTempSaveRemove();
+                            handleRequestTempSave();
                           }}
                         >
-                          <span class="material-icons">delete</span>
+                          <span className="material-icons">save</span>
                         </motion.button>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                {temporarySaveButtonEnable ? "임시 저장" : <SpinningSvg />}
-              </motion.button>
+                        {Object.keys(tempSaveState).length !== 0 && (
+                          <motion.button
+                            whileHover={{ y: "-10%" }}
+                            className="px-1 py-1 ml-5 flex items-center justify-center rounded-full border-2 border-blue-400 text-blue-400 bg-transparent"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setTempSaveModal(false);
+                              setTemporarySaveButtonEnable(false);
+                              handleRequestTempSaveRemove();
+                            }}
+                          >
+                            <span class="material-icons">delete</span>
+                          </motion.button>
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  {temporarySaveButtonEnable ? "임시 저장" : <SpinningSvg />}
+                </motion.button>
 
-              <motion.button
+                <motion.button
+                  whileHover={{ y: "-10%" }}
+                  onClick={() => {
+                    setOpenCommitModal(true);
+                  }}
+                  disabled={!commitButtonEnable}
+                  style={{ fontSize: "0.8rem" }}
+                  className="flex items-center justify-center w-20 h-8 shadow-md rounded-2xl border-2 border-blue-400 text-blue-400 bg-transparent"
+                >
+                  {commitButtonEnable ? "제출" : <SpinningSvg />}
+                </motion.button>
+              </div>
+            )}
+
+            {/* Commit load Div */}
+            <div
+              style={{ bottom: "5%", left: "5%", zIndex: 52 }}
+              className="fixed font-noto flex items-center"
+            >
+              <motion.span
                 whileHover={{ y: "-10%" }}
                 onClick={() => {
-                  setOpenCommitModal(true);
+                  if (writingInfo.commits.length !== 0) {
+                    setOpenModal(true);
+                  }
                 }}
-                disabled={!commitButtonEnable}
-                style={{ fontSize: "0.8rem" }}
-                className="flex items-center justify-center w-20 h-8 shadow-md rounded-2xl border-2 border-blue-400 text-blue-400 bg-transparent"
+                style={{ fontSize: "2rem" }}
+                className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
               >
-                {commitButtonEnable ? "제출" : <SpinningSvg />}
-              </motion.button>
+                update
+              </motion.span>
+              <motion.span
+                onClick={() => {
+                  if (writingInfo.commits.length !== 0) {
+                    setCompareModalOpen(true);
+                  }
+                }}
+                whileHover={{ y: "-10%" }}
+                style={{ fontSize: "2rem" }}
+                className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2 mx-5"
+              >
+                compare
+              </motion.span>
+              {selectedCompareKey && (
+                <motion.span
+                  whileHover={{ y: "-10%" }}
+                  style={{ fontSize: "2rem" }}
+                  onClick={() => {
+                    setSlateCompareOpen(false);
+                    setSelectedCompareKey("");
+                  }}
+                  className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
+                >
+                  close
+                </motion.span>
+              )}
             </div>
-          )}
-
-          {/* Commit load Div */}
-          <motion.div
-            whileHover={{ y: "-10%" }}
-            style={{ bottom: "5%", left: "5%", zIndex: 52 }}
-            className="fixed font-noto flex"
-          >
-            <span
-              onClick={() => {
-                if (writingInfo.commits.length !== 0) {
-                  setOpenModal(true);
-                }
-              }}
-              style={{ fontSize: "2rem" }}
-              className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
-            >
-              update
-            </span>
-          </motion.div>
-        </Slate>
+          </Slate>
+        </motion.div>
       ) : (
         // Loading Div
         <div className="w-full h-full top-0 left-0 fixed flex items-center justify-center">

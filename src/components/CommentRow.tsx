@@ -93,7 +93,7 @@ const CommentRow: React.FC<props> = (
     }
     return (
     <AnimatePresence>
-        <motion.div layout animate={{opacity:[0,1]} } className=" flex flex-col items-start justify-center w-full h-fit border-t border-opacity-10 shadow-md px-3 py-3">
+        <motion.div layout animate={{ opacity:[ 0, 1 ] } } className="flex flex-col items-start justify-center w-full h-fit border-t border-opacity-10 shadow-md px-3 py-3">
             <div className="flex items-center justify-between mb-3 w-full">
                 <div className="flex items-center">
                     <img className="w-7 rounded-full mr-3" src={commentOwnerInfo.profileImg} alt="comment owner" />

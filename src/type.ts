@@ -115,3 +115,8 @@ export interface commentType {
   dateCreated: number
   replies: { [key:number]: string }
 }
+
+export type editorValue = {
+  type: string;
+  children: { type: string; text: string; fontSize: number; fontStyle: string; }[]
+}

@@ -204,7 +204,10 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
             }}
           >
             {writingInfo && writingInfo.commits && (
-              <div className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg">
+              <div
+                style={{ backgroundColor: "#f7f7f7" }}
+                className="flex flex-col items-center w-1/4 h-1/2 py-5 rounded-lg"
+              >
                 <span className="text-xl font-bold text-gray-500 mb-5">
                   제출 기록
                 </span>
@@ -218,6 +221,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
                     const tmpData = Object.keys(data);
                     const key = "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
                     const date = new Date(parseInt(key)).toLocaleString();
+                    const DateNight = date.includes("오전") ? "오전" : "오후";
                     return (
                       <div
                         onClick={(e) => {
@@ -234,8 +238,22 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
                           selectedKey === key && "bg-genreSelectedBG"
                         } hover:bg-wirtingButtonHover`}
                       >
-                        <span className="mr-5">{date}</span>
-                        <span>{data.memo}</span>
+                        <div className="flex items-center w-5/6 justify-between">
+                          <div className="flex flex-col items-center text-sm">
+                            <span>{date.split(DateNight)[0]}</span>
+                            <span>
+                              {`${DateNight} `}
+                              {date.split(DateNight)[1]}
+                            </span>
+                          </div>
+                          <textarea
+                            value={data.memo}
+                            readOnly
+                            className="w-1/2 text-sm resize-none cursor-pointer focus:outline-none bg-transparent"
+                          >
+                            {data.memo}
+                          </textarea>
+                        </div>
                       </div>
                     );
                   })}

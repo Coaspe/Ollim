@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { cx, css } from "@emotion/css";
-
+import { motion } from "framer-motion";
 export const Button = React.forwardRef(
   ({ className, active, reversed, ...props }, ref) => (
     <span
@@ -105,30 +105,57 @@ export const Instruction = React.forwardRef(({ className, ...props }, ref) => (
   />
 ));
 
-export const Menu = React.forwardRef(
-  ({ className, isFullScreen, ...props }, ref) => (
-    <div
-      {...props}
-      ref={ref}
-      className={cx(
-        className,
-        `drop-shadow-md border-t border-black border-opacity-5 justify-start flex items-center ${
-          isFullScreen
-            ? "absolute grid grid-cols-3 place-items-center gap-2"
-            : "sticky space-x-3.5 > * + *"
-        }`,
-        css`
-          border-radius: 10px;
-          margin-bottom: 10px;
-          & > * {
-            display: inline-block;
-          }
-        `
-      )}
-    />
-  )
-);
+export const Menu = React.forwardRef(({ className, ...props }, ref) => (
+  <div
+    {...props}
+    ref={ref}
+    className={cx(
+      className,
+      `drop-shadow-md border-t border-black border-opacity-5 justify-start flex items-center sticky space-x-3.5 > * + *`,
+      css`
+        border-radius: 10px;
+        margin-bottom: 10px;
+        & > * {
+          display: inline-block;
+        }
+      `
+    )}
+  />
+));
+export const FullScreenMenu = React.forwardRef(
+  ({ className, ...props }, ref) => {
+    const [windowSize, setWindowSize] = useState([0, 0]);
 
+    useEffect(() => {
+      setWindowSize([window.innerHeight, window.innerWidth]);
+    }, []);
+
+    return (
+      <motion.div
+        drag
+        dragConstraints={{
+          left: 16,
+          top: 16,
+          right: windowSize[1] ? windowSize[1] - 304 : 0,
+          bottom: windowSize[0] ? windowSize[0] - 16 : 0,
+        }}
+        {...props}
+        ref={ref}
+        className={cx(
+          className,
+          `drop-shadow-md border-t border-black border-opacity-5 justify-start items-center absolute grid grid-cols-3 place-items-center gap-2`,
+          css`
+            border-radius: 10px;
+            margin-bottom: 10px;
+            & > * {
+              display: inline-block;
+            }
+          `
+        )}
+      />
+    );
+  }
+);
 export const Portal = ({ children }) => {
   return typeof document === "object"
     ? ReactDOM.createPortal(children, document.body)
@@ -136,20 +163,33 @@ export const Portal = ({ children }) => {
 };
 
 export const Toolbar = React.forwardRef(
-  ({ className, isFullScreen, ...props }, ref) => (
-    <Menu
-      {...props}
-      isFullScreen={isFullScreen}
-      ref={ref}
-      style={{
-        backgroundColor: "#FAF6F5",
-        padding: isFullScreen ? "10px 0px" : "12px 18px",
-        zIndex: 1000,
-      }}
-      className={cx(
-        className,
-        `${isFullScreen ? "w-72 top-1/2 left-4" : "w-noneFullScreenMenu top-0"}`
-      )}
-    />
-  )
+  ({ className, isFullScreen, ...props }, ref) => {
+    if (isFullScreen) {
+      return (
+        <FullScreenMenu
+          {...props}
+          ref={ref}
+          style={{
+            backgroundColor: "#FAF6F5",
+            padding: "10px 0px",
+            zIndex: 1000,
+          }}
+          className={cx(className, "w-72 top-4 left-4")}
+        />
+      );
+    } else {
+      return (
+        <Menu
+          {...props}
+          ref={ref}
+          style={{
+            backgroundColor: "#FAF6F5",
+            padding: "12px 18px",
+            zIndex: 1000,
+          }}
+          className={cx(className, `w-noneFullScreenMenu top-0`)}
+        />
+      );
+    }
+  }
 );

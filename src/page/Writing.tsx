@@ -4,8 +4,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import UserContext from "../context/user"
 import CustomNodeFlowRDOnly from "../diagram/RelationShipDiagramReadOnly"
 import { getUserByEmail, getUserByUID, getWritingInfo } from "../services/firebase"
-import {writingType, tableType, gerneType, getFirestorePoem, disclosure, getFirestoreNovel, getFirestoreUser, toObjectElements  } from "../type"
-import SlateEditor from "../SlateEditor/SlateEditor"
+import {writingType, tableType, gerneType, getFirestorePoem, disclosure, getFirestoreNovel, getFirestoreUser, toObjectElements, editorValue  } from "../type"
 import { cx, css } from "@emotion/css";
 import SlateEditorRDOnly from "../SlateEditor/SlateEditorRDOnly"
 import { useDispatch, useSelector } from "react-redux"
@@ -18,6 +17,7 @@ import WritingSetting from "../components/WritingSetting"
 import Header from "../components/Header"
 import axios from "axios"
 import SpinningSvg from "../components/SpinningSvg"
+import WritingWrite from "../components/WritingWrite"
 
 const Writing = () => {
 
@@ -34,7 +34,7 @@ const Writing = () => {
     const [writingInfo, setWritingInfo] = useState<writingType>({} as writingType)
 
     // Editor value
-    const [value, setValue] = useState(initialValue);
+    const [value, setValue] = useState<editorValue[]>(initialValue);
     // Table State 
     const [table, setTable] = useState<tableType>("OVERVIEW")
     // Disclosure State
@@ -58,7 +58,6 @@ const Writing = () => {
     const setDiagram = useCallback((diagram: toObjectElements) => {
         dispatch(diagramAction.setDiagram({diagram}))
     }, [dispatch])
-    const [openDiagram, setOpenDiagram] = useState(false)
 
     // Diagram's elements State
     const setElements = useCallback((elements: Elements<any>) => {
@@ -260,21 +259,7 @@ const Writing = () => {
             {/* Table WRITE */}
             {
                 table === "WRITE" && uid === contextUser.uid &&
-                    <div
-                    className={cx(
-                        "w-full h-full mt-10 flex flex-col items-center justify-center pb-32 editor-container relative",
-                        css`
-                            :fullscreen {
-                                background-color: #e6ddda;
-                                padding-bottom: 0;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                            }
-                        `
-                        )}>
-                            <SlateEditor openDiagram={openDiagram} setOpenDiagram={setOpenDiagram} writingDocID={writingDocID} genre={writingInfo.genre} value={value} setValue={setValue}/>
-                    </div>
+                <WritingWrite genre={writingInfo.genre} value={value} setValue={setValue} writingDocID={writingDocID} />
             }
             
             {/* Table BROWSE */}
