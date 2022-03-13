@@ -55,14 +55,34 @@ const CommentRow: React.FC<props> = (
         setLikesState((origin) => {
             let likesTmp = origin.slice()
             axios.post("https://ollim.herokuapp.com/updateCommentLike", {like: doesUserLike, commentDocID: docID, userUID: user.uid})
-
+            
+            // Like
             if (doesUserLike) {
                 const indexLocal = likesTmp.indexOf(user.uid)
                 setDoesUserLike((origin)=>!origin)
                 likesTmp.splice(indexLocal, 1)
+                setComments((origin) => {
+                    let tmp = origin.slice()
+                    let tmpLikes = tmp[index].likes
+
+                    tmpLikes.push(user.uid)
+                    tmp[index] = { ...origin[index], likes: tmpLikes }
+
+                    return tmp
+                })
             } else {
+                // Cancle Like
                 likesTmp.push(user.uid)
-                setDoesUserLike((origin)=>!origin)
+                setDoesUserLike((origin) => !origin)
+                    setComments((origin) => {
+                    let tmp = origin.slice()
+                    let tmpLikes = tmp[index].likes
+                    
+                    tmpLikes.splice(tmpLikes.indexOf(user.uid), 1)
+                    tmp[index] = { ...origin[index], likes: tmpLikes }
+
+                    return tmp
+                })
             }
             return likesTmp
         })
