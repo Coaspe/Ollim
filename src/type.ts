@@ -34,6 +34,8 @@ export type toObjectElements = {
 }
 
 export type addNovelScenarioArg = {
+  collection: any
+  isCollection: boolean
   userEmail: string
   synopsis: string
   title: string
@@ -43,22 +45,25 @@ export type addNovelScenarioArg = {
 }
 
 export type addPoemArg = {
+  collection: any
+  isCollection: boolean
   userEmail: string
   title: string
   synopsis: string
   userUID: string
   disclosure: string
 }
-
+  // collection: {
+  // [collectionNum: number]:
+  //   {
+  //     commits: [{ [key: number]: { contents: string, memo: string } }]
+  //     tempSave: { contents: contentType[], date: number }
+  //     title: string
+  //   }
+  // }
+  
 export type getFirestorePoem = {
-  collection: {
-  [collectionNum: number]:
-    {
-      commits: [{ [key: number]: { contents: string, memo: string } }]
-      tempSave: { contents: contentType[], date: number }
-      title: string
-    }
-  }
+  collection: any
   dateCreated: number
   done: boolean
   killingVerse: Array<string>

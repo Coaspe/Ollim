@@ -114,13 +114,23 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                             handleGenrnError()
                         } else {
                             // Send firestore post
-                            const data: addPoemArg = {
+                            let data: addPoemArg =
+                            {
                                 userUID: userInfo.uid,
                                 userEmail: userInfo.userEmail,
+                                collection: {
+                                    1: {
+                                        title: firstCollectionElementTitle,
+                                        tempSave: {},
+                                        commit: []
+                                    }
+                                },
+                                isCollection,
                                 title,
                                 disclosure,
                                 synopsis
                             }
+
                             handleAddWriting(data, "Poem")
                             setNewWritingModalOpen(false)
                         }
@@ -321,12 +331,20 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                         className={`w-8 cursor-pointer`}
                         onClick={() => {
                             const data: addNovelScenarioArg = {
+                                collection: {
+                                    1: {
+                                        title: firstCollectionElementTitle,
+                                        tempSave: {},
+                                        commit: []
+                                    }
+                                },
+                                isCollection,
                                 userEmail: userInfo.userEmail,
-                                userUID: userInfo.uid,
-                                title,
                                 synopsis,
+                                title,
+                                userUID: userInfo.uid,
+                                diagram: Object.keys(diagram).length === 0 ? {elements:[], position:[0,0], zoom:1.5} : diagram,
                                 disclosure,
-                                diagram: Object.keys(diagram).length === 0 ? {elements:[], position:[0,0], zoom:1.5} : diagram
                             }
                             genrn === "NOVEL" ? handleAddWriting(data, "Novel") : handleAddWriting(data, "Scenario")
                             setNewWritingModalOpen(false)
