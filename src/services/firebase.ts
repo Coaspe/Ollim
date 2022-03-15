@@ -8,6 +8,8 @@ import {
   query,
   where,
   getDocs,
+  DocumentData,
+  updateDoc,
 
 } from "firebase/firestore";
 import { toObjectElements } from "../type";
@@ -112,4 +114,30 @@ export const getComments = (commentsDocID: string[]) => {
   return getDocs(
     query(collection(firestore, "comments"), where("__name__", "in", commentsDocID))
   )
+}
+
+export const copyPasteCommits = async () => {
+  let s = (await getDocs(collection(firestore, "poem")))
+  s.forEach(async (document: DocumentData) => {
+    const currentCommits = ((await getDoc(doc(firestore, "poem", document.id))).data() as DocumentData).commits
+    const currentTempSave = ((await getDoc(doc(firestore, "poem", document.id))).data() as DocumentData).tempSave
+    const update: any = {}
+    update['isCollection'] = false
+    update["collection.1.commits"] = currentCommits
+    update["collection.1.tempSave"] = currentTempSave
+    updateDoc(doc(firestore, "poem", document.id), update)
+  })
+}
+
+export const copyPasteCommitsNovel = async () => {
+  let s = (await getDocs(collection(firestore, "novel")))
+  s.forEach(async (document: DocumentData) => {
+    const currentCommits = ((await getDoc(doc(firestore, "novel", document.id))).data() as DocumentData).commits
+    const currentTempSave = ((await getDoc(doc(firestore, "novel", document.id))).data() as DocumentData).tempSave
+    const update: any = {}
+    update['isCollection'] = false
+    update["collection.1.commits"] = currentCommits
+    update["collection.1.tempSave"] = currentTempSave
+    updateDoc(doc(firestore, "novel", document.id), update)
+  })
 }

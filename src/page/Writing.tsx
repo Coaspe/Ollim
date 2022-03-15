@@ -3,7 +3,7 @@ import { useCallback, useContext, useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import UserContext from "../context/user"
 import CustomNodeFlowRDOnly from "../diagram/RelationShipDiagramReadOnly"
-import { getUserByEmail, getUserByUID, getWritingInfo } from "../services/firebase"
+import { copyPasteCommits, getUserByEmail, getUserByUID, getWritingInfo } from "../services/firebase"
 import {writingType, tableType, gerneType, getFirestorePoem, disclosure, getFirestoreNovel, getFirestoreUser, toObjectElements, editorValue  } from "../type"
 import { cx, css } from "@emotion/css";
 import SlateEditorRDOnly from "../SlateEditor/SlateEditorRDOnly"
@@ -83,12 +83,14 @@ const Writing = () => {
 
     // useEffect to get writing's owner's information
     useEffect(() => {
+        // copyPasteCommits()
         if (uid) {
             getUserByUID(uid).then((res) => {
                 setWritingOwnerInfo(res.docs[0].data() as getFirestoreUser)
             })
         }
     }, [uid])
+
     useEffect(() => {
         if (writingDocID && genre && (table === "OVERVIEW" || table === "WRITE")) {
             getWritingInfo(writingDocID, genre).then((res: any) => {

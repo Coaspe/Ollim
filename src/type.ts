@@ -51,28 +51,41 @@ export type addPoemArg = {
 }
 
 export type getFirestorePoem = {
-  commits: [{ [key: number]: { contents: string, memo: string } } ]
+  collection: {
+  [collectionNum: number]:
+    {
+      commits: [{ [key: number]: { contents: string, memo: string } }]
+      tempSave: { contents: contentType[], date: number }
+      title: string
+    }
+  }
   dateCreated: number
   done: boolean
   killingVerse: Array<string>
   synopsis: string
-  tempSave: {contents: contentType[], date:number}
   title: string
   userEmail: string
   userUID: string
   genre: string
   id: string
   disclosure: disclosure
+  isCollection: boolean
   memo: string
 }
 export type getFirestoreNovel = {
-  commits: [{ [key: number]: { contents: string, memo: string } } ]
+  collection: {
+  [collectionNum: number]:
+    {
+      commits: [{ [key: number]: { contents: string, memo: string } }]
+      tempSave: { contents: contentType[], date: number }
+      title: string
+    }
+  }
   dateCreated: number
   diagram: toObjectElements
   done: boolean
   killingVerse: Array<string>
   synopsis: string
-  tempSave: {contents: contentType[], date:number}
   title: string
   userEmail: string
   userUID: string
@@ -80,22 +93,31 @@ export type getFirestoreNovel = {
   id: string
   disclosure: disclosure
   memo: string
+  isCollection: boolean
 }
 export type getFirestoreScenario = {
-  commits: [{ [key: number]: { contents: string, memo: string } } ]
+    collection: {
+  [collectionNum: number]:
+    {
+      commits: [{ [key: number]: { contents: string, memo: string } }]
+      tempSave: { contents: contentType[], date: number }
+      title: string
+    }
+  }
+  title: string
   dateCreated: number
   diagram: toObjectElements
   done: boolean
   killingVerse: Array<string>
   synopsis: string
-  tempSave: {contents: contentType[], date:number}
-  title: string
   userEmail: string
   userUID: string
   genre: string
   id: string
   disclosure: disclosure
   memo: string
+  isCollection: boolean
+
 }
 export type contentType = {
     type: string;

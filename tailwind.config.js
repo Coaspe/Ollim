@@ -32,6 +32,7 @@ module.exports = {
       },
       height: {
         a4Height: "297mm",
+        a4FullScreenHeight: "270mm",
       },
       screens: {
         GalaxyS20Ultra: "400px",

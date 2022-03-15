@@ -122,6 +122,7 @@ export const Menu = React.forwardRef(({ className, ...props }, ref) => (
     )}
   />
 ));
+
 export const FullScreenMenu = React.forwardRef(
   ({ className, ...props }, ref) => {
     const [windowSize, setWindowSize] = useState([0, 0]);

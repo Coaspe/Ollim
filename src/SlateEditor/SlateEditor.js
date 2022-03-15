@@ -46,7 +46,7 @@ const SlateEditor = ({
   setSelectedCompareKey,
   selectedCompareKey,
   isFullScreen,
-  setIsFullScreen
+  setIsFullScreen,
 }) => {
   const [percentage, setPercentage] = useState(0);
   const [tempSaveModal, setTempSaveModal] = useState(false);
@@ -92,6 +92,15 @@ const SlateEditor = ({
   // Compare modal
   const [compareModalOpen, setCompareModalOpen] = useState(false);
 
+  const [openNewCollectionElementModal, setOpenNewCollectionElementModal] =
+    useState(false);
+  const [nowCollectionNum, setNowCollectionNum] = useState(0);
+  const [collectionNumArray, setCollectionNumArray] = useState([]);
+  const [newCollectionElementTitle, setNewCollectionElementTitle] =
+    useState("");
+  const [changeCollectionElementModal, setChangeCollectionElementModal] =
+    useState(false);
+  const loadTemp = useRef(true);
   // Render Slate element
   const renderElement = ({ element, attributes, children }) => {
     const elementKey = ReactEditor.findKey(editor, element);
@@ -117,6 +126,7 @@ const SlateEditor = ({
   const setAlarm = (alarm) => {
     dispatch(alarmAction.setAlarm({ alarm }));
   };
+  // https://ollim.herokuapp.com
   // Handle Save fuctions
   const handleRequestTempSave = () => {
     const date = new Date().getTime();
@@ -125,6 +135,7 @@ const SlateEditor = ({
         contents: JSON.stringify(value),
         writingDocID,
         genre: writingInfo.genre,
+        collectionNum: nowCollectionNum,
       })
       .then((res) => {
         setTemporarySaveButtonEnable(true);
@@ -142,6 +153,7 @@ const SlateEditor = ({
       .post(`https://ollim.herokuapp.com/removeTempSave`, {
         writingDocID,
         genre: writingInfo.genre,
+        collectionNum: nowCollectionNum,
       })
       .then((res) => {
         setTemporarySaveButtonEnable(true);
@@ -161,7 +173,6 @@ const SlateEditor = ({
         userUID: writingInfo.userUID,
         memo: commitDescription,
         genre: writingInfo.genre,
-        title: writingInfo.title,
       })
       .then((res) => {
         commitSuccess.current = !commitSuccess.current;
@@ -172,51 +183,80 @@ const SlateEditor = ({
         }, 2000);
       });
   };
-
+  const handleAddCollectionElement = () => {
+    setOpenNewCollectionElementModal(false);
+    axios
+      .post("https://ollim.herokuapp.com/addCollectionElement", {
+        genre,
+        writingDocID,
+        collectionElementNum: collectionNumArray.length + 1,
+        title: newCollectionElementTitle,
+      })
+      .then((res) => {
+        commitSuccess.current = !commitSuccess.current;
+        setAlarm(res.data);
+        setTimeout(() => {
+          setAlarm(["", "success", false]);
+        }, 2000);
+      });
+    setNewCollectionElementTitle("");
+  };
   // useEffect to get writing information
   useEffect(() => {
     getWritingInfo(writingDocID, genre).then((res) => {
       setWritingInfo(res);
-      setTempSaveState(res.tempSave);
+      nowCollectionNum === 0 && setNowCollectionNum(1);
+      setCollectionNumArray(Object.keys(res.collection));
+      setTempSaveState(
+        nowCollectionNum === 0
+          ? res.collection["1"].tempSave
+          : res.collection[nowCollectionNum.toString()].tempSave
+      );
     });
   }, [commitSuccess.current]);
 
   useEffect(() => {
     // Check is writingInfo empty
     if (Object.keys(writingInfo).length !== 0) {
-      // Check has temporary save
-      if (Object.keys(writingInfo.tempSave).length !== 0) {
-        // get temporary save
-        let date = new Date(writingInfo.tempSave.date);
+      const nowCollection = writingInfo.collection[nowCollectionNum.toString()];
+      // Has chapter and chapter number already set
+      if (nowCollectionNum && loadTemp.current) {
+        if (Object.keys(nowCollection.tempSave).length !== 0) {
+          setTempSaveState(nowCollection.tempSave);
+          // Get temporary save of collection
+          let date = new Date(nowCollection.tempSave.date);
 
-        // Ask if user is going to load temporary save
-        let getTmpSave = window.confirm(
-          `${
-            "[" +
-            date.getFullYear() +
-            "년 " +
-            (date.getMonth() + 1) +
-            "월 " +
-            date.getDate() +
-            "일 " +
-            date.getHours() +
-            ":" +
-            date.getMinutes() +
-            ":" +
-            date.getSeconds() +
-            "]"
-          } 에 임시저장한 글이 있습니다. 불러오시겠습니까?`
-        );
-        getTmpSave && setValue(writingInfo.tempSave.contents);
+          // Ask if user is going to load temporary save
+          let getTmpSave = window.confirm(
+            `${
+              "[" +
+              date.getFullYear() +
+              "년 " +
+              (date.getMonth() + 1) +
+              "월 " +
+              date.getDate() +
+              "일 " +
+              date.getHours() +
+              ":" +
+              date.getMinutes() +
+              ":" +
+              date.getSeconds() +
+              "]"
+            } 에 임시저장한 글이 있습니다. 불러오시겠습니까?`
+          );
+          getTmpSave && setValue(nowCollection.tempSave.contents);
+          getTmpSave && setLoading(true);
+          loadTemp.current = false;
+        }
+      } else {
+        loadTemp.current = true;
       }
-      setLoading(true);
     }
-  }, [writingInfo]);
+  }, [writingInfo, nowCollectionNum]);
 
   // If value changed (ex. selected commit changed)
-  // If value changed is caused by typing something, there is no change with contentLoading
   useEffect(() => {
-    value.length > 0 && setLoading(true);
+    setLoading(false);
   }, [value]);
 
   // window.addEventListener("beforeunload", function (e) {
@@ -260,6 +300,7 @@ const SlateEditor = ({
 
   return (
     <>
+      {/* Submit Commitment modal */}
       {openModal && (
         <motion.div
           animate={{
@@ -273,51 +314,114 @@ const SlateEditor = ({
             setOpenModal(false);
           }}
         >
-          {writingInfo && writingInfo.commits && (
+          {writingInfo &&
+            writingInfo.collection[nowCollectionNum.toString()].commits && (
+              <div
+                style={{ backgroundColor: "#f7f7f7" }}
+                className="flex flex-col items-center w-1/4 h-1/2 py-5 rounded-lg"
+              >
+                <span className="text-xl font-bold text-gray-500 mb-5">
+                  제출 기록
+                </span>
+                <div className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scroll">
+                  {writingInfo.collection[
+                    nowCollectionNum.toString()
+                  ].commits.map((data) => {
+                    const tmpData = Object.keys(data);
+                    const key = "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
+                    const date = new Date(parseInt(key)).toLocaleString();
+                    const DateNight = date.includes("오전") ? "오전" : "오후";
+                    return (
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (selectedKey !== key) {
+                            setLoading(true);
+                            setSelectedKey(key);
+                            setValue(data[key]);
+                            setOpenModal(false);
+                          }
+                        }}
+                        key={key}
+                        className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${
+                          selectedKey === key && "bg-genreSelectedBG"
+                        } hover:bg-wirtingButtonHover`}
+                      >
+                        <div className="flex items-center w-5/6 justify-between">
+                          <div className="flex flex-col items-center text-sm">
+                            <span>{date.split(DateNight)[0]}</span>
+                            <span>
+                              {`${DateNight} `}
+                              {date.split(DateNight)[1]}
+                            </span>
+                          </div>
+                          <textarea
+                            value={data.memo}
+                            readOnly
+                            className="w-1/2 text-sm resize-none cursor-pointer focus:outline-none bg-transparent"
+                          >
+                            {data.memo}
+                          </textarea>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+        </motion.div>
+      )}
+      {/* Change current editing chapter or poem element of collection modal */}
+      {changeCollectionElementModal && writingInfo.isCollection && (
+        <motion.div
+          animate={{
+            backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],
+          }}
+          transition={{ duration: 0.2 }}
+          style={{ zIndex: 10000 }}
+          className="fixed w-full h-full items-center justify-center top-0 left-0 flex"
+          onClick={() => {
+            setChangeCollectionElementModal(false);
+          }}
+        >
+          {writingInfo && writingInfo.collection && (
             <div
               style={{ backgroundColor: "#f7f7f7" }}
               className="flex flex-col items-center w-1/4 h-1/2 py-5 rounded-lg"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
             >
               <span className="text-xl font-bold text-gray-500 mb-5">
-                제출 기록
+                {genre !== "POEM" ? "장 추가" : "시 추가"}
               </span>
               <div className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scroll">
-                {writingInfo.commits.map((data) => {
-                  const tmpData = Object.keys(data);
-                  const key = "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
-                  const date = new Date(parseInt(key)).toLocaleString();
-                  const DateNight = date.includes("오전") ? "오전" : "오후";
+                {Object.keys(writingInfo.collection).map((data) => {
+                  const collection = writingInfo.collection[data];
+
                   return (
                     <div
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (selectedKey !== key) {
-                          setLoading(false);
-                          setSelectedKey(key);
-                          setValue(data[key]);
-                          setOpenModal(false);
+                        if (nowCollectionNum !== parseInt(data)) {
+                          setNowCollectionNum(parseInt(data));
+                          setChangeCollectionElementModal(false);
+                          loadTemp.current = true;
                         }
                       }}
-                      key={key}
+                      key={data}
                       className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${
-                        selectedKey === key && "bg-genreSelectedBG"
+                        nowCollectionNum === parseInt(data) &&
+                        "bg-genreSelectedBG"
                       } hover:bg-wirtingButtonHover`}
                     >
                       <div className="flex items-center w-5/6 justify-between">
-                        <div className="flex flex-col items-center text-sm">
-                          <span>{date.split(DateNight)[0]}</span>
-                          <span>
-                            {`${DateNight} `}
-                            {date.split(DateNight)[1]}
-                          </span>
-                        </div>
-                        <textarea
-                          value={data.memo}
-                          readOnly
-                          className="w-1/2 text-sm resize-none cursor-pointer focus:outline-none bg-transparent"
-                        >
-                          {data.memo}
-                        </textarea>
+                        <span>
+                          {genre !== "POEM"
+                            ? `제 ${data} 장`
+                            : `${data}번째 시`}
+                        </span>
+                        <span>{collection.title}</span>
                       </div>
                     </div>
                   );
@@ -327,6 +431,7 @@ const SlateEditor = ({
           )}
         </motion.div>
       )}
+      {/* Compare modal */}
       {compareModalOpen && (
         <motion.div
           animate={{
@@ -340,62 +445,116 @@ const SlateEditor = ({
             setCompareModalOpen(false);
           }}
         >
-          {writingInfo && writingInfo.commits && (
-            <div
-              style={{ backgroundColor: "#f7f7f7" }}
-              className="flex flex-col items-center w-1/4 h-1/2 py-5 rounded-lg"
-            >
-              <span className="text-xl font-bold text-gray-500 mb-5">
-                비교 창 열기
-              </span>
-              <div className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scroll">
-                {writingInfo.commits.map((data) => {
-                  const tmpData = Object.keys(data);
-                  const key = "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
-                  const date = new Date(parseInt(key)).toLocaleString();
-                  const DateNight = date.includes("오전") ? "오전" : "오후";
+          {writingInfo &&
+            writingInfo.collection[nowCollectionNum.toString()].commits && (
+              <div
+                style={{ backgroundColor: "#f7f7f7" }}
+                className="flex flex-col items-center w-1/4 h-1/2 py-5 rounded-lg"
+              >
+                <span className="text-xl font-bold text-gray-500 mb-5">
+                  비교 창 열기
+                </span>
+                <div className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scroll">
+                  {writingInfo.collection[
+                    nowCollectionNum.toString()
+                  ].commits.map((data) => {
+                    const tmpData = Object.keys(data);
+                    const key = "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
+                    const date = new Date(parseInt(key)).toLocaleString();
+                    const DateNight = date.includes("오전") ? "오전" : "오후";
 
-                  return (
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (selectedCompareKey !== key) {
-                          setSelectedCompareKey(key);
-                          setSlateCompareValue(data[key]);
-                          setSlateCompareOpen(true);
-                          setCompareModalOpen(false);
-                        }
-                      }}
-                      key={key}
-                      className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${
-                        selectedCompareKey === key && "bg-genreSelectedBG"
-                      } hover:bg-wirtingButtonHover`}
-                    >
-                      <div className="flex items-center w-5/6 justify-between">
-                        <div className="flex flex-col items-center text-sm">
-                          <span>{date.split(DateNight)[0]}</span>
-                          <span>
-                            {`${DateNight} `}
-                            {date.split(DateNight)[1]}
-                          </span>
+                    return (
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (selectedCompareKey !== key) {
+                            setSelectedCompareKey(key);
+                            setSlateCompareValue(data[key]);
+                            setSlateCompareOpen(true);
+                            setCompareModalOpen(false);
+                          }
+                        }}
+                        key={key}
+                        className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${
+                          selectedCompareKey === key && "bg-genreSelectedBG"
+                        } hover:bg-wirtingButtonHover`}
+                      >
+                        <div className="flex items-center w-5/6 justify-between">
+                          <div className="flex flex-col items-center text-sm">
+                            <span>{date.split(DateNight)[0]}</span>
+                            <span>
+                              {`${DateNight} `}
+                              {date.split(DateNight)[1]}
+                            </span>
+                          </div>
+                          <textarea
+                            value={data.memo}
+                            readOnly
+                            className="w-1/2 text-sm resize-none cursor-pointer focus:outline-none bg-transparent"
+                          >
+                            {data.memo}
+                          </textarea>
                         </div>
-                        <textarea
-                          value={data.memo}
-                          readOnly
-                          className="w-1/2 text-sm resize-none cursor-pointer focus:outline-none bg-transparent"
-                        >
-                          {data.memo}
-                        </textarea>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </motion.div>
       )}
-      {loading ? (
+      {/* Add new chpater or collection poem element of collection modal*/}
+      {openNewCollectionElementModal && writingInfo.isCollection && (
+        <motion.div
+          animate={{
+            backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],
+          }}
+          transition={{ duration: 0.2 }}
+          style={{ zIndex: 10000 }}
+          className="fixed w-full h-full items-center justify-center top-0 left-0 flex"
+          onClick={() => {
+            setOpenNewCollectionElementModal(false);
+          }}
+        >
+          <div
+            style={{ backgroundColor: "#f7f7f7" }}
+            className="flex flex-col items-center w-1/4 h-fit py-5 rounded-lg"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <span className="text-xl font-bold text-gray-500 mb-5">
+              {genre !== "POEM" ? "장 추가" : "시 추가 "}
+            </span>
+            <div className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scroll">
+              <span>
+                {genre !== "POEM"
+                  ? `${writingInfo.title}의 제 ${
+                      collectionNumArray.length + 1
+                    } 장`
+                  : `${writingInfo.title}의 ${
+                      collectionNumArray.length + 1
+                    }번째 시`}
+              </span>
+              <div className="flex w-full items-center">
+                <span className="text-md mr-3">제목</span>
+                <input
+                  onChange={(e) => {
+                    setNewCollectionElementTitle(e.target.value);
+                  }}
+                  value={newCollectionElementTitle}
+                  type="text"
+                  className="shadow-md w-5/6 border-gray-200 border px-3 py-1 rounded-xl bg-transparent focus:outline-gray-500"
+                />
+                <button onClick={handleAddCollectionElement}>확인</button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Slate Editor */}
+      {!loading ? (
         <motion.div layout>
           <Slate
             editor={editor}
@@ -404,8 +563,8 @@ const SlateEditor = ({
               setValue(value);
             }}
           >
+            {/* Toolbar Div */}
             <div className="flex flex-col items-center">
-              {/* Tools */}
               <Toolbar isFullScreen={isFullScreen}>
                 <MarkButton format="bold" icon="format_bold" />
                 <MarkButton format="italic" icon="format_italic" />
@@ -428,10 +587,12 @@ const SlateEditor = ({
                     setOpenDiagram={setOpenDiagram}
                   />
                 )}
+                {/* Open Dictionary */}
                 <DictButton
                   selectedProp={selected}
                   setIsFullScreen={setIsFullScreen}
                 />
+
                 {/* Memo */}
                 <Tooltip placement="top" title="메모" arrow>
                   <span
@@ -456,6 +617,7 @@ const SlateEditor = ({
                     storage
                   </span>
                 </Tooltip>
+
                 {/* Full Screen */}
                 <Tooltip placement="top" title="전체 화면" arrow>
                   <span
@@ -480,6 +642,7 @@ const SlateEditor = ({
                     className="bg-slate-300"
                   />
                 )}
+
                 {/* percentage */}
                 <Tooltip
                   placement="top"
@@ -503,6 +666,48 @@ const SlateEditor = ({
                     </div>
                   </div>
                 </Tooltip>
+
+                {/* Chapter */}
+                {writingInfo && writingInfo.isCollection && (
+                  <div className="ml-3">
+                    <div className="flex items-center">
+                      <Tooltip
+                        placement="top"
+                        title={genre !== "POEM" ? "장 교체" : "시 교체"}
+                        arrow
+                      >
+                        <span
+                          onClick={() => {
+                            setChangeCollectionElementModal(true);
+                          }}
+                          style={{ fontSize: "0.8rem" }}
+                          className="font-bold cursor-pointer text-gray-400 hover:text-slate-500"
+                        >
+                          {genre !== "POEM"
+                            ? `${nowCollectionNum} 장`
+                            : writingInfo.collection[nowCollectionNum].title}
+                        </span>
+                      </Tooltip>
+                      <Tooltip
+                        placement="top"
+                        title={genre !== "POEM" ? "장 추가" : "시 추가"}
+                        arrow
+                      >
+                        <span
+                          style={{ fontSize: "1rem" }}
+                          className="cursor-pointer material-icons ml-1 font-bold text-gray-300 hover:text-slate-500"
+                          onClick={() => {
+                            setOpenNewCollectionElementModal(
+                              (origin) => !origin
+                            );
+                          }}
+                        >
+                          add_circle_outline
+                        </span>
+                      </Tooltip>
+                    </div>
+                  </div>
+                )}
               </Toolbar>
 
               {/* Editable div */}
@@ -512,7 +717,7 @@ const SlateEditor = ({
                   backgroundColor: "#FAF6F5",
                 }}
                 className={`z-50 editor-inner overflow-y-scroll w-noneFullScreenMenu h-a4Height overflow-x-hidden ${
-                  isFullScreen && "my-5"
+                  isFullScreen && "my-5 h-a4FullScreenHeight"
                 }`}
               >
                 <ResizeObserver
@@ -653,7 +858,10 @@ const SlateEditor = ({
               <motion.span
                 whileHover={{ y: "-10%" }}
                 onClick={() => {
-                  if (writingInfo.commits.length !== 0) {
+                  if (
+                    writingInfo.collection[nowCollectionNum.toString()].commits
+                      .length !== 0
+                  ) {
                     setOpenModal(true);
                   }
                 }}
@@ -664,7 +872,10 @@ const SlateEditor = ({
               </motion.span>
               <motion.span
                 onClick={() => {
-                  if (writingInfo.commits.length !== 0) {
+                  if (
+                    writingInfo.collection[nowCollectionNum.toString()].commits
+                      .length !== 0
+                  ) {
                     setCompareModalOpen(true);
                   }
                 }}
