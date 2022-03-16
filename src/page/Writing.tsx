@@ -8,7 +8,7 @@ import {writingType, tableType, gerneType, getFirestorePoem, disclosure, getFire
 import { cx, css } from "@emotion/css";
 import SlateEditorRDOnly from "../SlateEditor/SlateEditorRDOnly"
 import { useDispatch, useSelector } from "react-redux"
-import { diagramAction, elementsAction } from "../redux"
+import { diagramAction, elementsAction, isFullScreenAction } from "../redux"
 import { RootState } from "../redux/store"
 import { Alert } from "@mui/material"
 import { Elements } from "react-flow-renderer"
@@ -63,7 +63,7 @@ const Writing = () => {
     const setElements = useCallback((elements: Elements<any>) => {
         dispatch(elementsAction.setElements({elements}))
     }, [dispatch])
-
+    const setIsFullScreen = useCallback((isFullScreen) => { dispatch(isFullScreenAction.setIsFullScreen({ isFullScreen })) }, [dispatch])
     // alarm state
     // alarm[0] : alarm message, alarm[1] : alarm type, alarm[2] : alarm on, off
     const alarm = useSelector((state: RootState) => state.setAlarm.alarm)
@@ -109,7 +109,17 @@ const Writing = () => {
             })
         }
     }, [table, writingDocID])
-
+    useEffect(() => {
+    if (document.addEventListener) {
+      document.addEventListener("fullscreenchange", exitHandler, false);
+    }
+    function exitHandler() {
+      if (!document.fullscreenElement) {
+        // Run code on exit
+        setIsFullScreen(false);
+      }
+    }
+    }, [])
     const alertVariants = {
         initial: {
             opacity: 0,

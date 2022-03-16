@@ -54,3 +54,14 @@ interface setAlarmTimerAction {
     payload: setAlarmTimerPayload
 }
 
+
+interface isFullScreenState {
+    isFullScreen: boolean
+}
+interface setIsFullScreenPayload {
+    isFullScreen: boolean
+}
+interface setIsFullScreenAction {
+    payload: setIsFullScreenPayload
+}
+

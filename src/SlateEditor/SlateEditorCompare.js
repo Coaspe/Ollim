@@ -6,17 +6,16 @@ import { cx, css } from "@emotion/css";
 import { Leaf } from "./utils";
 import { motion } from "framer-motion";
 import ParagraphWithoutNum from "./paragraphWithoutNum";
-
-const SlateEditorCompare = ({
-  valueProps,
-  setSlateCompareOpen,
-  setSelectedCompareKey,
-  isFullScreen,
-}) => {
+import { useSelector } from "react-redux";
+const SlateEditorCompare = ({ valueProps }) => {
   const [value, setValue] = useState([]);
   const [loading, setLoading] = useState(true);
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+
+  const isFullScreen = useSelector(
+    (state) => state.setIsFullScreen.isFullScreen
+  );
 
   const renderElement = ({ element, attributes, children }) => {
     const elementKey = ReactEditor.findKey(editor, element);
@@ -39,7 +38,6 @@ const SlateEditorCompare = ({
   };
 
   useEffect(() => {
-    console.log("valueProps", valueProps);
     setLoading(false);
     setValue(valueProps);
   }, [valueProps]);
@@ -48,27 +46,9 @@ const SlateEditorCompare = ({
     value.length > 0 && setLoading(true);
   }, [value]);
 
-  //   const containerVariants = {
-  //     initial: {
-  //       x: "-100%",
-  //     },
-  //     animate: {
-  //       x: "0%",
-  //     },
-  //     exit: {
-  //       x: "-100%",
-  //     },
-  //   };
   return (
     <>
-      <motion.div
-        className="mr-5"
-        layout
-        // variants={containerVariants}
-        // initial="initial"
-        // animate="animate"
-        // exit="exit"
-      >
+      <motion.div className="mr-5" layout>
         {loading ? (
           <Slate
             editor={editor}

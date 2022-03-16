@@ -16,11 +16,10 @@ const WritingWrite: React.FC<props> = ({ writingDocID, genre, value, setValue })
     const [slateCompareValue, setSlateCompareValue] = useState([])
     const [slateCompareOpen, setSlateCompareOpen] = useState(false)
     const [openDiagram, setOpenDiagram] = useState(false)
+    
     // Selected compare key
     const [selectedCompareKey, setSelectedCompareKey] = useState("");
 
-    // Is Full Screen?
-    const [isFullScreen, setIsFullScreen] = useState(false);
     return (
         <div
         className={cx(
@@ -38,10 +37,7 @@ const WritingWrite: React.FC<props> = ({ writingDocID, genre, value, setValue })
                 <AnimatePresence>
                 {slateCompareOpen &&
                     <SlateEditorCompare 
-                    isFullScreen={isFullScreen}
                     key="compare" 
-                    setSlateCompareOpen={setSlateCompareOpen} 
-                    setSelectedCompareKey={setSelectedCompareKey} 
                     valueProps={slateCompareValue} />}
                     <SlateEditor 
                     key="origin" 
@@ -52,8 +48,6 @@ const WritingWrite: React.FC<props> = ({ writingDocID, genre, value, setValue })
                     openDiagram={openDiagram} 
                     setOpenDiagram={setOpenDiagram} 
                     writingDocID={writingDocID} 
-                    isFullScreen={isFullScreen}
-                    setIsFullScreen={setIsFullScreen}
                     genre={genre} 
                     value={value} 
                     setValue={setValue}/>

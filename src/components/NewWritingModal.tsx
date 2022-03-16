@@ -122,7 +122,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                                     1: {
                                         title: firstCollectionElementTitle,
                                         tempSave: {},
-                                        commit: []
+                                        commits: []
                                     }
                                 },
                                 isCollection,
@@ -335,7 +335,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({ setNewWritingModalOpen }) 
                                     1: {
                                         title: firstCollectionElementTitle,
                                         tempSave: {},
-                                        commit: []
+                                        commits: []
                                     }
                                 },
                                 isCollection,

@@ -1,6 +1,6 @@
 import { createAction, createReducer } from "@reduxjs/toolkit";
 import { getFirestoreUser, toObjectElements } from "../type";
-import { elementsState, setElementsAction, setElementsPayload, setUserInfoPayload, userInfoState, setUserInfoAction, diagramState, setDiagramAction, setDiagramPayload, alarmState, setAlarmPayload, setAlarmAction, setAlarmTimerPayload, alarmTimerState, setAlarmTimerAction } from "./type";
+import { elementsState, setElementsAction, setElementsPayload, setUserInfoPayload, userInfoState, setUserInfoAction, diagramState, setDiagramAction, setDiagramPayload, alarmState, setAlarmPayload, setAlarmAction, setAlarmTimerPayload, alarmTimerState, setAlarmTimerAction, setIsFullScreenAction, isFullScreenState, setIsFullScreenPayload } from "./type";
 
 export const elementsAction = {
     setElements: createAction<setElementsPayload>("SETELEMENTS"),
@@ -85,4 +85,20 @@ export const alarmTimerReducer = {
 export const setAlarmTimerReducer = createReducer(alarmTimerInitialState, builder => {
     builder
         .addCase(alarmTimerAction.setAlarmTimer, alarmTimerReducer.setAlarmTimer)
+})
+
+export const isFullScreenAction = {
+    setIsFullScreen: createAction<setIsFullScreenPayload>("SETISFULLSCREEN"),
+}
+const isFullScreenInitialState: isFullScreenState = {
+    isFullScreen : false
+}
+export const isFullScreenReducer = {
+    setIsFullScreen: (state: isFullScreenState, action: setIsFullScreenAction) => {
+        state.isFullScreen = action.payload.isFullScreen
+    }
+}
+export const setIsFullScreenReducer = createReducer(isFullScreenInitialState, builder => {
+    builder
+        .addCase(isFullScreenAction.setIsFullScreen, isFullScreenReducer.setIsFullScreen)
 })

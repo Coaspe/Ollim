@@ -5,7 +5,7 @@ import { Editor, createEditor } from "slate";
 import { withHistory } from "slate-history";
 import { Toolbar } from "./components";
 import { cx, css } from "@emotion/css";
-import { alarmAction } from "../redux";
+import { alarmAction, isFullScreenAction } from "../redux";
 import { getWritingInfo } from "../services/firebase";
 import { motion, AnimatePresence } from "framer-motion";
 import DiagramWrite from "../diagram/RelationShipDiagram";
@@ -19,7 +19,7 @@ import {
   MarkButton,
 } from "./utils";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Tooltip } from "@mui/material";
 import "../style/Slate.css";
 import ResizeObserver from "rc-resize-observer";
@@ -45,8 +45,6 @@ const SlateEditor = ({
   setSlateCompareOpen,
   setSelectedCompareKey,
   selectedCompareKey,
-  isFullScreen,
-  setIsFullScreen,
 }) => {
   const [percentage, setPercentage] = useState(0);
   const [tempSaveModal, setTempSaveModal] = useState(false);
@@ -101,6 +99,7 @@ const SlateEditor = ({
   const [changeCollectionElementModal, setChangeCollectionElementModal] =
     useState(false);
   const loadTemp = useRef(true);
+
   // Render Slate element
   const renderElement = ({ element, attributes, children }) => {
     const elementKey = ReactEditor.findKey(editor, element);
@@ -201,6 +200,7 @@ const SlateEditor = ({
       });
     setNewCollectionElementTitle("");
   };
+
   // useEffect to get writing information
   useEffect(() => {
     getWritingInfo(writingDocID, genre).then((res) => {
@@ -259,6 +259,8 @@ const SlateEditor = ({
     setLoading(false);
   }, [value]);
 
+  useEffect(() => {}, []);
+
   // window.addEventListener("beforeunload", function (e) {
   //   var confirmationMessage = "o/";
 
@@ -297,6 +299,16 @@ const SlateEditor = ({
       opacity: "0%",
     },
   };
+
+  const isFullScreen = useSelector(
+    (state) => state.setIsFullScreen.isFullScreen
+  );
+  const setIsFullScreen = useCallback(
+    (isFullScreen) => {
+      dispatch(isFullScreenAction.setIsFullScreen({ isFullScreen }));
+    },
+    [dispatch]
+  );
 
   return (
     <>
@@ -393,7 +405,7 @@ const SlateEditor = ({
               }}
             >
               <span className="text-xl font-bold text-gray-500 mb-5">
-                {genre !== "POEM" ? "장 추가" : "시 추가"}
+                {genre !== "POEM" ? "장" : "시"}
               </span>
               <div className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scroll">
                 {Object.keys(writingInfo.collection).map((data) => {

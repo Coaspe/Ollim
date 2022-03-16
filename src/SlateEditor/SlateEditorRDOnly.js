@@ -11,6 +11,9 @@ import CommentRow from "../components/CommentRow";
 import axios from "axios";
 import UserContext from "../context/user";
 import SpinningSvg from "../components/SpinningSvg";
+import { Tooltip } from "@mui/material";
+import { isFullScreenAction } from "../redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const SlateEditorRDOnly = ({ writingDocID, genre }) => {
   const [value, setValue] = useState([]);
@@ -19,7 +22,6 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const [writingInfo, setWritingInfo] = useState({});
-  const [isFullScreen, setIsFullScreen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [openCommentsModal, setOpenCommentsModal] = useState(false);
 
@@ -29,6 +31,11 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
 
   const [commentText, setCommentText] = useState("");
   const { user } = useContext(UserContext);
+
+  const [nowCollectionNum, setNowCollectionNum] = useState(0);
+  const [changeCollectionElementModal, setChangeCollectionElementModal] =
+    useState(false);
+
   const renderElement = ({ element, attributes, children }) => {
     const elementKey = ReactEditor.findKey(editor, element);
     let target = 0;
@@ -48,11 +55,22 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
       />
     );
   };
+  const dispatch = useDispatch();
+  const isFullScreen = useSelector(
+    (state) => state.setIsFullScreen.isFullScreen
+  );
+  const setIsFullScreen = useCallback(
+    (isFullScreen) => {
+      dispatch(isFullScreenAction.setIsFullScreen({ isFullScreen }));
+    },
+    [dispatch]
+  );
 
   useEffect(() => {
     getWritingInfo(writingDocID, genre).then((res) => {
       setWritingInfo(res);
-      setCommentsDocID(Object.values(res.comments));
+      nowCollectionNum === 0 && setNowCollectionNum(1);
+      setCommentsDocID(res.comments ? Object.values(res.comments) : []);
     });
   }, []);
 
@@ -67,11 +85,12 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
   }, [commentsDocID]);
 
   useEffect(() => {
-    if (Object.keys(writingInfo).length !== 0) {
-      if (writingInfo.commits.length !== 0) {
+    if (Object.keys(writingInfo).length !== 0 && nowCollectionNum) {
+      const elementCommits = writingInfo.collection[nowCollectionNum].commits;
+      if (Object.keys(elementCommits).length !== 0) {
         // Get lastest commit
-        const keys = Object.keys(writingInfo.commits);
-        const lastestCommit = writingInfo.commits[keys[keys.length - 1]];
+        const keys = Object.keys(elementCommits);
+        const lastestCommit = elementCommits[keys[keys.length - 1]];
         const lastestCommitKey = Object.keys(lastestCommit);
         const lastDate =
           "memo" !== lastestCommitKey[0]
@@ -82,7 +101,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
       }
       setLoading(true);
     }
-  }, [writingInfo]);
+  }, [writingInfo, nowCollectionNum]);
 
   useEffect(() => {
     value.length > 0 && setLoading(true);
@@ -127,6 +146,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
         setCommentButtonDisabled(false);
       });
   };
+
   return (
     <>
       <AnimatePresence>
@@ -203,67 +223,130 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
               setOpenModal(false);
             }}
           >
-            {writingInfo && writingInfo.commits && (
-              <div
-                style={{ backgroundColor: "#f7f7f7" }}
-                className="flex flex-col items-center w-1/4 h-1/2 py-5 rounded-lg"
-              >
-                <span className="text-xl font-bold text-gray-500 mb-5">
-                  제출 기록
-                </span>
+            {writingInfo &&
+              writingInfo.collection[nowCollectionNum.toString()].commits && (
                 <div
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                  className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scroll"
+                  style={{ backgroundColor: "#f7f7f7" }}
+                  className="flex flex-col items-center w-1/4 h-1/2 py-5 rounded-lg"
                 >
-                  {writingInfo.commits.map((data) => {
-                    const tmpData = Object.keys(data);
-                    const key = "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
-                    const date = new Date(parseInt(key)).toLocaleString();
-                    const DateNight = date.includes("오전") ? "오전" : "오후";
-                    return (
-                      <div
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (selectedKey !== key) {
-                            setLoading(false);
-                            setSelectedKey(key);
-                            setValue(data[key]);
-                            setOpenModal(false);
-                          }
-                        }}
-                        key={key}
-                        className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${
-                          selectedKey === key && "bg-genreSelectedBG"
-                        } hover:bg-wirtingButtonHover`}
-                      >
-                        <div className="flex items-center w-5/6 justify-between">
-                          <div className="flex flex-col items-center text-sm">
-                            <span>{date.split(DateNight)[0]}</span>
-                            <span>
-                              {`${DateNight} `}
-                              {date.split(DateNight)[1]}
-                            </span>
-                          </div>
-                          <textarea
-                            value={data.memo}
-                            readOnly
-                            className="w-1/2 text-sm resize-none cursor-pointer focus:outline-none bg-transparent"
+                  <span className="text-xl font-bold text-gray-500 mb-5">
+                    제출 기록
+                  </span>
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scroll"
+                  >
+                    {writingInfo.collection[nowCollectionNum.toString()].map(
+                      (data) => {
+                        const tmpData = Object.keys(data);
+                        const key =
+                          "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
+                        const date = new Date(parseInt(key)).toLocaleString();
+                        const DateNight = date.includes("오전")
+                          ? "오전"
+                          : "오후";
+                        return (
+                          <div
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (selectedKey !== key) {
+                                setLoading(false);
+                                setSelectedKey(key);
+                                setValue(data[key]);
+                                setOpenModal(false);
+                              }
+                            }}
+                            key={key}
+                            className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${
+                              selectedKey === key && "bg-genreSelectedBG"
+                            } hover:bg-wirtingButtonHover`}
                           >
-                            {data.memo}
-                          </textarea>
-                        </div>
-                      </div>
-                    );
-                  })}
+                            <div className="flex items-center w-5/6 justify-between">
+                              <div className="flex flex-col items-center text-sm">
+                                <span>{date.split(DateNight)[0]}</span>
+                                <span>
+                                  {`${DateNight} `}
+                                  {date.split(DateNight)[1]}
+                                </span>
+                              </div>
+                              <textarea
+                                value={data.memo}
+                                readOnly
+                                className="w-1/2 text-sm resize-none cursor-pointer focus:outline-none bg-transparent"
+                              >
+                                {data.memo}
+                              </textarea>
+                            </div>
+                          </div>
+                        );
+                      }
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </motion.div>
         )}
       </AnimatePresence>
+      {changeCollectionElementModal && writingInfo.isCollection && (
+        <motion.div
+          animate={{
+            backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],
+          }}
+          transition={{ duration: 0.2 }}
+          style={{ zIndex: 10000 }}
+          className="fixed w-full h-full items-center justify-center top-0 left-0 flex"
+          onClick={() => {
+            setChangeCollectionElementModal(false);
+          }}
+        >
+          {writingInfo && writingInfo.collection && (
+            <div
+              style={{ backgroundColor: "#f7f7f7" }}
+              className="flex flex-col items-center w-1/4 h-1/2 py-5 rounded-lg"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <span className="text-xl font-bold text-gray-500 mb-5">
+                {genre !== "POEM" ? "장" : "시"}
+              </span>
+              <div className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scroll">
+                {Object.keys(writingInfo.collection).map((data) => {
+                  const collection = writingInfo.collection[data];
 
+                  return (
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (nowCollectionNum !== parseInt(data)) {
+                          setNowCollectionNum(parseInt(data));
+                          setChangeCollectionElementModal(false);
+                        }
+                      }}
+                      key={data}
+                      className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${
+                        nowCollectionNum === parseInt(data) &&
+                        "bg-genreSelectedBG"
+                      } hover:bg-wirtingButtonHover`}
+                    >
+                      <div className="flex items-center w-5/6 justify-between">
+                        <span>
+                          {genre !== "POEM"
+                            ? `제 ${data} 장`
+                            : `${data}번째 시`}
+                        </span>
+                        <span>{collection.title}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </motion.div>
+      )}
       {loading ? (
         <Slate
           editor={editor}
@@ -272,6 +355,23 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
             setValue(value);
           }}
         >
+          {writingInfo.isCollection && !isFullScreen && (
+            <div
+              onClick={() => {
+                setChangeCollectionElementModal(true);
+              }}
+              className={`flex flex-col items-center mb-5 cursor-pointer px-2 py-2 rounded-2xl hover:bg-gray-200`}
+            >
+              <span className="mb-2 text-lg">
+                {genre !== "POEM"
+                  ? `제${nowCollectionNum} 장`
+                  : `${nowCollectionNum}번째 시`}
+              </span>
+              <span className="text-2xl text-extrabold italic">
+                {writingInfo.collection[nowCollectionNum.toString()].title}
+              </span>
+            </div>
+          )}
           <div
             style={{
               boxShadow: "0px 0px 10px rgba(0,0,0,0.3)",
@@ -307,8 +407,28 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
           </div>
           <div
             style={{ bottom: "5%", right: "5%", zIndex: 52 }}
-            className="fixed font-noto flex"
+            className="fixed font-noto flex items-center space-x-5 > * + *"
           >
+            {writingInfo.isCollection && isFullScreen && (
+              <Tooltip
+                arrow
+                placement="top"
+                title={`${nowCollectionNum}.${
+                  writingInfo.collection[nowCollectionNum.toString()].title
+                }`}
+              >
+                <motion.span
+                  onClick={() => {
+                    setChangeCollectionElementModal(true);
+                  }}
+                  style={{ fontSize: "2rem" }}
+                  whileHover={{ y: "-10%" }}
+                  className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
+                >
+                  timeline
+                </motion.span>
+              </Tooltip>
+            )}
             <motion.span
               whileHover={{ y: "-10%" }}
               onClick={() => {
@@ -328,12 +448,15 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
             <motion.span
               whileHover={{ y: "-10%" }}
               onClick={() => {
-                if (writingInfo.commits.length !== 0) {
+                if (
+                  writingInfo.collection[nowCollectionNum.toString()].commits
+                    .length !== 0
+                ) {
                   setOpenModal(true);
                 }
               }}
               style={{ fontSize: "2rem" }}
-              className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
+              className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
             >
               update
             </motion.span>
@@ -343,7 +466,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
                 setOpenCommentsModal((origin) => !origin);
               }}
               style={{ fontSize: "2rem" }}
-              className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2 ml-5"
+              className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
             >
               chat
             </motion.span>

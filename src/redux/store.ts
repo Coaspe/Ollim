@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { setAlarmReducer, setAlarmTimerReducer, setDiagramReducer, setElementReducer, setUserInfoReducer } from '.'
+import { setAlarmReducer, setAlarmTimerReducer, setDiagramReducer, setElementReducer, setIsFullScreenReducer, setUserInfoReducer } from '.'
 
 export const store = configureStore({
     reducer: {
@@ -7,7 +7,8 @@ export const store = configureStore({
     setUserInfo: setUserInfoReducer,
     setDiagram: setDiagramReducer,
     setAlarm: setAlarmReducer,
-    setAlarmTimer: setAlarmTimerReducer
+    setAlarmTimer: setAlarmTimerReducer,
+    setIsFullScreen: setIsFullScreenReducer
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
 })
