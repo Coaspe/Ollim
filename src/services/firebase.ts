@@ -141,3 +141,13 @@ export const copyPasteCommitsNovel = async () => {
     updateDoc(doc(firestore, "novel", document.id), update)
   })
 }
+
+export const edit = async () => {
+  let s =(await getDoc(doc(firestore, "poem", "fjaG0EG64pq39AFWHFp3")) as DocumentData).data()
+  let objec: any = Object.values(s.collection)[0]
+  let update: any = {}
+  update["collection.1"] = objec
+  updateDoc(doc(firestore, "poem", "fjaG0EG64pq39AFWHFp3"), update)
+  console.log(objec);
+  
+}

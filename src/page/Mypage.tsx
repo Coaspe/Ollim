@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { Profiler, useCallback, useContext, useEffect, useRef, useState } from "react"
 import MypageWriting from "../components/MypageWriting"
 import UserContext from "../context/user"
-import { getPoemArrayInfo, getUserWritings, getNovelArrayInfo, getScenarioArrayInfo, getUserByUID, getFollowersInfinite, getFollowingsInfinite, copyPasteCommitsNovel } from "../services/firebase"
+import { edit, getPoemArrayInfo, getUserWritings, getNovelArrayInfo, getScenarioArrayInfo, getUserByUID, getFollowersInfinite, getFollowingsInfinite } from "../services/firebase"
 import Compressor from "compressorjs";
 import { signOutAuth } from "../helpers/auth-OAuth2"
 import NewWritingModal from "../components/NewWritingModal"
@@ -20,7 +20,6 @@ import FollowingRow from "../components/FollowingRow"
 import FollowerRow from "../components/FollowerRow"
 import FollowersFollowingsSkeleton from "../components/FollowersFollowingsSkeleton"
 import Header from "../components/Header"
-import SpinningSvg from "../components/SpinningSvg"
 
 const Mypage = () => {
 
@@ -130,7 +129,6 @@ const Mypage = () => {
 
     // Uid param change detection
     useEffect(() => {
-
         if (uidChangeDetect.current === 0) {
             uidChangeDetect.current += 1
         } else {
@@ -181,7 +179,7 @@ const Mypage = () => {
         }
 
     }, [uid, contextUser.uid])
-copyPasteCommitsNovel()
+    // edit()
     // Get context user's information
     useEffect(() => {
         profileOwnerInfo && getUserByUID(contextUser.uid).then((res: any) => {
