@@ -171,6 +171,7 @@ const SlateEditor = ({
         writingDocID,
         userUID: writingInfo.userUID,
         memo: commitDescription,
+        collectionNum: nowCollectionNum,
         genre: writingInfo.genre,
       })
       .then((res) => {
