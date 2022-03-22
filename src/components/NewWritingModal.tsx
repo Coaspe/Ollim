@@ -71,8 +71,9 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
   };
   const handleAddWriting = (data: addWritingArg, genre: string) => {
     axios
-      .post(`https://ollim.herokuapp.com/add${genre}`, {
+      .post(`https://ollim.herokuapp.com/addWriting`, {
         data: JSON.stringify(data),
+        genre,
       })
       .then((res) => {
         setAlarm(res.data);

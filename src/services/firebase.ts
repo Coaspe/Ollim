@@ -140,6 +140,13 @@ export const getAllUsers = async () => {
   docs.forEach((data) => returnValue.push(data.data()));
   return returnValue;
 };
+
+export const text = async () => {
+  const docs = (
+    await getDoc(doc(firestore, "poem", "Fi37T65kdJXOGnt61647"))
+  ).data();
+  setDoc(doc(firestore, "allWritings", "Fi37T65kdJXOGnt61647"), { ...docs });
+};
 // export const copyPasteCommits = async () => {
 //   let s = await getDocs(collection(firestore, "poem"));
 //   s.forEach(async (document: DocumentData) => {

@@ -24,7 +24,7 @@ const SearchAutoComplete: React.FC<props> = ({
   return (
     <motion.div
       layout
-      className="w-full py-2 px-5 h-fit flex flex-col relative"
+      className="w-full py-2 px-2 h-fit flex flex-col relative"
     >
       <input
         autoFocus

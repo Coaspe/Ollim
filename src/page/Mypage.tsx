@@ -654,9 +654,12 @@ const Mypage = () => {
                     ))}
                   {onWritingCategory === "TOTAL" &&
                     totalWritings &&
-                    totalWritings.map((data) => (
-                      <MypageWriting key={data.dateCreated} data={data} />
-                    ))}
+                    totalWritings.map((data, index) => {
+                      console.log(index, data);
+                      return (
+                        <MypageWriting key={data.dateCreated} data={data} />
+                      );
+                    })}
                 </div>
               </div>
             </div>
