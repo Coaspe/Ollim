@@ -1,14 +1,9 @@
 import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
 import { memo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  genre,
-  getFirestoreNovel,
-  getFirestorePoem,
-  getFirestoreScenario,
-} from "../type";
+import { genre, getFirestoreWriting } from "../type";
 interface props {
-  data: getFirestoreNovel | getFirestorePoem | getFirestoreScenario;
+  data: getFirestoreWriting;
   medal?: string;
 }
 const MypageWriting: React.FC<props> = ({ data }) => {
@@ -26,7 +21,9 @@ const MypageWriting: React.FC<props> = ({ data }) => {
     <motion.div
       layout
       onClick={() => {
-        navigator(`/writings/${data.userUID}/${data.genre}/${data.id}`);
+        navigator(
+          `/writings/${data.userUID}/${data.genre}/${data.writingDocID}`
+        );
       }}
       onHoverStart={() => {
         setTimer(

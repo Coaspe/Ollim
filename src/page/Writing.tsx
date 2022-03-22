@@ -4,18 +4,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import UserContext from "../context/user";
 import CustomNodeFlowRDOnly from "../diagram/RelationShipDiagramReadOnly";
 import {
-  copyPasteCommits,
   getUserByEmail,
   getUserByUID,
   getWritingInfo,
 } from "../services/firebase";
 import {
-  writingType,
   tableType,
   gerneType,
-  getFirestorePoem,
   disclosure,
-  getFirestoreNovel,
+  getFirestoreWriting,
   getFirestoreUser,
   toObjectElements,
   editorValue,
@@ -49,8 +46,8 @@ const Writing = () => {
   const [writingOwnerInfo, setWritingOwnerInfo] = useState<getFirestoreUser>(
     {} as getFirestoreUser
   );
-  const [writingInfo, setWritingInfo] = useState<writingType>(
-    {} as writingType
+  const [writingInfo, setWritingInfo] = useState<getFirestoreWriting>(
+    {} as getFirestoreWriting
   );
 
   // Context user's writing like state
@@ -130,12 +127,12 @@ const Writing = () => {
     if (writingDocID && genre && (table === "OVERVIEW" || table === "WRITE")) {
       getWritingInfo(writingDocID).then((res: any) => {
         if (res.genre.toLocaleLowerCase() !== "poem") {
-          setWritingInfo(res as getFirestoreNovel);
+          setWritingInfo(res as getFirestoreWriting);
           setDiagram(res.diagram as toObjectElements);
           setElements(res.diagram.elements);
           setReadOnlyDiagram(res.diagram as toObjectElements);
         } else {
-          setWritingInfo(res as getFirestorePoem);
+          setWritingInfo(res as getFirestoreWriting);
         }
         setKillingVerse(res.killingVerse);
         setSynopsis(res.synopsis);

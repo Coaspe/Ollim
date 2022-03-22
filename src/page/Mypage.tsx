@@ -3,10 +3,8 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import MypageWriting from "../components/MypageWriting";
 import UserContext from "../context/user";
 import {
-  getPoemArrayInfo,
   getUserWritings,
-  getNovelArrayInfo,
-  getScenarioArrayInfo,
+  getWritingsArrayInfo,
   getUserByUID,
   getFollowersInfinite,
   getFollowingsInfinite,
@@ -19,9 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import {
   alarmType,
-  getFirestoreNovel,
-  getFirestorePoem,
-  getFirestoreScenario,
+  getFirestoreWriting,
   getFirestoreUser,
   getFirestoreUserWritings,
 } from "../type";
@@ -77,14 +73,14 @@ const Mypage = () => {
   // Does User Follow Profile Owner?
   const [doseUserFollow, setDoseUserFollow] = useState(false);
   // Profile owner's poems list
-  const [poems, setPoems] = useState<Array<getFirestorePoem>>([]);
+  const [poems, setPoems] = useState<Array<getFirestoreWriting>>([]);
   // Profile owner's novels list
-  const [novels, setNovels] = useState<Array<getFirestoreNovel>>([]);
+  const [novels, setNovels] = useState<Array<getFirestoreWriting>>([]);
   // Profile owner's scenarioes list
-  const [scenarioes, setScenarioes] = useState<Array<getFirestoreScenario>>([]);
+  const [scenarioes, setScenarioes] = useState<Array<getFirestoreWriting>>([]);
   // Profile owner's total writings list
   const [totalWritings, setTotalWritings] = useState<
-    Array<getFirestoreScenario | getFirestoreNovel | getFirestorePoem>
+    Array<getFirestoreWriting>
   >([]);
 
   const navigator = useNavigate();
@@ -182,30 +178,30 @@ const Mypage = () => {
   useEffect(() => {
     const getWritings = async (userWritings: getFirestoreUserWritings) => {
       const poems = userWritings.poemDocID
-        ? await getPoemArrayInfo(userWritings.poemDocID)
+        ? (
+            (await getWritingsArrayInfo(
+              userWritings.poemDocID
+            )) as Array<getFirestoreWriting>
+          ).sort((a, b) => b.dateCreated - a.dateCreated)
         : [];
       const novel = userWritings.novelDocID
-        ? await getNovelArrayInfo(userWritings.novelDocID)
+        ? (
+            (await getWritingsArrayInfo(
+              userWritings.novelDocID
+            )) as Array<getFirestoreWriting>
+          ).sort((a, b) => b.dateCreated - a.dateCreated)
         : [];
       const scenario = userWritings.scenarioDocID
-        ? await getScenarioArrayInfo(userWritings.scenarioDocID)
+        ? (
+            (await getWritingsArrayInfo(
+              userWritings.scenarioDocID
+            )) as Array<getFirestoreWriting>
+          ).sort((a, b) => b.dateCreated - a.dateCreated)
         : [];
 
-      setPoems(
-        (poems as Array<getFirestorePoem>).sort(
-          (a, b) => b.dateCreated - a.dateCreated
-        )
-      );
-      setNovels(
-        (novel as Array<getFirestoreNovel>).sort(
-          (a, b) => b.dateCreated - a.dateCreated
-        )
-      );
-      setScenarioes(
-        (scenario as Array<getFirestoreScenario>).sort(
-          (a, b) => b.dateCreated - a.dateCreated
-        )
-      );
+      setPoems(poems);
+      setNovels(novel);
+      setScenarioes(scenario);
       setTotalWritings(
         Array.prototype
           .concat(poems, novel, scenario)
@@ -240,7 +236,7 @@ const Mypage = () => {
       });
     }
   }, [uid, contextUser.uid]);
-  // edit()
+
   // Get context user's information
   useEffect(() => {
     profileOwnerInfo &&
