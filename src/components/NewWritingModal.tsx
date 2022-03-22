@@ -73,7 +73,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
     axios
       .post(`https://ollim.herokuapp.com/addWriting`, {
         data: JSON.stringify(data),
-        genre,
+        genre: genre.toLocaleUpperCase(),
       })
       .then((res) => {
         setAlarm(res.data);
