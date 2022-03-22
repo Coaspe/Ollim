@@ -1,17 +1,17 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import useAuthListner from './hooks/useAuth';
-import { lazy, Suspense } from 'react';
+import useAuthListner from "./hooks/useAuth";
+import { lazy, Suspense } from "react";
 import UserContext from "./context/user";
 import IsUserLoggedIn from "./helpers/Is-user-logged-in";
 import ProtectedRoute from "./helpers/Protected-route";
 import Community from "./page/Community";
 import Writing from "./page/Writing";
 
-const Intro = lazy(() => import("./page/Intro"))
-const Mypage = lazy(() => import("./page/Mypage"))
+const Intro = lazy(() => import("./page/Intro"));
+const Mypage = lazy(() => import("./page/Mypage"));
 
 const App = () => {
-  const { user } = useAuthListner()
+  const { user } = useAuthListner();
   return (
     <UserContext.Provider value={{ user }}>
       <Router>
@@ -44,14 +44,7 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
-            
-            <Route
-              path="/community"
-              element={
-                <Community />
-              }
-            />
-
+            <Route path="/community" element={<Community />} />
             <Route
               path="/intro"
               element={
@@ -59,13 +52,11 @@ const App = () => {
                   <Intro />
                 </IsUserLoggedIn>
               }
-              />
+            />
             <Route
               path="/writings/:uid/:genre/:writingDocID"
-              element={
-                <Writing />
-              }
-              />
+              element={<Writing />}
+            />
             {/* <Route
               path="/signup"
               element={
@@ -79,6 +70,6 @@ const App = () => {
       </Router>
     </UserContext.Provider>
   );
-}
+};
 
 export default App;

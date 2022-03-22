@@ -10,7 +10,7 @@ import {
   getDocs,
   DocumentData,
   updateDoc,
-
+  orderBy,
 } from "firebase/firestore";
 import { toObjectElements } from "../type";
 
@@ -20,7 +20,7 @@ export const singInWithGoogleInfoToFB = (info: any) => {
     poemDocID: [],
     scenarioDocID: [],
     totalCommits: {},
-  })
+  });
   return setDoc(doc(firestore, "users", info.user.email), {
     userEmail: info.user.email.toLowerCase(),
     uid: info.user.uid,
@@ -32,7 +32,7 @@ export const singInWithGoogleInfoToFB = (info: any) => {
     profileImg: info.user.photoURL,
     profileCaption: "",
   });
-}
+};
 
 export async function doesEmailExist(userEmail: string) {
   const q = doc(firestore, "users", userEmail);
@@ -41,68 +41,76 @@ export async function doesEmailExist(userEmail: string) {
 }
 
 export const getUserByUID = async (uid: string) => {
-  const q = query(collection(firestore, "users"), where("uid", "==", uid))
-  return getDocs(q)
-}
+  const q = query(collection(firestore, "users"), where("uid", "==", uid));
+  return getDocs(q);
+};
 export const getUserByEmail = async (email: string) => {
-  return getDoc(doc(firestore, "users", email))
-}
+  return getDoc(doc(firestore, "users", email));
+};
 
 export const getUserWritings = async (userUID: string) => {
-  return (await getDoc(doc(firestore, "writings", userUID))).data()
-}
-export const getWritingInfo = async (writingDocID: string, genre: string) => {
-  return (await getDoc(doc(firestore, genre.toLowerCase(), writingDocID))).data()
-}
+  return (await getDoc(doc(firestore, "writings", userUID))).data();
+};
+export const getWritingInfo = async (writingDocID: string) => {
+  return (await getDoc(doc(firestore, "allWritings", writingDocID))).data();
+};
 
 export const addElements = (elements: toObjectElements) => {
-  addDoc(collection(firestore, "test"), elements)
-}
+  addDoc(collection(firestore, "test"), elements);
+};
 
 export const getPoemArrayInfo = (poemDocIDs: Array<string>) => {
-  return Promise.all(poemDocIDs.map(async (docID: string) => {
-    const tmp = await getDoc(doc(firestore, "poem", docID))
-    if (tmp.exists()) {
-      const data = tmp.data()
-      console.log(data);
-      return {...data, id: tmp.id}
-    }
-  }
-  ))
-}
+  return Promise.all(
+    poemDocIDs.map(async (docID: string) => {
+      const tmp = await getDoc(doc(firestore, "allWritings", docID));
+      if (tmp.exists()) {
+        const data = tmp.data();
+        console.log(data);
+        return { ...data, id: tmp.id };
+      }
+    })
+  );
+};
 export const getNovelArrayInfo = (novelDocIDs: Array<string>) => {
-  return Promise.all(novelDocIDs.map(async (docID: string) => {
-  const tmp = (await getDoc(doc(firestore, "novel", docID)))
-    if (tmp.exists()) {
-      const data = tmp.data()
-      return {...data, id: tmp.id}
-    }
-  }
-  ))
-}
+  return Promise.all(
+    novelDocIDs.map(async (docID: string) => {
+      const tmp = await getDoc(doc(firestore, "allWritings", docID));
+      if (tmp.exists()) {
+        const data = tmp.data();
+        return { ...data, id: tmp.id };
+      }
+    })
+  );
+};
 export const getScenarioArrayInfo = (scenarioDocIDs: Array<string>) => {
-  return Promise.all(scenarioDocIDs.map(async (docID: string) => {
-    const tmp = (await getDoc(doc(firestore, "scenario", docID)))
-    if (tmp.exists()) {
-      const data = tmp.data()
-      const id = tmp.id
-      return {...data, id: tmp.id}
-    }
-  }
-  ))
-}
+  return Promise.all(
+    scenarioDocIDs.map(async (docID: string) => {
+      const tmp = await getDoc(doc(firestore, "allWritings", docID));
+      if (tmp.exists()) {
+        const data = tmp.data();
+        return { ...data, id: tmp.id };
+      }
+    })
+  );
+};
 export const getDiagram = (writingDocID: string) => {
-  return getDoc(doc(firestore, "diagram", writingDocID))
-}
+  return getDoc(doc(firestore, "diagram", writingDocID));
+};
 
-export const getFollowersInfinite = async (followersEmailArr: string[], key: number) => {
+export const getFollowersInfinite = async (
+  followersEmailArr: string[],
+  key: number
+) => {
   const tmp = followersEmailArr.slice(key, key + 5);
   return await getDocs(
     query(collection(firestore, "users"), where("__name__", "in", tmp))
   );
 };
 
-export const getFollowingsInfinite = async (followingsEmailArr: string[], key: number) => {
+export const getFollowingsInfinite = async (
+  followingsEmailArr: string[],
+  key: number
+) => {
   const tmp = followingsEmailArr.slice(key, key + 5);
   return await getDocs(
     query(collection(firestore, "users"), where("__name__", "in", tmp))
@@ -110,44 +118,110 @@ export const getFollowingsInfinite = async (followingsEmailArr: string[], key: n
 };
 
 export const getComments = (commentsDocID: string[]) => {
-
   return getDocs(
-    query(collection(firestore, "comments"), where("__name__", "in", commentsDocID))
-  )
-}
+    query(
+      collection(firestore, "comments"),
+      where("__name__", "in", commentsDocID)
+    )
+  );
+};
 
 export const copyPasteCommits = async () => {
-  let s = (await getDocs(collection(firestore, "poem")))
+  let s = await getDocs(collection(firestore, "poem"));
   s.forEach(async (document: DocumentData) => {
-    const currentCommits = ((await getDoc(doc(firestore, "poem", document.id))).data() as DocumentData).commits
-    const currentTempSave = ((await getDoc(doc(firestore, "poem", document.id))).data() as DocumentData).tempSave
-    const update: any = {}
-    update['isCollection'] = false
-    update["collection.1.commits"] = currentCommits
-    update["collection.1.tempSave"] = currentTempSave
-    updateDoc(doc(firestore, "poem", document.id), update)
-  })
-}
+    const currentCommits = (
+      (await getDoc(doc(firestore, "poem", document.id))).data() as DocumentData
+    ).commits;
+    const currentTempSave = (
+      (await getDoc(doc(firestore, "poem", document.id))).data() as DocumentData
+    ).tempSave;
+    const update: any = {};
+    update["isCollection"] = false;
+    update["collection.1.commits"] = currentCommits;
+    update["collection.1.tempSave"] = currentTempSave;
+    updateDoc(doc(firestore, "poem", document.id), update);
+  });
+};
 
 export const copyPasteCommitsNovel = async () => {
-  let s = (await getDocs(collection(firestore, "novel")))
+  let s = await getDocs(collection(firestore, "novel"));
   s.forEach(async (document: DocumentData) => {
-    const currentCommits = ((await getDoc(doc(firestore, "novel", document.id))).data() as DocumentData).commits
-    const currentTempSave = ((await getDoc(doc(firestore, "novel", document.id))).data() as DocumentData).tempSave
-    const update: any = {}
-    update['isCollection'] = false
-    update["collection.1.commits"] = currentCommits
-    update["collection.1.tempSave"] = currentTempSave
-    updateDoc(doc(firestore, "novel", document.id), update)
-  })
-}
+    const currentCommits = (
+      (
+        await getDoc(doc(firestore, "novel", document.id))
+      ).data() as DocumentData
+    ).commits;
+    const currentTempSave = (
+      (
+        await getDoc(doc(firestore, "novel", document.id))
+      ).data() as DocumentData
+    ).tempSave;
+    const update: any = {};
+    update["isCollection"] = false;
+    update["collection.1.commits"] = currentCommits;
+    update["collection.1.tempSave"] = currentTempSave;
+    updateDoc(doc(firestore, "novel", document.id), update);
+  });
+};
 
 export const edit = async () => {
-  let s =(await getDoc(doc(firestore, "poem", "fjaG0EG64pq39AFWHFp3")) as DocumentData).data()
-  let objec: any = Object.values(s.collection)[0]
-  let update: any = {}
-  update["collection.1"] = objec
-  updateDoc(doc(firestore, "poem", "fjaG0EG64pq39AFWHFp3"), update)
-  console.log(objec);
-  
-}
+  let s = (
+    (await getDoc(
+      doc(firestore, "poem", "fjaG0EG64pq39AFWHFp3")
+    )) as DocumentData
+  ).data();
+  let objec: any = Object.values(s.collection)[0];
+  let update: any = {};
+  update["collection.1"] = objec;
+  updateDoc(doc(firestore, "poem", "fjaG0EG64pq39AFWHFp3"), update);
+};
+
+export const integration = async () => {
+  const novelDocs = await getDocs(collection(firestore, "novel"));
+  const poemDocs = await getDocs(collection(firestore, "poem"));
+  novelDocs.forEach((data) => {
+    setDoc(doc(firestore, "allWritings", data.id), data.data());
+  });
+  poemDocs.forEach((data) => {
+    setDoc(doc(firestore, "allWritings", data.id), data.data());
+  });
+};
+
+export const getAllWritings = async () => {
+  const docs = await getDocs(
+    query(
+      collection(firestore, "allWritings"),
+      where("dateCreated", ">=", 1646092800000),
+      where("dateCreated", "<=", 1648771199000),
+      orderBy("dateCreated", "desc")
+    )
+  );
+  let returnValue: any = [];
+
+  docs.forEach((data) => {
+    if (data.data().likes.length > 0) {
+      returnValue.push({ ...data.data(), writingUID: data.id });
+    }
+  });
+
+  returnValue.sort((b: any, a: any) => b.likes.length - a.likes.length);
+
+  return returnValue.slice(0, 2);
+};
+
+export const getAllUsers = async () => {
+  const docs = await getDocs(collection(firestore, "users"));
+  let returnValue: any = [];
+  docs.forEach((data) => returnValue.push(data.data()));
+  return returnValue;
+};
+
+export const giveLikesLength = async () => {
+  const docs = await getDocs(collection(firestore, "allWritings"));
+  docs.forEach((data) => {
+    setDoc(doc(firestore, "allWritings", data.id), {
+      ...data.data(),
+      likesLength: 0,
+    });
+  });
+};

@@ -67,7 +67,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
   );
 
   useEffect(() => {
-    getWritingInfo(writingDocID, genre).then((res) => {
+    getWritingInfo(writingDocID).then((res) => {
       setWritingInfo(res);
       nowCollectionNum === 0 && setNowCollectionNum(1);
       setCommentsDocID(res.comments ? Object.values(res.comments) : []);
