@@ -34,8 +34,8 @@ export type toObjectElements = {
 export type commitType = { [key: number]: { contents: string; memo: string } };
 export type collectionType = {
   [collectionNum: number]: {
-    commits: [{ [key: number]: { contents: string; memo: string } }];
-    tempSave: { contents: contentType[]; date: number };
+    commits: [];
+    tempSave: {};
     title: string;
   };
 };

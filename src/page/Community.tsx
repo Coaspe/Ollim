@@ -1,4 +1,4 @@
-import { memo, useContext, useEffect, useState } from "react";
+import { memo, useContext, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "../components/Header";
 import UserContext from "../context/user";
@@ -20,6 +20,8 @@ import BestWritings from "../components/BestWritings";
 import { useNavigate } from "react-router-dom";
 import SearchAutoComplete from "../SearchAutoComplete/SearchAutoComplete";
 import { genreMatching } from "./Writing";
+import FormatResultWriting from "../SearchAutoComplete/FormatResultWriting";
+import FormatResultUser from "../SearchAutoComplete/FormatResultUser";
 
 const Community = () => {
   const { user: contextUser } = useContext(UserContext);
@@ -50,48 +52,6 @@ const Community = () => {
     setOpen(false);
   };
 
-  const formatResultUser = (item: any) => {
-    return (
-      <motion.div
-        animate={{ opacity: [0, 1] }}
-        layout
-        onClick={() => {
-          navigator(`/${item.item.uid}`);
-        }}
-        className="px-5 py-2 flex items-center font-noto cursor-pointer hover:bg-gray-200"
-      >
-        <img
-          src={item.item.profileImg}
-          alt="profile"
-          className="w-7 rounded-full mr-2"
-        />
-        <span>{item.item.username}</span>
-      </motion.div>
-    );
-  };
-  const formatResultWriting = (item: any) => {
-    return (
-      <motion.div
-        animate={{ opacity: [0, 1] }}
-        layout
-        key={item.item.writingUID}
-        onClick={() => {
-          navigator(
-            `/writings/${item.item.userUID}/${item.item.genre}/${item.item.writingUID}`
-          );
-        }}
-        className="px-5 py-2 space-x-2 flex items-center font-noto cursor-pointer hover:bg-gray-200"
-      >
-        <span className="font-bold">
-          {genreMatching[item.item.genre as gerneType]}
-        </span>
-        <span>-</span>
-        <span>{item.item.title}</span>
-      </motion.div>
-    );
-  };
-  const memoizedFormatResultWriting = memo(formatResultWriting);
-  const memoizedFormatResultUser = memo(formatResultUser);
   useEffect(() => {
     contextUser.uid &&
       getUserByUID(contextUser.uid).then((res: any) => {
@@ -115,12 +75,14 @@ const Community = () => {
     handleRecommandedUsers();
     handleGetAllWritings();
   }, []);
+
   useEffect(() => {
     allBestWritingInfo.length &&
       recommandedUsers.length &&
       allWritings.length &&
       setLoading(false);
   }, [allBestWritingInfo, recommandedUsers, allWritings]);
+
   return (
     <div className="w-full font-noto flex flex-col items-center">
       <Header userInfo={userInfo} />
@@ -140,7 +102,10 @@ const Community = () => {
                   </span>
                   <AnimatePresence>
                     {open && (
-                      <motion.div className="absolute bg-slate-200">
+                      <motion.div
+                        animate={{ scale: 1 }}
+                        className="absolute bg-slate-200"
+                      >
                         <Tooltip arrow placement="left" title="작가">
                           <MenuItem
                             onClick={() => {
@@ -177,8 +142,8 @@ const Community = () => {
                     }
                     SearchedRow={
                       searchNowText === "text_snippet"
-                        ? memoizedFormatResultWriting
-                        : memoizedFormatResultUser
+                        ? FormatResultWriting
+                        : FormatResultUser
                     }
                     matchKeys={
                       searchNowText === "text_snippet" ? "title" : "username"

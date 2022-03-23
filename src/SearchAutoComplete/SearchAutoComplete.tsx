@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
 interface rowProps {
   item: {};
+  focus: boolean;
 }
 
 interface props {
@@ -18,12 +19,38 @@ const SearchAutoComplete: React.FC<props> = ({
   matchKeys,
   SearchedRow,
 }) => {
-  // const [text, setText] = useState("");
   const [searchedItems, setSearchedItems] = useState<any[]>([]);
+  const [open, setOpen] = useState(false);
+  const [selectedIndex, setSeletedIndex] = useState(-1);
+  const arrowKeyDown = useRef(false);
 
+  useEffect(() => {
+    if (searchedItems) {
+      setOpen(true);
+    }
+  }, [searchedItems]);
   return (
     <motion.div
       layout
+      onBlur={() => {
+        setOpen(false);
+        setSeletedIndex(-1);
+      }}
+      onFocus={() => {
+        arrowKeyDown.current = !arrowKeyDown.current;
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "ArrowUp" && arrowKeyDown.current && selectedIndex > 0) {
+          setSeletedIndex((origin) => origin - 1);
+        }
+        if (
+          e.key === "ArrowDown" &&
+          arrowKeyDown.current &&
+          selectedIndex < searchedItems.length
+        ) {
+          setSeletedIndex((origin) => origin + 1);
+        }
+      }}
       className="w-full py-2 px-2 h-fit flex flex-col relative"
     >
       <input
@@ -45,11 +72,17 @@ const SearchAutoComplete: React.FC<props> = ({
         }}
         type="text"
       />
-      <motion.div layout className="absolute bg-white w-full top-10 left-0">
-        {searchedItems.map((item, index) => (
-          <SearchedRow key={index} item={item} />
-        ))}
-      </motion.div>
+      {searchedItems && open && (
+        <motion.div layout className="absolute bg-white w-full top-10 left-0">
+          {searchedItems.map((item, index) => (
+            <SearchedRow
+              key={index}
+              item={item}
+              focus={index === selectedIndex}
+            />
+          ))}
+        </motion.div>
+      )}
     </motion.div>
   );
 };

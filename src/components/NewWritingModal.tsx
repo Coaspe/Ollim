@@ -167,8 +167,8 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
                     collection: {
                       1: {
                         title: firstCollectionElementTitle,
-                        tempSave: { contents: [], date: 0 },
-                        commits: [{} as commitType],
+                        tempSave: {},
+                        commits: [],
                       },
                     },
                     isCollection,
@@ -529,8 +529,8 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
                   collection: {
                     1: {
                       title: firstCollectionElementTitle,
-                      tempSave: { contents: [], date: 0 },
-                      commits: [{} as commitType],
+                      tempSave: {},
+                      commits: [],
                     },
                   },
                   isCollection,
