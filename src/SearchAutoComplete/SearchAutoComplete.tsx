@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 
 interface rowProps {
   item: {};
-  focus: boolean;
 }
 
 interface props {
@@ -21,9 +20,8 @@ const SearchAutoComplete: React.FC<props> = ({
 }) => {
   const [searchedItems, setSearchedItems] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
-  const [selectedIndex, setSeletedIndex] = useState(-1);
-  const arrowKeyDown = useRef(false);
 
+  const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (searchedItems) {
       setOpen(true);
@@ -34,34 +32,26 @@ const SearchAutoComplete: React.FC<props> = ({
       layout
       onBlur={() => {
         setOpen(false);
-        setSeletedIndex(-1);
       }}
       onFocus={() => {
-        arrowKeyDown.current = !arrowKeyDown.current;
-      }}
-      onKeyDown={(e) => {
-        if (e.key === "ArrowUp" && arrowKeyDown.current && selectedIndex > 0) {
-          setSeletedIndex((origin) => origin - 1);
-        }
-        if (
-          e.key === "ArrowDown" &&
-          arrowKeyDown.current &&
-          selectedIndex < searchedItems.length
-        ) {
-          setSeletedIndex((origin) => origin + 1);
-        }
+        setOpen(true);
       }}
       className="w-full py-2 px-2 h-fit flex flex-col relative"
     >
       <input
         autoFocus
+        ref={inputRef}
         className="w-3/4 h-full bg-transparent focus:outline-none"
+        onKeyDown={(e) => {
+          if (e.key === "ArrowDown" && inputRef.current) {
+            inputRef.current.blur();
+          }
+        }}
         onChange={(e) => {
           if (e.target.value.length >= matchNumber) {
             setSearchedItems(() => {
               let tmp: any[] = [];
               items.forEach((item) => {
-                console.log(item[matchKeys]);
                 item[matchKeys].includes(e.target.value) && tmp.push(item);
               });
               return tmp;
@@ -75,11 +65,7 @@ const SearchAutoComplete: React.FC<props> = ({
       {searchedItems && open && (
         <motion.div layout className="absolute bg-white w-full top-10 left-0">
           {searchedItems.map((item, index) => (
-            <SearchedRow
-              key={index}
-              item={item}
-              focus={index === selectedIndex}
-            />
+            <SearchedRow key={index} item={item} />
           ))}
         </motion.div>
       )}

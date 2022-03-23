@@ -59,12 +59,13 @@ const Writing = () => {
   // Disclosure State
   const [disclosure, setDisclosure] = useState<disclosure>("PUBLIC");
   // Synopsis State
-  const [synopsis, setSynopsis] = useState<string>("");
+  const [synopsis, setSynopsis] = useState("");
   // KillingVerse State
   const [killingVerse, setKillingVerse] = useState<string[]>([]);
   // Title
-  const [title, setTitle] = useState<string>("");
-
+  const [title, setTitle] = useState("");
+  // BGM
+  const [bgm, setBgm] = useState<string>("");
   const dispatch = useDispatch();
 
   const navigator = useNavigate();
@@ -102,7 +103,7 @@ const Writing = () => {
 
   // useEffect to get context user's information
   useEffect(() => {
-    if (contextUser.email) {
+    if (contextUser && contextUser.email) {
       getUserByEmail(contextUser.email as string).then((res) => {
         setContextUserInfo(res.data() as getFirestoreUser);
       });
@@ -111,7 +112,7 @@ const Writing = () => {
       setElements([]);
       setDiagram({} as toObjectElements);
     };
-  }, [contextUser.email]);
+  }, [contextUser]);
 
   // useEffect to get writing's owner's information
   useEffect(() => {
@@ -126,19 +127,19 @@ const Writing = () => {
   useEffect(() => {
     if (writingDocID && genre && (table === "OVERVIEW" || table === "WRITE")) {
       getWritingInfo(writingDocID).then((res: any) => {
-        if (res.genre.toLocaleLowerCase() !== "poem") {
-          setWritingInfo(res as getFirestoreWriting);
+        if (res.genre !== "POEM") {
           setDiagram(res.diagram as toObjectElements);
-          setElements(res.diagram.elements);
           setReadOnlyDiagram(res.diagram as toObjectElements);
+          setElements(res.diagram.elements);
         } else {
-          setWritingInfo(res as getFirestoreWriting);
+          setBgm(res.bgm);
         }
+        setWritingInfo(res as getFirestoreWriting);
         setKillingVerse(res.killingVerse);
         setSynopsis(res.synopsis);
         setDisclosure(res.disclosure);
         setTitle(res.title);
-        if (contextUser.uid) {
+        if (contextUser && Object.keys(contextUser).length !== 0) {
           setLikeWritingState(res.likes.includes(contextUser.email));
         }
       });
@@ -267,15 +268,19 @@ const Writing = () => {
                 <span className="text-lg">
                   {genreMatching[writingInfo.genre as gerneType]}
                 </span>
-                <span className="text-lg">·</span>
-                <span
-                  onClick={handleLikeWriting}
-                  className={`cursor-pointer material-icons ${
-                    likeWritingState ? "text-red-500" : "text-gray-500"
-                  }`}
-                >
-                  favorite
-                </span>
+                {contextUser && contextUser.uid && (
+                  <>
+                    <span className="text-lg">·</span>
+                    <span
+                      onClick={handleLikeWriting}
+                      className={`cursor-pointer material-icons ${
+                        likeWritingState ? "text-red-500" : "text-gray-500"
+                      }`}
+                    >
+                      favorite
+                    </span>
+                  </>
+                )}
               </div>
             </div>
             <div
@@ -452,6 +457,8 @@ const Writing = () => {
                 disclosure={disclosure}
                 setDisclosure={setDisclosure}
                 writingDocID={writingDocID}
+                bgm={bgm}
+                setBgm={setBgm}
               />
             )}
         </div>

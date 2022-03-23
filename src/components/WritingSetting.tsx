@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { alarmAction } from "../redux";
@@ -19,6 +19,8 @@ interface props {
   setDisclosure: React.Dispatch<React.SetStateAction<disclosure>>;
   killingVerse: string[];
   setKillingVerse: React.Dispatch<React.SetStateAction<string[]>>;
+  bgm: string;
+  setBgm: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const WritingSetting: React.FC<props> = ({
@@ -32,6 +34,8 @@ const WritingSetting: React.FC<props> = ({
   setDisclosure,
   killingVerse,
   setKillingVerse,
+  bgm,
+  setBgm,
 }) => {
   const dispatch = useDispatch();
   // Delete modal variables
@@ -41,7 +45,7 @@ const WritingSetting: React.FC<props> = ({
   const setAlarm = (alarm: [string, alarmType, boolean]) => {
     dispatch(alarmAction.setAlarm({ alarm }));
   };
-
+  const [mp4File, setMp4File] = useState<File>();
   const [titleSaveButtonDisabled, setTitleSaveButtonDisabled] = useState(false);
   const [synopsisSaveButtonDisabled, setSynopsisSaveButtonDisabled] =
     useState(false);
@@ -49,7 +53,7 @@ const WritingSetting: React.FC<props> = ({
   const [disclosureSaveButtonDisabled, setDisclosureSaveButtonDisabled] =
     useState(false);
   const [newVerse, setNewVerse] = useState("");
-
+  const audioRef = useRef<HTMLAudioElement>(null);
   const variants = {
     initial: {
       opacity: 0,
@@ -67,6 +71,37 @@ const WritingSetting: React.FC<props> = ({
       },
     },
   };
+  const handleBGMChange = () => {
+    if (mp4File) {
+      const formData = new FormData();
+      formData.append("userUID", writingInfo.userUID);
+      formData.append("writingDocID", writingDocID);
+      formData.append("file", mp4File);
+
+      axios
+        .post(`https://ollim.herokuapp.com/updateBGM`, formData)
+        .then((res) => {
+          setAlarm(res.data);
+          setTimeout(() => {
+            setAlarm(["", "success", false]);
+          }, 3000);
+        });
+    }
+  };
+  const handleWebBGM = (event: any) => {
+    setMp4File(event.target.files[0]);
+    setBgm(URL.createObjectURL(event.target.files[0]));
+  };
+
+  useEffect(() => {
+    console.log(bgm);
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.load();
+      // audioRef.current.play();
+    }
+  }, [bgm]);
 
   return (
     <div className="w-full font-noto flex flex-col items-start px-20 mt-20">
@@ -153,9 +188,43 @@ const WritingSetting: React.FC<props> = ({
           {synopsis}
         </textarea>
       </div>
+      {/* Synopsis div */}
+      {writingInfo.genre === "POEM" && (
+        <div className="flex flex-col w-2/3 mt-20">
+          <div className="flex items-center mb-10">
+            <span className="text-2xl font-bold mr-10">배경 음악</span>
+            <button
+              style={{ fontSize: "0.75rem" }}
+              disabled={synopsisSaveButtonDisabled}
+              onClick={handleBGMChange}
+              className="border border-blue-400 px-3 mr-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
+            >
+              저장
+            </button>
+            <label htmlFor="bgm">
+              <span
+                style={{ fontSize: "0.75rem" }}
+                className="cursor-pointer border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
+              >
+                찾기
+              </span>
+            </label>
+            <input
+              style={{ display: "none" }}
+              id="bgm"
+              onChange={handleWebBGM}
+              type="file"
+              accept="audio/*"
+            />
+          </div>
+          <audio controls ref={audioRef}>
+            <source src={bgm} type="audio/mpeg" />
+          </audio>
+        </div>
+      )}
 
       {/* Killing verse */}
-      <div className="flex flex-col w-full my-20">
+      {/* <div className="flex flex-col w-full my-20">
         <div className="flex items-center mb-10">
           <span className="text-2xl font-bold mr-10">표지</span>
           <button
@@ -233,7 +302,6 @@ const WritingSetting: React.FC<props> = ({
               </motion.div>
             </AnimatePresence>
 
-            {/* New verse div */}
             <div key="new verse" className="flex items-center">
               <input
                 spellCheck={false}
@@ -260,7 +328,7 @@ const WritingSetting: React.FC<props> = ({
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Disclosure div */}
       <div className="flex flex-col items-start w-1/3 my-20">

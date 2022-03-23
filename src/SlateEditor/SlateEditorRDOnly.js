@@ -469,6 +469,16 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
               chat
             </motion.span>
           </div>
+          {writingInfo && writingInfo.bgm && (
+            <div
+              style={{ bottom: "5%", left: "1%", zIndex: 52 }}
+              className="fixed font-noto flex items-center"
+            >
+              <audio controls autoPlay loop>
+                <source src={writingInfo.bgm} type="audio/mpeg" />
+              </audio>
+            </div>
+          )}
         </Slate>
       ) : (
         <div className="w-full h-full top-0 left-0 fixed flex items-center justify-center">

@@ -28,25 +28,10 @@ const App = () => {
           }
         >
           <Routes>
-            <Route
-              path="/:uid"
-              element={
-                <ProtectedRoute user={user}>
-                  <Mypage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute user={user}>
-                  <Mypage />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/:uid" element={<Mypage />} />
             <Route path="/community" element={<Community />} />
             <Route
-              path="/intro"
+              path="/"
               element={
                 <IsUserLoggedIn user={user}>
                   <Intro />

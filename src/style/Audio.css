@@ -1,0 +1,9 @@
+.rhap_current-time {
+  width: 0;
+  visibility: hidden;
+}
+.rhap_progress-container {
+  width: 0;
+  height: 0;
+  visibility: hidden;
+}

@@ -191,11 +191,12 @@ const Community = () => {
           </div>
         </>
       ) : (
-        <div className="w-full h-full top-0 left-0 fixed flex items-center justify-center">
+        // Loading Page
+        <div className="w-screen h-screen flex items-center justify-center bg-opacity-30">
           <img
-            style={{ width: "12%" }}
             src="/logo/Ollim-logos_black.png"
-            alt="writing loading..."
+            className="w-32 opacity-50"
+            alt="loading"
           />
         </div>
       )}

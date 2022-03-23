@@ -51,9 +51,6 @@ const Mypage = () => {
   const followingsLength = useRef(0);
   const followersLength = useRef(0);
 
-  // Indicates UID change
-  const uidChangeDetect = useRef(0);
-
   // Profile owner's followers, followings datas and modal open states
   const [followers, setFollowers] = useState<getFirestoreUser[]>([]);
   const [followings, setFollowings] = useState<getFirestoreUser[]>([]);
@@ -166,12 +163,8 @@ const Mypage = () => {
 
   // Uid param change detection
   useEffect(() => {
-    if (uidChangeDetect.current === 0) {
-      uidChangeDetect.current += 1;
-    } else {
-      followingsLength.current = 0;
-      followersLength.current = 0;
-    }
+    followingsLength.current = 0;
+    followersLength.current = 0;
   }, [uid]);
 
   // Get profileOwner's user info and user's writings info
@@ -209,44 +202,30 @@ const Mypage = () => {
       );
     };
 
-    if (uid) {
-      getUserByUID(uid as string).then((res: any) => {
-        const data = res.docs[0].data();
-        setProfileOwnerInfo(data);
-        setProfileImage(data.profileImg);
-        getUserWritings(data.uid).then((writings: any) => {
-          setUserWritings(writings as getFirestoreUserWritings);
-          getWritings(writings);
-        });
-        followersLength.current = data.followers.length;
-        followingsLength.current = data.followings.length;
+    getUserByUID(uid as string).then((res: any) => {
+      const data = res.docs[0].data();
+      setProfileOwnerInfo(data);
+      setProfileImage(data.profileImg);
+      getUserWritings(data.uid).then((writings: any) => {
+        setUserWritings(writings as getFirestoreUserWritings);
+        getWritings(writings);
       });
-    } else {
-      // If uid is undefined, go to context user's mypage
-      getUserByUID(contextUser.uid).then((res: any) => {
-        const data = res.docs[0].data();
-        setProfileOwnerInfo(data);
-        getUserWritings(data.uid).then((writings: any) => {
-          setUserWritings(writings as getFirestoreUserWritings);
-          getWritings(writings);
-        });
-        setProfileImage(data.profileImg);
-        followersLength.current = data.followers.length;
-        followingsLength.current = data.followings.length;
-      });
-    }
-  }, [uid, contextUser.uid]);
+      followersLength.current = data.followers.length;
+      followingsLength.current = data.followings.length;
+    });
+  }, [uid]);
 
   // Get context user's information
   useEffect(() => {
-    profileOwnerInfo &&
+    profileOwnerInfo.userEmail &&
+      contextUser &&
       contextUser.uid &&
       getUserByUID(contextUser.uid).then((res: any) => {
         const data = res.docs[0].data();
         setUserInfo(data);
         setDoseUserFollow(data.followings.includes(profileOwnerInfo.userEmail));
       });
-  }, [profileOwnerInfo, contextUser.uid]);
+  }, [profileOwnerInfo, contextUser]);
 
   // Image Compress process
   const handleFileOnChange = (event: any) => {
@@ -290,6 +269,7 @@ const Mypage = () => {
       },
     });
   };
+
   const handleGoToCommunity = () => {
     navigator("/community");
   };
@@ -439,7 +419,7 @@ const Mypage = () => {
         )}
       </AnimatePresence>
 
-      {profileOwnerInfo && profileImage && userWritings && totalWritings ? (
+      {profileOwnerInfo && profileImage ? (
         <div className="relative w-full font-noto bg-opacity-30">
           {/* New Writing Modal */}
           {newWritingModalOpen && (
@@ -463,13 +443,15 @@ const Mypage = () => {
                     alt="profile"
                   />
                 </label>
-                <input
-                  onChange={handleFileOnChange}
-                  style={{ display: "none" }}
-                  type="file"
-                  name="profileImg"
-                  id="profileImg"
-                />
+                {contextUser.uid && contextUser.uid === uid && (
+                  <input
+                    onChange={handleFileOnChange}
+                    style={{ display: "none" }}
+                    type="file"
+                    name="profileImg"
+                    id="profileImg"
+                  />
+                )}
               </div>
 
               {/* Username */}
@@ -477,7 +459,7 @@ const Mypage = () => {
                 <span className="text-2xl font-bold my-7 mr-3">
                   {profileOwnerInfo.username}
                 </span>
-                {uid && contextUser.uid !== uid && (
+                {uid && contextUser && contextUser.uid !== uid && (
                   <button
                     onClick={() => {
                       setDoseUserFollow((origin) => {
@@ -499,10 +481,10 @@ const Mypage = () => {
                       !doseUserFollow ? "bg-blue-400" : "bg-gray-300"
                     } px-2 py-1 rounded-xl text-xs font-Nanum_Gothic font-bold text-gray-700`}
                   >
-                    팔로우
+                    {doseUserFollow ? "팔로우 취소" : "팔로우"}
                   </button>
                 )}
-                {(!uid || contextUser.uid === uid) && (
+                {contextUser && contextUser.uid === uid && (
                   <svg
                     onClick={signOutAuth}
                     className="w-7 cursor-pointer"
@@ -655,7 +637,6 @@ const Mypage = () => {
                   {onWritingCategory === "TOTAL" &&
                     totalWritings &&
                     totalWritings.map((data, index) => {
-                      console.log(index, data);
                       return (
                         <MypageWriting key={data.dateCreated} data={data} />
                       );

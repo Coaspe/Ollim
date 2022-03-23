@@ -1,4 +1,4 @@
-import { memo, useContext } from "react";
+import { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { getFirestoreUser } from "../type";
 
@@ -14,13 +14,15 @@ const Header: React.FC<props> = ({ userInfo }) => {
       {/* logo */}
       <img
         onClick={() => {
-          navigator("/");
+          userInfo.uid
+            ? navigator(`/${userInfo.uid}`)
+            : navigator("/community");
         }}
         className="h-28 cursor-pointer"
         src="/logo/Ollim-logos_transparent.png"
         alt="header logo"
       />
-      {userInfo ? (
+      {userInfo.uid ? (
         <div
           onClick={() => {
             navigator(`/${userInfo.uid}`);
@@ -40,7 +42,7 @@ const Header: React.FC<props> = ({ userInfo }) => {
             onClick={() => {
               navigator("/");
             }}
-            className="w-7 rounded-full"
+            className="w-7 cursor-pointer"
             x="0px"
             y="0px"
             viewBox="0 0 481.5 481.5"

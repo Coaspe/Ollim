@@ -68,6 +68,7 @@ export type getFirestoreWriting = {
   memo: string;
   likes: string[];
   isCollection: boolean;
+  bgm?: string;
 };
 export type contentType = {
   type: string;

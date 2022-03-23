@@ -122,7 +122,7 @@ export const getBestWritings = async () => {
 
   returnValue.sort((b: any, a: any) => b.likes.length - a.likes.length);
 
-  return returnValue.slice(0, 2);
+  return returnValue.slice(0, 3);
 };
 export const getAllWritings = async () => {
   const docs = await getDocs(collection(firestore, "allWritings"));

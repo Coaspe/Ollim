@@ -3,7 +3,7 @@ const ProtectedRoute = ({ children, user }) => {
   if (user !== null && user !== {}) {
     return children;
   }
-  return <Navigate to="/intro" />;
+  return <Navigate to="/" />;
 };
 
 export default ProtectedRoute;
