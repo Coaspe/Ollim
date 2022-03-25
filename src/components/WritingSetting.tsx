@@ -3,9 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { alarmAction } from "../redux";
-import { alarmType, getFirestoreWriting, disclosure, genre } from "../type";
-import { motion, AnimatePresence } from "framer-motion";
-import MypageWritingSetting from "./MypageWritingSetting";
+import { alarmType, getFirestoreWriting, disclosure } from "../type";
+import { motion } from "framer-motion";
 import SpinningSvg from "./SpinningSvg";
 
 interface props {
@@ -17,8 +16,6 @@ interface props {
   writingDocID: string;
   disclosure: string;
   setDisclosure: React.Dispatch<React.SetStateAction<disclosure>>;
-  killingVerse: string[];
-  setKillingVerse: React.Dispatch<React.SetStateAction<string[]>>;
   bgm: string;
   setBgm: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -32,52 +29,41 @@ const WritingSetting: React.FC<props> = ({
   writingDocID,
   disclosure,
   setDisclosure,
-  killingVerse,
-  setKillingVerse,
   bgm,
   setBgm,
 }) => {
   const dispatch = useDispatch();
+
   // Delete modal variables
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
+
   const navigate = useNavigate();
   const setAlarm = (alarm: [string, alarmType, boolean]) => {
     dispatch(alarmAction.setAlarm({ alarm }));
   };
+
+  // BGM file input state
   const [mp4File, setMp4File] = useState<File>();
+  // Auido tag ref
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // To prohibit indiscriminate request, use disable state.
   const [titleSaveButtonDisabled, setTitleSaveButtonDisabled] = useState(false);
   const [synopsisSaveButtonDisabled, setSynopsisSaveButtonDisabled] =
     useState(false);
-  const [coverSaveButtonDisabled, setCoverSaveButtonDisabled] = useState(false);
   const [disclosureSaveButtonDisabled, setDisclosureSaveButtonDisabled] =
     useState(false);
-  const [newVerse, setNewVerse] = useState("");
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const variants = {
-    initial: {
-      opacity: 0,
-    },
-    animate: {
-      opacity: 1,
-      transition: {
-        duration: 0.1,
-      },
-    },
-    exit: {
-      opacity: 0,
-      transition: {
-        duration: 0.1,
-      },
-    },
-  };
+  const [exportFile, setExportFile] = useState("HANCOM");
+
+  // Handle BGM file changed
   const handleBGMChange = () => {
     if (mp4File) {
       const formData = new FormData();
       formData.append("userUID", writingInfo.userUID);
       formData.append("writingDocID", writingDocID);
       formData.append("file", mp4File);
-
+      // https://ollim.herokuapp.com
       axios
         .post(`https://ollim.herokuapp.com/updateBGM`, formData)
         .then((res) => {
@@ -88,23 +74,22 @@ const WritingSetting: React.FC<props> = ({
         });
     }
   };
+  // Set preview BGM
   const handleWebBGM = (event: any) => {
     setMp4File(event.target.files[0]);
     setBgm(URL.createObjectURL(event.target.files[0]));
   };
 
+  // When changed bgm state, execute pause(), load()
   useEffect(() => {
-    console.log(bgm);
-
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.load();
       // audioRef.current.play();
     }
   }, [bgm]);
-
   return (
-    <div className="w-full font-noto flex flex-col items-start px-20 mt-20">
+    <div className="w-full font-noto flex flex-col items-start px-20 mt-20 space-y-20">
       {/* Title div */}
       <div className="flex flex-col w-2/3">
         <div className="flex items-center mb-10">
@@ -146,7 +131,7 @@ const WritingSetting: React.FC<props> = ({
       </div>
 
       {/* Synopsis div */}
-      <div className="flex flex-col w-2/3 mt-20">
+      <div className="flex flex-col w-2/3">
         <div className="flex items-center mb-10">
           <span className="text-2xl font-bold mr-10">
             {writingInfo.genre !== "POEM" ? "시놉시스" : "여는 말"}
@@ -188,9 +173,10 @@ const WritingSetting: React.FC<props> = ({
           {synopsis}
         </textarea>
       </div>
-      {/* Synopsis div */}
+
+      {/* BGM div */}
       {writingInfo.genre === "POEM" && (
-        <div className="flex flex-col w-2/3 mt-20">
+        <div className="flex flex-col w-2/3">
           <div className="flex items-center mb-10">
             <span className="text-2xl font-bold mr-10">배경 음악</span>
             <button
@@ -223,115 +209,8 @@ const WritingSetting: React.FC<props> = ({
         </div>
       )}
 
-      {/* Killing verse */}
-      {/* <div className="flex flex-col w-full my-20">
-        <div className="flex items-center mb-10">
-          <span className="text-2xl font-bold mr-10">표지</span>
-          <button
-            disabled={coverSaveButtonDisabled}
-            style={{ fontSize: "0.75rem" }}
-            onClick={() => {
-              if (writingInfo.killingVerse !== killingVerse) {
-                setCoverSaveButtonDisabled(true);
-                axios
-                  .post(`https://ollim.herokuapp.com/updateKillingVerse`, {
-                    genre: writingInfo.genre,
-                    writingDocID,
-                    killingVerse: JSON.stringify(killingVerse),
-                  })
-                  .then((res) => {
-                    setAlarm(res.data);
-                    setCoverSaveButtonDisabled(false);
-                    setTimeout(() => {
-                      setAlarm(["", "success", false]);
-                    }, 2000);
-                  })
-                  .catch((error) => {
-                    console.log(error);
-                  });
-              }
-            }}
-            className="border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
-          >
-            저장
-          </button>
-        </div>
-        <div className="flex items-center w-full">
-          <div className="grid w-1/4">
-            <MypageWritingSetting
-              title={writingInfo.title}
-              genre={writingInfo.genre as genre}
-              killingVerse={killingVerse}
-              synopsis={synopsis}
-            />
-          </div>
-          <div style={{ borderLeft: "3px" }} className="h-36 mx-10"></div>
-          <div
-            style={{ backgroundColor: "#FAF6F5" }}
-            className="flex flex-col justify-between w-1/3 h-72 border-black border border-opacity-5 shadow-lg rounded-lg px-10 py-5"
-          >
-            <AnimatePresence>
-              <motion.div layout className="flex flex-col gap-2">
-                {killingVerse.map((verse, index) => (
-                  <motion.div
-                    className="flex items-center"
-                    layout
-                    key={`${verse}+${index}`}
-                    variants={variants}
-                    initial="initial"
-                    animate="animate"
-                    exit="exit"
-                  >
-                    <div className="flex w-full items-center justify-between shadow-md border border-gray-200 px-3 py-2 rounded-2xl">
-                      {verse}
-                    </div>
-                    <span
-                      onClick={() => {
-                        setKillingVerse((origin) => {
-                          let tmp = origin.slice();
-                          tmp.splice(index, 1);
-                          return tmp;
-                        });
-                      }}
-                      className="mx-4 material-icons text-red-400 rounded-full cursor-pointer hover:bg-red-100"
-                    >
-                      highlight_off
-                    </span>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </AnimatePresence>
-
-            <div key="new verse" className="flex items-center">
-              <input
-                spellCheck={false}
-                className="shadow-md w-full border-gray-200 border px-3 py-1 rounded-2xl bg-transparent focus:outline-gray-500"
-                onChange={(e) => {
-                  setNewVerse(e.target.value);
-                }}
-                type="text"
-                value={newVerse}
-              />
-              <span
-                onClick={() => {
-                  setKillingVerse((origin) => {
-                    let tmp = origin.slice();
-                    tmp.push(newVerse);
-                    return tmp;
-                  });
-                  setNewVerse("");
-                }}
-                className="mx-4 material-icons text-green-400 rounded-full cursor-pointer hover:bg-green-100"
-              >
-                add_circle_outline
-              </span>
-            </div>
-          </div>
-        </div>
-      </div> */}
-
       {/* Disclosure div */}
-      <div className="flex flex-col items-start w-1/3 my-20">
+      <div className="flex flex-col items-start w-1/3">
         <div className="flex items-center">
           <span className="text-2xl font-bold mr-10">공개 범위</span>
           <button
@@ -403,7 +282,7 @@ const WritingSetting: React.FC<props> = ({
         </div>
       </div>
 
-      {/* Delete */}
+      {/* Delete modal*/}
       {deleteModalOpen && (
         <motion.div
           style={{ zIndex: 10000 }}
@@ -471,7 +350,8 @@ const WritingSetting: React.FC<props> = ({
           </div>
         </motion.div>
       )}
-      <div className="flex flex-col items-start w-1/3 my-20">
+      {/* Delete div */}
+      <div className="flex flex-col items-start w-1/3">
         <div className="flex flex-col">
           <span className="text-2xl font-bold mb-10">글 삭제</span>
           <button

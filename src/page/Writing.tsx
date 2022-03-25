@@ -30,6 +30,7 @@ import Header from "../components/Header";
 import axios from "axios";
 import SpinningSvg from "../components/SpinningSvg";
 import WritingWrite from "../components/WritingWrite";
+
 export const genreMatching = {
   NOVEL: "소설",
   POEM: "시",
@@ -39,33 +40,39 @@ export const genreMatching = {
 const Writing = () => {
   // User Info Variables
   const { uid, genre, writingDocID } = useParams();
+
+  // ContextUser's information
   const { user: contextUser } = useContext(UserContext);
   const [contextUserInfo, setContextUserInfo] = useState<getFirestoreUser>(
     {} as getFirestoreUser
   );
+  // Writing owner's information
   const [writingOwnerInfo, setWritingOwnerInfo] = useState<getFirestoreUser>(
     {} as getFirestoreUser
   );
+  // Writing information state
   const [writingInfo, setWritingInfo] = useState<getFirestoreWriting>(
     {} as getFirestoreWriting
   );
 
-  // Context user's writing like state
-  const [likeWritingState, setLikeWritingState] = useState(false);
-  // Editor value
-  const [value, setValue] = useState<editorValue[]>(initialValue);
   // Table State
   const [table, setTable] = useState<tableType>("OVERVIEW");
+
+  // Context user's writing like state
+  const [likeWritingState, setLikeWritingState] = useState(false);
+
+  // Writing informations that can be editted by user are assigned to useState ex. value, disclosure, synposis, title ...
+  // Editor value
+  const [value, setValue] = useState<editorValue[]>(initialValue);
   // Disclosure State
   const [disclosure, setDisclosure] = useState<disclosure>("PUBLIC");
   // Synopsis State
   const [synopsis, setSynopsis] = useState("");
-  // KillingVerse State
-  const [killingVerse, setKillingVerse] = useState<string[]>([]);
   // Title
   const [title, setTitle] = useState("");
   // BGM
   const [bgm, setBgm] = useState<string>("");
+
   const dispatch = useDispatch();
 
   const navigator = useNavigate();
@@ -75,7 +82,7 @@ const Writing = () => {
     {} as toObjectElements
   );
 
-  //  Diagram variables
+  //  Diagram redux state
   const diagram = useSelector((state: RootState) => state.setDiagram.diagram);
   const setDiagram = useCallback(
     (diagram: toObjectElements) => {
@@ -91,6 +98,7 @@ const Writing = () => {
     },
     [dispatch]
   );
+  // FullScreen redux setState
   const setIsFullScreen = useCallback(
     (isFullScreen) => {
       dispatch(isFullScreenAction.setIsFullScreen({ isFullScreen }));
@@ -114,7 +122,7 @@ const Writing = () => {
     };
   }, [contextUser]);
 
-  // useEffect to get writing's owner's information
+  // useEffect to get writing owner's information
   useEffect(() => {
     // copyPasteCommits()
     if (uid) {
@@ -124,28 +132,32 @@ const Writing = () => {
     }
   }, [uid]);
 
+  // Get writing info and set relevant states
   useEffect(() => {
     if (writingDocID && genre && (table === "OVERVIEW" || table === "WRITE")) {
       getWritingInfo(writingDocID).then((res: any) => {
         if (res.genre !== "POEM") {
+          // Poem doesn't have diagram, diagram's elements fields
           setDiagram(res.diagram as toObjectElements);
           setReadOnlyDiagram(res.diagram as toObjectElements);
           setElements(res.diagram.elements);
         } else {
+          // Only poem has BGM field
           setBgm(res.bgm);
         }
+        // All genres have below fields
         setWritingInfo(res as getFirestoreWriting);
-        setKillingVerse(res.killingVerse);
         setSynopsis(res.synopsis);
         setDisclosure(res.disclosure);
         setTitle(res.title);
-        if (contextUser && Object.keys(contextUser).length !== 0) {
+        contextUser &&
+          contextUser.email &&
           setLikeWritingState(res.likes.includes(contextUser.email));
-        }
       });
     }
   }, [table, writingDocID]);
 
+  // Detect full screen change and Set fullscreen redux state
   useEffect(() => {
     if (document.addEventListener) {
       document.addEventListener("fullscreenchange", exitHandler, false);
@@ -158,6 +170,7 @@ const Writing = () => {
     }
   }, []);
 
+  // Handle like writing function
   const handleLikeWriting = () => {
     setLikeWritingState((origin) => {
       axios.post("https://ollim.herokuapp.com/updateLikeWriting", {
@@ -169,6 +182,7 @@ const Writing = () => {
     });
   };
 
+  // Alert modal framer-motion variant
   const alertVariants = {
     initial: {
       opacity: 0,
@@ -184,11 +198,12 @@ const Writing = () => {
     },
   };
 
-  // Server check
+  // Server check state
   const [isServerClosedBtnDisable, setIsServerClosedDisable] = useState(false);
   const [isServerClosedComment, setIsServerClosedComment] =
     useState("서버 확인");
 
+  // Check server is opened function
   const isOpened = () => {
     setIsServerClosedDisable(true);
     axios
@@ -244,6 +259,7 @@ const Writing = () => {
             )}
           </AnimatePresence>
 
+          {/* Header */}
           {table !== "WRITE" && <Header userInfo={contextUserInfo} />}
 
           {/* Writing title, genre, owner's name,  */}
@@ -368,7 +384,7 @@ const Writing = () => {
 
           {/* Table OVERVIEW */}
           {table === "OVERVIEW" &&
-            (genre?.toLocaleLowerCase() === "poem" ? (
+            (genre === "POEM" ? (
               <div className="w-full h-screen flex flex-col items-start px-20 mt-20">
                 {/* Synopsis div */}
                 <div className="flex flex-col w-2/3">
@@ -452,8 +468,6 @@ const Writing = () => {
                 setTitle={setTitle}
                 synopsis={synopsis}
                 setSynopsis={setSynopsis}
-                killingVerse={killingVerse}
-                setKillingVerse={setKillingVerse}
                 disclosure={disclosure}
                 setDisclosure={setDisclosure}
                 writingDocID={writingDocID}

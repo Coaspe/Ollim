@@ -1,22 +1,21 @@
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+import ReactDOM from "react-dom";
+import "./index.css";
+import App from "./App";
+import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import FirebaseContext from "./context/firebase";
 import { firebase, storageRef, FieldValue } from "./lib/firebase";
-import { store } from './redux/store'
-import { Provider } from 'react-redux'
+import { store } from "./redux/store";
+import { Provider } from "react-redux";
 ReactDOM.render(
   <FirebaseContext.Provider value={{ firebase, FieldValue, storageRef }}>
     <Provider store={store}>
       <App />
     </Provider>
   </FirebaseContext.Provider>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://cra.link/PWA
-serviceWorkerRegistration.unregister();
-
+serviceWorkerRegistration.register();

@@ -16,26 +16,41 @@ import { isFullScreenAction } from "../redux";
 import { useDispatch, useSelector } from "react-redux";
 
 const SlateEditorRDOnly = ({ writingDocID, genre }) => {
+  // SlateEditor value state
   const [value, setValue] = useState([]);
+  // Selected commit key
   const [selectedKey, setSelectedKey] = useState("");
+  // Loading State
   const [loading, setLoading] = useState(false);
+  // Render SlateEditor Leaf
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
+  // Slate Editor
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+  // WritingInfo State
   const [writingInfo, setWritingInfo] = useState({});
-  const [openModal, setOpenModal] = useState(false);
+
+  // Load commit modal open state
+  const [openLoadCommitModal, setOpenLoadCommitModal] = useState(false);
+  // Comment modal open state
   const [openCommentsModal, setOpenCommentsModal] = useState(false);
 
+  // Writing's comments state
   const [comments, setComments] = useState([]);
+  // Writing's comments' DocID
   const [commentsDocID, setCommentsDocID] = useState([]);
   const [commentButtonDisabled, setCommentButtonDisabled] = useState(false);
 
+  // Comment Text state
   const [commentText, setCommentText] = useState("");
   const { user } = useContext(UserContext);
 
+  // Now selected collection num state
   const [nowCollectionNum, setNowCollectionNum] = useState(0);
+  // Collection change modal open state
   const [changeCollectionElementModal, setChangeCollectionElementModal] =
     useState(false);
 
+  // Render SlateEditor element function
   const renderElement = ({ element, attributes, children }) => {
     const elementKey = ReactEditor.findKey(editor, element);
     let target = 0;
@@ -56,6 +71,8 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
     );
   };
   const dispatch = useDispatch();
+
+  // FullScreen redux state
   const isFullScreen = useSelector(
     (state) => state.setIsFullScreen.isFullScreen
   );
@@ -66,6 +83,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
     [dispatch]
   );
 
+  // useEffect to get writing's information
   useEffect(() => {
     getWritingInfo(writingDocID).then((res) => {
       setWritingInfo(res);
@@ -74,6 +92,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
     });
   }, []);
 
+  // After getting commetsDocID in writing's information, request comments information to firestore
   useEffect(() => {
     if (commentsDocID.length !== 0) {
       getComments(commentsDocID).then((res) => {
@@ -84,6 +103,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
     }
   }, [commentsDocID]);
 
+  // Get writing's collection's lastest value
   useEffect(() => {
     if (Object.keys(writingInfo).length !== 0 && nowCollectionNum) {
       const elementCommits = writingInfo.collection[nowCollectionNum].commits;
@@ -103,10 +123,12 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
     }
   }, [writingInfo, nowCollectionNum]);
 
+  // When value changed, Set load state true
   useEffect(() => {
     value.length > 0 && setLoading(true);
   }, [value]);
 
+  // Comment modal framer-motion variant
   const commentsModalVariants = {
     initial: {
       x: "100%",
@@ -118,6 +140,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
       x: "100%",
     },
   };
+  // Add comment function
   const handleAddComment = () => {
     setCommentText("");
     setCommentButtonDisabled(true);
@@ -210,7 +233,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
             </div>
           </motion.div>
         )}
-        {openModal && (
+        {openLoadCommitModal && (
           <motion.div
             animate={{
               backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],
@@ -220,7 +243,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
             className="fixed w-full h-full items-center justify-center top-0 left-0 flex"
             onClick={(e) => {
               e.stopPropagation();
-              setOpenModal(false);
+              setOpenLoadCommitModal(false);
             }}
           >
             {writingInfo &&
@@ -254,7 +277,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
                               setLoading(false);
                               setSelectedKey(key);
                               setValue(data[key]);
-                              setOpenModal(false);
+                              setOpenLoadCommitModal(false);
                             }
                           }}
                           key={key}
@@ -450,7 +473,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
                   writingInfo.collection[nowCollectionNum.toString()].commits
                     .length !== 0
                 ) {
-                  setOpenModal(true);
+                  setOpenLoadCommitModal(true);
                 }
               }}
               style={{ fontSize: "2rem" }}

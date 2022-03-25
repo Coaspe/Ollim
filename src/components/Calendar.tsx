@@ -74,9 +74,7 @@ const Calendar: React.FC<props> = ({ totalCommits }) => {
       initial();
     }
   }, [totalCommits]);
-  useEffect(() => {
-    console.log(recent3MonthsCommits);
-  }, [recent3MonthsCommits]);
+
   return (
     <div className="w-2/3 my-10 grid grid-cols-3 gap-4">
       {recent3MonthsCommits &&

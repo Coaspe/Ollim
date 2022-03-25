@@ -167,8 +167,9 @@ const Mypage = () => {
     followersLength.current = 0;
   }, [uid]);
 
-  // Get profileOwner's user info and user's writings info
+  // Get profileOwner's user information and user's writings information
   useEffect(() => {
+    // Get and Set profileOwner's writings information function
     const getWritings = async (userWritings: getFirestoreUserWritings) => {
       const poems = userWritings.poemDocID
         ? (
@@ -191,7 +192,6 @@ const Mypage = () => {
             )) as Array<getFirestoreWriting>
           ).sort((a, b) => b.dateCreated - a.dateCreated)
         : [];
-
       setPoems(poems);
       setNovels(novel);
       setScenarioes(scenario);
@@ -202,6 +202,7 @@ const Mypage = () => {
       );
     };
 
+    // Get user information
     getUserByUID(uid as string).then((res: any) => {
       const data = res.docs[0].data();
       setProfileOwnerInfo(data);
@@ -228,7 +229,7 @@ const Mypage = () => {
   }, [profileOwnerInfo, contextUser]);
 
   // Image Compress process
-  const handleFileOnChange = (event: any) => {
+  const handleProfileImgOnChange = (event: any) => {
     const element = event.target.files[0];
 
     let qual = 0.45;
@@ -270,6 +271,7 @@ const Mypage = () => {
     });
   };
 
+  // Navigate to community
   const handleGoToCommunity = () => {
     navigator("/community");
   };
@@ -445,7 +447,7 @@ const Mypage = () => {
                 </label>
                 {contextUser.uid && contextUser.uid === uid && (
                   <input
-                    onChange={handleFileOnChange}
+                    onChange={handleProfileImgOnChange}
                     style={{ display: "none" }}
                     type="file"
                     name="profileImg"
