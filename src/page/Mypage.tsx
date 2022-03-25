@@ -21,11 +21,11 @@ import {
   getFirestoreUser,
   getFirestoreUserWritings,
 } from "../type";
-import { alarmAction, userInfoAction } from "../redux";
+import { alarmAction, userInfoAction, widthSizeAction } from "../redux";
 import { useNavigate, useParams } from "react-router-dom";
 
 import Calendar from "../components/Calendar";
-import { Alert } from "@mui/material";
+import { Alert, Tooltip } from "@mui/material";
 import axios from "axios";
 import FollowingRow from "../components/FollowingRow";
 import FollowerRow from "../components/FollowerRow";
@@ -91,6 +91,14 @@ const Mypage = () => {
     (state: RootState) => state.setUserInfo.userInfo
   );
 
+  // Window width size
+  const setWidthSize = (widthSize: number) => {
+    dispatch(widthSizeAction.setWidthSize({ widthSize }));
+  };
+  const widthSize = useSelector(
+    (state: RootState) => state.setWidthSize.widthSize
+  );
+
   const setAlarm = (alarm: [string, alarmType, boolean]) => {
     dispatch(alarmAction.setAlarm({ alarm }));
   };
@@ -138,6 +146,14 @@ const Mypage = () => {
       });
     }
   }, [profileOwnerInfo.followings]);
+
+  useEffect(() => {
+    window.onresize = () => {
+      console.log(window.innerWidth);
+
+      setWidthSize(window.innerWidth);
+    };
+  }, []);
 
   // Loading more followers, followings completed, set loading false
   useEffect(() => {
@@ -308,7 +324,7 @@ const Mypage = () => {
               setFollowersModal(false);
             }}
           >
-            <div className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg">
+            <div className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg GalaxyS20Ultra:w-1/2 GalaxyS20Ultra:w-4/5">
               <span className="text-xl font-bold text-gray-500 mb-5">
                 팔로워
               </span>
@@ -363,7 +379,7 @@ const Mypage = () => {
               setFollowingsModal(false);
             }}
           >
-            <div className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg">
+            <div className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg GalaxyS20Ultra:w-4/5">
               <span className="text-xl font-bold text-gray-500 mb-5">
                 팔로우
               </span>
@@ -549,15 +565,17 @@ const Mypage = () => {
                 </div>
               }
               <div className="flex w-full items-center justify-center my-10">
-                <motion.button
-                  onClick={() => {
-                    setNewWritingModalOpen(true);
-                  }}
-                  whileHover={{ y: "-10%" }}
-                  className="mr-5 px-4 py-3 rounded-2xl bg-white shadow-md font-semibold"
-                >
-                  새 작품 추가
-                </motion.button>
+                {widthSize > 500 && (
+                  <motion.button
+                    onClick={() => {
+                      setNewWritingModalOpen(true);
+                    }}
+                    whileHover={{ y: "-10%" }}
+                    className="mr-5 px-4 py-3 rounded-2xl bg-white shadow-md font-semibold"
+                  >
+                    새 작품 추가
+                  </motion.button>
+                )}
                 <motion.button
                   onClick={handleGoToCommunity}
                   whileHover={{ y: "-10%" }}
@@ -568,79 +586,118 @@ const Mypage = () => {
               </div>
 
               {/* Calendar */}
-              <Calendar totalCommits={userWritings.totalCommits} />
+              <Calendar
+                totalCommits={userWritings.totalCommits}
+                widthSize={widthSize}
+              />
 
               {/* On writing */}
-              <div className="flex items-center flex-col my-20 w-2/3">
-                <div className="w-full grid grid-cols-3 items-center mb-20">
+              <div className="flex items-center flex-col my-20 w-2/3 GalaxyS20Ultra:my-10">
+                <div className="w-full grid grid-cols-3 items-center mb-20 GalaxyS20Ultra:flex GalaxyS20Ultra:flex-col GalaxyS20Ultra:items-center GalaxyS20Ultra:space-y-10 GalaxyS20Ultra:mb-10">
                   <span className="text-2xl font-bold justify-center col-start-2 w-full text-center">
                     작가의 글
                   </span>
-                  <div className="grid grid-cols-4 col-start-3 gap-4 text-sm">
-                    <button
-                      className={`text-gray-700 font-semibold shadow border border-writingButton rounded-2xl hover:bg-wirtingButtonHover py-1 ${
-                        onWritingCategory === "NOVEL" && "bg-writingButton"
-                      }`}
-                      onClick={() => {
-                        setOnWritingCategory("NOVEL");
-                      }}
-                    >
-                      소설
-                    </button>
-                    <button
-                      className={`text-gray-700 font-semibold shadow border border-writingButton rounded-2xl hover:bg-wirtingButtonHover py-1 ${
-                        onWritingCategory === "POEM" && "bg-writingButton"
-                      }`}
-                      onClick={() => {
-                        setOnWritingCategory("POEM");
-                      }}
-                    >
-                      시
-                    </button>
-                    <button
-                      className={`text-gray-700 font-semibold shadow border border-writingButton rounded-2xl hover:bg-wirtingButtonHover py-1 ${
-                        onWritingCategory === "SCENARIO" && "bg-writingButton"
-                      }`}
-                      onClick={() => {
-                        setOnWritingCategory("SCENARIO");
-                      }}
-                    >
-                      시나리오
-                    </button>
-                    <button
-                      className={`text-gray-700 font-semibold shadow border border-writingButton rounded-2xl hover:bg-wirtingButtonHover py-1 ${
-                        onWritingCategory === "TOTAL" && "bg-writingButton"
-                      }`}
-                      onClick={() => {
-                        setOnWritingCategory("TOTAL");
-                      }}
-                    >
-                      전체
-                    </button>
+                  <div className="flex items-center place-self-end col-start-3 gap-4 text-sm GalaxyS20Ultra:w-full GalaxyS20Ultra:justify-center">
+                    <Tooltip title="소설" placement="top" arrow>
+                      <span
+                        onClick={() => {
+                          setOnWritingCategory("NOVEL");
+                        }}
+                        style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
+                        className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${
+                          onWritingCategory === "NOVEL"
+                            ? "text-slate-700 bg-genreSelectedBG"
+                            : "text-slate-400"
+                        }`}
+                      >
+                        menu_book
+                      </span>
+                    </Tooltip>
+                    <Tooltip title="시" placement="top" arrow>
+                      <span
+                        onClick={() => {
+                          setOnWritingCategory("POEM");
+                        }}
+                        style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
+                        className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${
+                          onWritingCategory === "POEM"
+                            ? "text-slate-700 bg-genreSelectedBG"
+                            : "text-slate-400"
+                        }`}
+                      >
+                        history_edu
+                      </span>
+                    </Tooltip>
+                    <Tooltip title="시나리오" placement="top" arrow>
+                      <span
+                        onClick={() => {
+                          setOnWritingCategory("SCENARIO");
+                        }}
+                        style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
+                        className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${
+                          onWritingCategory === "SCENARIO"
+                            ? "text-slate-700 bg-genreSelectedBG"
+                            : "text-slate-400"
+                        }`}
+                      >
+                        adf_scanner
+                      </span>
+                    </Tooltip>
+                    <Tooltip title="전체" placement="top" arrow>
+                      <span
+                        onClick={() => {
+                          setOnWritingCategory("TOTAL");
+                        }}
+                        style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
+                        className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${
+                          onWritingCategory === "TOTAL"
+                            ? "text-slate-700 bg-genreSelectedBG"
+                            : "text-slate-400"
+                        }`}
+                      >
+                        clear_all
+                      </span>
+                    </Tooltip>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 items-center justify-between w-full gap-5">
+                <div className="grid grid-cols-3 items-center justify-between w-full gap-5 GalaxyS20Ultra:flex GalaxyS20Ultra:flex-col GalaxyS20Ultra:items-center GalaxyS20Ultra:overflow-y-scroll GalaxyS20Ultra:max-h-72 GalaxyS20Ultra:py-5 GalaxyS20Ultra:px-3">
                   {onWritingCategory === "NOVEL" &&
                     novels &&
                     novels.map((data) => (
-                      <MypageWriting key={data.dateCreated} data={data} />
+                      <MypageWriting
+                        key={data.dateCreated}
+                        data={data}
+                        widthSize={widthSize}
+                      />
                     ))}
                   {onWritingCategory === "POEM" &&
                     poems &&
                     poems.map((data) => (
-                      <MypageWriting key={data.dateCreated} data={data} />
+                      <MypageWriting
+                        key={data.dateCreated}
+                        data={data}
+                        widthSize={widthSize}
+                      />
                     ))}
                   {onWritingCategory === "SCENARIO" &&
                     scenarioes &&
                     scenarioes.map((data) => (
-                      <MypageWriting key={data.dateCreated} data={data} />
+                      <MypageWriting
+                        key={data.dateCreated}
+                        data={data}
+                        widthSize={widthSize}
+                      />
                     ))}
                   {onWritingCategory === "TOTAL" &&
                     totalWritings &&
                     totalWritings.map((data, index) => {
                       return (
-                        <MypageWriting key={data.dateCreated} data={data} />
+                        <MypageWriting
+                          key={data.dateCreated}
+                          data={data}
+                          widthSize={widthSize}
+                        />
                       );
                     })}
                 </div>

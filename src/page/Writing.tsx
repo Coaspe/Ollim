@@ -20,7 +20,12 @@ import {
 import { cx, css } from "@emotion/css";
 import SlateEditorRDOnly from "../SlateEditor/SlateEditorRDOnly";
 import { useDispatch, useSelector } from "react-redux";
-import { diagramAction, elementsAction, isFullScreenAction } from "../redux";
+import {
+  diagramAction,
+  elementsAction,
+  isFullScreenAction,
+  widthSizeAction,
+} from "../redux";
 import { RootState } from "../redux/store";
 import { Alert } from "@mui/material";
 import { Elements } from "react-flow-renderer";
@@ -239,6 +244,18 @@ const Writing = () => {
       });
   };
 
+  // Window width size
+  const setWidthSize = (widthSize: number) => {
+    dispatch(widthSizeAction.setWidthSize({ widthSize }));
+  };
+  const widthSize = useSelector(
+    (state: RootState) => state.setWidthSize.widthSize
+  );
+  useEffect(() => {
+    window.onresize = () => {
+      setWidthSize(window.innerWidth);
+    };
+  }, []);
   return (
     <>
       {Object.keys(writingInfo).length > 0 && uid && genre && writingDocID && (
@@ -263,7 +280,7 @@ const Writing = () => {
           {table !== "WRITE" && <Header userInfo={contextUserInfo} />}
 
           {/* Writing title, genre, owner's name,  */}
-          <div className="flex flex-col items-start px-20">
+          <div className="flex flex-col items-start px-20 GalaxyS20Ultra:px-10">
             <div className="flex flex-col items-start justify-center font-bold mb-10">
               <div
                 onClick={() => {
@@ -301,7 +318,7 @@ const Writing = () => {
             </div>
             <div
               style={{ fontSize: "0.75rem", color: "#ada6a2" }}
-              className="flex items-center"
+              className="flex items-center space-x-5"
             >
               <span
                 className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${
@@ -318,7 +335,7 @@ const Writing = () => {
                 onClick={() => {
                   setTable("BROWSE");
                 }}
-                className={`shadow ml-5 material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${
+                className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${
                   table === "BROWSE" &&
                   "text-hoverSpanMenu shadow-hoverSpanMenu"
                 }`}
@@ -327,17 +344,19 @@ const Writing = () => {
               </span>
               {uid && contextUser.uid === uid && (
                 <>
-                  <span
-                    onClick={() => {
-                      setTable("WRITE");
-                    }}
-                    className={`material-icons shadow mx-5 cursor-pointer px-1 py-1 rounded-full ${
-                      table === "WRITE" &&
-                      "text-hoverSpanMenu shadow-hoverSpanMenu"
-                    } hover:text-hoverSpanMenu`}
-                  >
-                    drive_file_rename_outline
-                  </span>
+                  {widthSize > 500 && (
+                    <span
+                      onClick={() => {
+                        setTable("WRITE");
+                      }}
+                      className={`material-icons shadow cursor-pointer px-1 py-1 rounded-full ${
+                        table === "WRITE" &&
+                        "text-hoverSpanMenu shadow-hoverSpanMenu"
+                      } hover:text-hoverSpanMenu`}
+                    >
+                      drive_file_rename_outline
+                    </span>
+                  )}
                   <span
                     onClick={() => {
                       setTable("SETTING");
@@ -385,9 +404,9 @@ const Writing = () => {
           {/* Table OVERVIEW */}
           {table === "OVERVIEW" &&
             (genre === "POEM" ? (
-              <div className="w-full h-screen flex flex-col items-start px-20 mt-20">
+              <div className="w-full h-full flex flex-col items-start px-20 mt-20 GalaxyS20Ultra:px-10">
                 {/* Synopsis div */}
-                <div className="flex flex-col w-2/3">
+                <div className="flex flex-col w-2/3 GalaxyS20Ultra:w-full">
                   <span className="text-2xl font-bold mb-10">여는 말</span>
                   <textarea
                     value={writingInfo.synopsis}
@@ -401,9 +420,9 @@ const Writing = () => {
               </div>
             ) : (
               diagram && (
-                <div className="w-full flex flex-col items-start px-20 mt-20">
+                <div className="w-full flex flex-col items-start px-20 mt-20 GalaxyS20Ultra:px-10">
                   {/* Synopsis div */}
-                  <div className="flex flex-col w-2/3">
+                  <div className="flex flex-col w-2/3 GalaxyS20Ultra:w-full">
                     <span className="text-2xl font-bold mb-10">시놉시스</span>
                     <textarea
                       value={writingInfo.synopsis}
@@ -415,7 +434,7 @@ const Writing = () => {
                     </textarea>
                   </div>
                   {/* diagram div */}
-                  <div className="flex flex-col w-2/3 my-20">
+                  <div className="flex flex-col w-2/3 my-20 GalaxyS20Ultra:w-full">
                     <span className="text-2xl font-bold mb-10">
                       인물 관계도
                     </span>
@@ -454,6 +473,7 @@ const Writing = () => {
               <SlateEditorRDOnly
                 writingDocID={writingDocID}
                 genre={writingInfo.genre}
+                widthSize={widthSize}
               />
             </div>
           )}

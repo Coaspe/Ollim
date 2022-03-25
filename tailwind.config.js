@@ -22,6 +22,7 @@ module.exports = {
         hoverSpanMenu: "#c69e92",
         writingButton: "#e6cec8",
         wirtingButtonHover: "#f5ebe9",
+        htmlBG: "#fff6f0",
       },
       fontSize: {
         xs: ".55rem",
@@ -35,7 +36,13 @@ module.exports = {
         a4FullScreenHeight: "270mm",
       },
       screens: {
-        GalaxyS20Ultra: "400px",
+        GalaxyS20Ultra: { min: "300px", max: "500px" },
+      },
+      minWidth: {
+        "1/3": "30%",
+      },
+      animation: {
+        "pulse-slow": "pulse 5s ease infinite",
       },
     },
   },

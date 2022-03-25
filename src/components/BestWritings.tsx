@@ -1,9 +1,6 @@
 import { memo } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  genre,
-  medal,
-} from "../type";
+import { genre, medal } from "../type";
 interface props {
   data: any;
   medal: medal;

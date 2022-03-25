@@ -90,7 +90,7 @@ const Community = () => {
       {/* Search Div */}
       {!loading ? (
         <>
-          <div className="border w-1/3 max-w-lg rounded-3xl bg-opacity-90 px-3 py-2 flex items-center justify-center shadow-md">
+          <div className="border w-1/3 max-w-lg rounded-3xl bg-opacity-90 px-3 py-2 flex items-center justify-center shadow-md GalaxyS20Ultra:w-2/3">
             {recommandedUsers.length > 0 && (
               <div className="w-full flex items-center">
                 <div className="relative">
@@ -156,9 +156,12 @@ const Community = () => {
 
           <div className="flex flex-col w-3/4 mt-10">
             <span className="text-2xl font-bold">이 달의 글</span>
-            <div className="flex py-8 space-x-10 w-full">
+            <div className="flex py-8 space-x-10 w-full GalaxyS20Ultra:overflow-x-scroll GalaxyS20Ultra:snap-x">
               {allBestWritingInfo.map((data, index) => (
-                <div key={index} style={{ minWidth: "30%" }} className="w-1/3">
+                <div
+                  key={index}
+                  className="w-1/3 min-w-1/3 GalaxyS20Ultra:w-full GalaxyS20Ultra:min-w-full GalaxyS20Ultra:snap-center"
+                >
                   <BestWritings
                     data={data}
                     medal={
@@ -172,12 +175,11 @@ const Community = () => {
 
           <div className="flex flex-col w-3/4 mt-10">
             <span className="text-2xl font-bold">추천 작가</span>
-            <div className="grid grid-cols-3 py-8 gap-10 w-full">
+            <div className="grid grid-cols-3 py-8 gap-10 w-full GalaxyS20Ultra:flex GalaxyS20Ultra:items-center GalaxyS20Ultra:overflow-x-scroll">
               {recommandedUsers.map((data, index) => (
                 <div
                   key={index}
-                  style={{ minWidth: "30%" }}
-                  className="snap-center"
+                  className="w-1/3 min-w-1/3 GalaxyS20Ultra:w-full GalaxyS20Ultra:min-w-full GalaxyS20Ultra:snap-center"
                 >
                   <WriterRecommandation key={data.uid} data={data} />
                 </div>
@@ -185,10 +187,10 @@ const Community = () => {
             </div>
           </div>
 
-          <div className="flex flex-col w-3/4 mt-10">
+          {/* <div className="flex flex-col w-3/4 mt-10">
             <span className="text-2xl font-bold">신춘 문예</span>
             <div></div>
-          </div>
+          </div> */}
         </>
       ) : (
         // Loading Page

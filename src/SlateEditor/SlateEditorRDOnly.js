@@ -15,7 +15,7 @@ import { Tooltip } from "@mui/material";
 import { isFullScreenAction } from "../redux";
 import { useDispatch, useSelector } from "react-redux";
 
-const SlateEditorRDOnly = ({ writingDocID, genre }) => {
+const SlateEditorRDOnly = ({ writingDocID, genre, widthSize }) => {
   // SlateEditor value state
   const [value, setValue] = useState([]);
   // Selected commit key
@@ -180,7 +180,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
             animate="animate"
             exit="exit"
             style={{ zIndex: 51, top: "20%" }}
-            className="fixed right-0 w-1/3 h-2/3 bg-white flex flex-col items-center border border-opacity-20 border-black"
+            className="fixed right-0 w-1/3 h-2/3 bg-white flex flex-col items-center border border-opacity-20 border-black GalaxyS20Ultra:w-4/5 GalaxyS20Ultra:h-1/2"
           >
             <motion.div
               layout
@@ -250,7 +250,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
               writingInfo.collection[nowCollectionNum.toString()].commits && (
                 <div
                   style={{ backgroundColor: "#f7f7f7" }}
-                  className="flex flex-col items-center w-1/4 h-1/2 py-5 rounded-lg"
+                  className="flex flex-col items-center w-1/4 h-1/2 py-5 rounded-lg GalaxyS20Ultra:w-4/5 GalaxyS20Ultra:h-1/2"
                 >
                   <span className="text-xl font-bold text-gray-500 mb-5">
                     제출 기록
@@ -398,7 +398,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
               boxShadow: "0px 0px 10px rgba(0,0,0,0.3)",
               backgroundColor: "#FAF6F5",
             }}
-            className={`z-50 editor-inner-browse overflow-y-scroll w-noneFullScreenMenu h-a4Height overflow-x-hidden ${
+            className={`z-50 editor-inner-browse overflow-y-scroll w-noneFullScreenMenu GalaxyS20Ultra:w-4/5 GalaxyS20Ultra:overflow-x-scroll h-a4Height overflow-x-hidden ${
               isFullScreen && "my-5"
             }`}
           >
@@ -408,10 +408,8 @@ const SlateEditorRDOnly = ({ writingDocID, genre }) => {
                 css`
                   padding-top: 20px;
                   padding-bottom: 20px;
-                  width: 220mm;
                   p {
-                    cursor: text;
-                    width: 210mm;
+                    width: ${widthSize > 500 ? "220mm" : "100%"};
                     padding-right: 20px;
                     padding-left: 20px;
                   }

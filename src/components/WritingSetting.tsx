@@ -89,9 +89,9 @@ const WritingSetting: React.FC<props> = ({
     }
   }, [bgm]);
   return (
-    <div className="w-full font-noto flex flex-col items-start px-20 mt-20 space-y-20">
+    <div className="w-full font-noto flex flex-col items-start px-20 my-20 space-y-20 GalaxyS20Ultra:px-10">
       {/* Title div */}
-      <div className="flex flex-col w-2/3">
+      <div className="flex flex-col w-2/3 GalaxyS20Ultra:w-full">
         <div className="flex items-center mb-10">
           <span className="text-2xl font-bold mr-10">제목</span>
           <button
@@ -131,7 +131,7 @@ const WritingSetting: React.FC<props> = ({
       </div>
 
       {/* Synopsis div */}
-      <div className="flex flex-col w-2/3">
+      <div className="flex flex-col w-2/3 GalaxyS20Ultra:w-full">
         <div className="flex items-center mb-10">
           <span className="text-2xl font-bold mr-10">
             {writingInfo.genre !== "POEM" ? "시놉시스" : "여는 말"}
@@ -176,7 +176,7 @@ const WritingSetting: React.FC<props> = ({
 
       {/* BGM div */}
       {writingInfo.genre === "POEM" && (
-        <div className="flex flex-col w-2/3">
+        <div className="flex flex-col w-2/3 GalaxyS20Ultra:w-full">
           <div className="flex items-center mb-10">
             <span className="text-2xl font-bold mr-10">배경 음악</span>
             <button
@@ -210,7 +210,7 @@ const WritingSetting: React.FC<props> = ({
       )}
 
       {/* Disclosure div */}
-      <div className="flex flex-col items-start w-1/3">
+      <div className="flex flex-col items-start w-1/3 GalaxyS20Ultra:w-full">
         <div className="flex items-center">
           <span className="text-2xl font-bold mr-10">공개 범위</span>
           <button
@@ -351,7 +351,7 @@ const WritingSetting: React.FC<props> = ({
         </motion.div>
       )}
       {/* Delete div */}
-      <div className="flex flex-col items-start w-1/3">
+      <div className="flex flex-col items-start w-1/3 GalaxyS20Ultra:w-full">
         <div className="flex flex-col">
           <span className="text-2xl font-bold mb-10">글 삭제</span>
           <button

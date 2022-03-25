@@ -10,7 +10,7 @@ const Header: React.FC<props> = ({ userInfo }) => {
   const navigator = useNavigate();
 
   return (
-    <div className="flex w-full items-center justify-between px-20">
+    <div className="flex w-full items-center justify-between px-20 GalaxyS20Ultra:px-10 GalaxyS20Ultra:my-5">
       {/* logo */}
       <img
         onClick={() => {
@@ -18,7 +18,7 @@ const Header: React.FC<props> = ({ userInfo }) => {
             ? navigator(`/${userInfo.uid}`)
             : navigator("/community");
         }}
-        className="h-28 cursor-pointer"
+        className="h-28 cursor-pointer GalaxyS20Ultra:h-16"
         src="/logo/Ollim-logos_transparent.png"
         alt="header logo"
       />
@@ -27,14 +27,16 @@ const Header: React.FC<props> = ({ userInfo }) => {
           onClick={() => {
             navigator(`/${userInfo.uid}`);
           }}
-          className="flex items-center cursor-pointer border border-writingSettingBorder px-4 py-2 rounded-3xl"
+          className="flex items-center cursor-pointer border border-writingSettingBorder px-4 py-2 rounded-3xl GalaxyS20Ultra:p-0 GalaxyS20Ultra:h-0"
         >
           <img
             src={userInfo.profileImg}
-            className="w-7 mr-3 rounded-full"
+            className="w-7 mr-3 rounded-full GalaxyS20Ultra:mr-0"
             alt="user profile"
           />
-          <span>{userInfo.username}</span>
+          <span className="GalaxyS20Ultra:invisible GalaxyS20Ultra:w-0">
+            {userInfo.username}
+          </span>
         </div>
       ) : (
         <div>

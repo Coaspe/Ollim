@@ -4,11 +4,13 @@ import CalendarElement from "./CalendarElement";
 
 interface props {
   totalCommits: { [key: number]: string };
+  widthSize: number;
 }
-const Calendar: React.FC<props> = ({ totalCommits }) => {
+const Calendar: React.FC<props> = ({ totalCommits, widthSize }) => {
   const [recent3MonthsCommits, setRecent3MonthsCommits] = useState<{
     [key: string]: number[];
   }>({});
+  console.log(widthSize);
 
   useEffect(() => {
     const initial = () => {
@@ -76,17 +78,46 @@ const Calendar: React.FC<props> = ({ totalCommits }) => {
   }, [totalCommits]);
 
   return (
-    <div className="w-2/3 my-10 grid grid-cols-3 gap-4">
-      {recent3MonthsCommits &&
-        Object.keys(recent3MonthsCommits).map((commitsChunk) => (
-          <CalendarElement
-            key={commitsChunk}
-            yearMonth={commitsChunk}
-            keys={recent3MonthsCommits[commitsChunk]}
-            totalCommits={totalCommits}
-          />
-        ))}
-    </div>
+    <>
+      {widthSize > 500 ? (
+        <div className="w-2/3 my-10 grid grid-cols-3 gap-4">
+          {recent3MonthsCommits &&
+            Object.keys(recent3MonthsCommits).map((commitsChunk) => (
+              <CalendarElement
+                key={commitsChunk}
+                yearMonth={commitsChunk}
+                keys={recent3MonthsCommits[commitsChunk]}
+                totalCommits={totalCommits}
+              />
+            ))}
+        </div>
+      ) : (
+        <div className="w-2/3 flex items-center justify-center">
+          {recent3MonthsCommits && (
+            <CalendarElement
+              key={
+                Object.keys(recent3MonthsCommits)[
+                  Object.keys(recent3MonthsCommits).length - 1
+                ]
+              }
+              yearMonth={
+                Object.keys(recent3MonthsCommits)[
+                  Object.keys(recent3MonthsCommits).length - 1
+                ]
+              }
+              keys={
+                recent3MonthsCommits[
+                  Object.keys(recent3MonthsCommits)[
+                    Object.keys(recent3MonthsCommits).length - 1
+                  ]
+                ]
+              }
+              totalCommits={totalCommits}
+            />
+          )}
+        </div>
+      )}
+    </>
   );
 };
 

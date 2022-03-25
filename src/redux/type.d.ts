@@ -2,66 +2,73 @@ import { Elements } from "react-flow-renderer";
 import { alarmType, getFirestoreUser, toObjectElements } from "../type";
 
 interface elementsState {
-    elements: Elements;
+  elements: Elements;
 }
 interface setElementsPayload {
-    elements: Elements
+  elements: Elements;
 }
 interface setElementsAction {
-    payload: setElementsPayload
+  payload: setElementsPayload;
 }
 
-
 interface userInfoState {
-    userInfo: getFirestoreUser;
+  userInfo: getFirestoreUser;
 }
 
 interface setUserInfoPayload {
-    userInfo: getFirestoreUser
+  userInfo: getFirestoreUser;
 }
 
 interface setUserInfoAction {
-    payload: setUserInfoPayload
+  payload: setUserInfoPayload;
 }
 
 interface diagramState {
-    diagram: toObjectElements;
+  diagram: toObjectElements;
 }
 interface setDiagramPayload {
-    diagram: toObjectElements
+  diagram: toObjectElements;
 }
 interface setDiagramAction {
-    payload: setDiagramPayload
+  payload: setDiagramPayload;
 }
 
 interface alarmState {
-    alarm: [string, alarmType, boolean];
+  alarm: [string, alarmType, boolean];
 }
 interface setAlarmPayload {
-    alarm: [string, alarmType, boolean]
+  alarm: [string, alarmType, boolean];
 }
 interface setAlarmAction {
-    payload: setAlarmPayload
+  payload: setAlarmPayload;
 }
 
 interface alarmTimerState {
-    timer: NodeJS.Timeout | null
+  timer: NodeJS.Timeout | null;
 }
 interface setAlarmTimerPayload {
-    timer: NodeJS.Timeout | null
+  timer: NodeJS.Timeout | null;
 }
 interface setAlarmTimerAction {
-    payload: setAlarmTimerPayload
+  payload: setAlarmTimerPayload;
 }
-
 
 interface isFullScreenState {
-    isFullScreen: boolean
+  isFullScreen: boolean;
 }
 interface setIsFullScreenPayload {
-    isFullScreen: boolean
+  isFullScreen: boolean;
 }
 interface setIsFullScreenAction {
-    payload: setIsFullScreenPayload
+  payload: setIsFullScreenPayload;
 }
 
+interface widthSizeState {
+  widthSize: number;
+}
+interface setWidthSizePayload {
+  widthSize: number;
+}
+interface setWidthSizeAction {
+  payload: setWidthSizePayload;
+}

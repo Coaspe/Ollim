@@ -5,8 +5,9 @@ import { genre, getFirestoreWriting } from "../type";
 interface props {
   data: getFirestoreWriting;
   medal?: string;
+  widthSize: number;
 }
-const MypageWriting: React.FC<props> = ({ data }) => {
+const MypageWriting: React.FC<props> = ({ data, widthSize }) => {
   const gerneType = {
     SCENARIO: "시나리오",
     POEM: "시",
@@ -51,7 +52,7 @@ const MypageWriting: React.FC<props> = ({ data }) => {
               기다려서 세부사항을 확인하기
             </span>
           )}
-          <div className="mb-3 flex items-center justify-between">
+          <div className="mb-3 flex items-center justify-between GalaxyS20Ultra:flex-col">
             <div className="flex items-center space-x-3">
               <span className="text-xl font-black">
                 {data.title.length > 9
@@ -67,14 +68,16 @@ const MypageWriting: React.FC<props> = ({ data }) => {
               {data.likes.length} 좋아요
             </span>
           </div>
-          <motion.textarea
-            layoutId="textarea"
-            value={data.synopsis}
-            readOnly
-            className="text-sm text-gray-400 mb-3 font-semibold bg-transparent resize-none overflow-hidden pointer-events-none"
-          >
-            {data.synopsis}
-          </motion.textarea>
+          {widthSize > 500 && (
+            <motion.textarea
+              layoutId="textarea"
+              value={data.synopsis}
+              readOnly
+              className="text-sm text-gray-400 mb-3 font-semibold bg-transparent resize-none overflow-hidden pointer-events-none"
+            >
+              {data.synopsis}
+            </motion.textarea>
+          )}
         </motion.div>
         <AnimatePresence>
           {hoverExpandDetail && data.killingVerse && (

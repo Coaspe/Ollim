@@ -37,7 +37,7 @@ const CalendarElement: React.FC<props> = ({
   return (
     <>
       {elementCommits && (
-        <div className="flex flex-col items-center font-bold">
+        <div className="flex flex-col items-center font-bold GalaxyS20Ultra:w-full">
           <span className="text-sm mb-3">{yearMonth}</span>
           <div
             style={{ borderColor: "#c0c0c0" }}
