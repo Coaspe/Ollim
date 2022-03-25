@@ -194,15 +194,7 @@ const Intro = () => {
         />
       </div>
 
-      <div className="GalaxyS20Ultra:visible GalaxyS20Ultra:w-full GalaxyS20Ultra:h-full GalaxyS20Ultra:absolute GalaxyS20Ultra:bg-genreSelectedBG">
-        <div className="absolute left-1/2 transform -translate-x-1/2">
-          <img
-            className="w-full"
-            src="/logo/Ollim-logos_transparent.png"
-            alt="intro"
-          />
-        </div>
-      </div>
+      <div className="GalaxyS20Ultra:visible GalaxyS20Ultra:w-full GalaxyS20Ultra:h-full GalaxyS20Ultra:absolute GalaxyS20Ultra:bg-genreSelectedBG"></div>
     </div>
   );
 };
