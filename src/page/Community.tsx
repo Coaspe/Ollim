@@ -59,7 +59,7 @@ const Community = () => {
 
   useEffect(() => {
     const handleGetAllBestWritingInfo = async () => {
-      setAllBestWritingInfo(await getBestWritings());
+      setAllBestWritingInfo((await getBestWritings()) as any);
     };
     const handleRecommandedUsers = async () => {
       setRecommandedUsers(await getAllUsers());

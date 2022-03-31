@@ -1,9 +1,10 @@
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useContext, useState } from "react";
-import AddCommentAlarmRow from "../components/AddCommentAlarmRow";
-import AddWritingAlarmRow from "../components/AddWritingAlarmRow";
-import FollowingAlarmRow from "../components/FollowingAlarmRow";
+import AddCommentAlarmRow from "../alarmrows/AddCommentAlarmRow";
+import AddWritingAlarmRow from "../alarmrows/AddWritingAlarmRow";
+import FollowingAlarmRow from "../alarmrows/FollowingAlarmRow";
+import RankInAlarmRow from "../alarmrows/RankInAlarmRow";
 import SpinningSvg from "../components/SpinningSvg";
 import UserContext from "../context/user";
 import { getFirestoreAlarmType } from "../type";
@@ -130,6 +131,15 @@ const AlarmModal: React.FC<props> = ({
                   setUnConfirmedAlarms={setUnConfirmedAlarms}
                 />
               );
+            } else if (data.category === "RANKIN") {
+              <RankInAlarmRow
+                key={`${index}_RANKIN`}
+                data={data}
+                index={index}
+                setAlarmValues={setAlarmValues}
+                setAlarmKeys={setAlarmKeys}
+                setUnConfirmedAlarms={setUnConfirmedAlarms}
+              />;
             } else {
               return (
                 <AddWritingAlarmRow

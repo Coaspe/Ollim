@@ -114,25 +114,15 @@ export const getComments = (commentsDocID: string[]) => {
 };
 
 export const getBestWritings = async () => {
-  const docs = await getDocs(
-    query(
-      collection(firestore, "allWritings"),
-      where("dateCreated", ">=", 1646092800000),
-      where("dateCreated", "<=", 1648771199000),
-      orderBy("dateCreated", "desc")
-    )
-  );
-  let returnValue: any = [];
-
-  docs.forEach((data) => {
-    if (data.data().likes.length > 0) {
-      returnValue.push({ ...data.data(), writingUID: data.id });
-    }
-  });
-
-  returnValue.sort((a: any, b: any) => b.likes.length - a.likes.length);
-
-  return returnValue.slice(0, 3);
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1) % 12 === 0 ? 12 : date.getMonth();
+  const data: any = (
+    await getDoc(doc(firestore, "Rank", `${year}.${month}`))
+  ).data();
+  const rankArray = [data["FIRST"], data["SECOND"], data["THIRD"]];
+  let writingData = await getWritingsArrayInfo(rankArray);
+  return writingData;
 };
 export const getAllWritings = async () => {
   const docs = await getDocs(collection(firestore, "allWritings"));

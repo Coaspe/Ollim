@@ -6,7 +6,20 @@ export type tableType = "OVERVIEW" | "WRITE" | "SETTING" | "BROWSE";
 export type gerneType = "NOVEL" | "POEM" | "SCENARIO";
 export type alarmType = "error" | "warning" | "info" | "success";
 export type contestType = "HOST" | "PARTICIPATION" | "TOTAL";
-export type alarmCategory = "ADDCOMMENT" | "FOLLOWING" | "NEWWRITING";
+export type alarmCategory =
+  | "ADDCOMMENT"
+  | "FOLLOWING"
+  | "NEWWRITING"
+  | "RANKIN";
+export type rankInType =
+  | "NEW"
+  | "THIRDTOSECOND"
+  | "SECONDTOFIRST"
+  | "THIRDTOFIRST";
+export type alarmRankInInfo = {
+  rankedInWritingTitle: string;
+  type: rankInType;
+};
 export type alarmCommitInfo = {
   commitKey: number;
   writingDocID: string;
@@ -50,7 +63,11 @@ export type getFirestoreAlarmType = {
   dateCreated: number;
   seen: boolean;
   key: string;
-  info?: alarmAddCommentInfo | alarmFollowingInfo | alarmAddWritingInfo;
+  info?:
+    | alarmAddCommentInfo
+    | alarmFollowingInfo
+    | alarmAddWritingInfo
+    | alarmRankInInfo;
 };
 
 export type getFirestoreUserWritings = {

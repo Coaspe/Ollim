@@ -70,7 +70,6 @@ const Header: React.FC<props> = ({ userInfo }) => {
           return originKeys;
         });
         setAlarmValues((originValues) => {
-          console.log("setAlarmValues Activated");
 
           let tmp: string[] = [];
           originValues.forEach((data) => {
@@ -127,7 +126,7 @@ const Header: React.FC<props> = ({ userInfo }) => {
           >
             {userInfo.username}
           </span>
-          <div className="relative">
+          <div className="relative" style={{ zIndex: 1000 }}>
             <Tooltip title={unConfirmedAlarms.length} placement="top" arrow>
               <motion.svg
                 fill={unConfirmedAlarms.length === 0 ? "#555" : "#d84742"}

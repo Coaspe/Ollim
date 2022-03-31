@@ -16,7 +16,7 @@ const BestWriting: React.FC<props> = ({ data, medal }) => {
   return (
     <div
       onClick={() => {
-        navigator(`/writings/${data.userUID}/${data.writingUID}`);
+        navigator(`/writings/${data.userUID}/${data.writingDocID}`);
       }}
       className="relative w-full h-full"
     >

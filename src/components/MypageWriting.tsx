@@ -53,13 +53,13 @@ const MypageWriting: React.FC<props> = ({ data, widthSize }) => {
           )}
           <div className="mb-3 flex items-center justify-between GalaxyS20Ultra:flex-col">
             <div className="flex items-center space-x-3">
-              <span className="text-xl font-black">
+              <span className="text-xl font-black GalaxyS20Ultra:text-sm">
                 {data.title.length > 9
                   ? `${data.title.slice(0, 10)} ...`
                   : data.title}
               </span>
               <span className="font-bold text-lg">·</span>
-              <span className="text-sm text-gray-700 font-black">
+              <span className="text-sm text-gray-700 font-black GalaxyS20Ultra:text-xs">
                 {gerneType[data.genre as genre]}
               </span>
             </div>
