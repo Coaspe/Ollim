@@ -108,7 +108,7 @@ const SlateEditorRDOnly = ({
       );
     });
     test.current = false;
-  }, []);
+  }, [writingDocID]);
 
   // Get writing's collection's lastest value
   useEffect(() => {

@@ -621,7 +621,7 @@ const Mypage = () => {
                       whileHover={{ y: "-10%" }}
                       className="px-4 py-3 rounded-2xl bg-white shadow-md font-semibold"
                     >
-                      공모전 개최
+                      백일장 개최
                     </motion.button>
                   )}
                 <motion.button
