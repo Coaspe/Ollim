@@ -137,7 +137,7 @@ const CommentRow: React.FC<props> = ({
           opacity: [0, 1],
           backgroundColor: isAlarmComment ? ["#fff", "#aaa", "#fff"] : [],
         }}
-        className="flex flex-col items-start justify-center w-full h-fit border-t border-opacity-10 shadow-md px-3 py-3"
+        className="flex flex-col items-start justify-center w-full border-t border-opacity-10 shadow-md px-3 py-3"
       >
         <div className="flex items-center justify-between mb-3 w-full">
           <div className="flex items-center">
@@ -204,9 +204,9 @@ const CommentRow: React.FC<props> = ({
         </div>
         <textarea
           value={content}
-          rows={1}
           readOnly
-          className="w-full h-fit resize-none focus:outline-none"
+          style={{ maxHeight: "100px" }}
+          className="w-full focus:outline-none"
         />
       </motion.div>
     </AnimatePresence>
