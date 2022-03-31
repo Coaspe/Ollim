@@ -1,4 +1,4 @@
-import { memo, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "../components/Header";
 import UserContext from "../context/user";
@@ -9,24 +9,20 @@ import {
   getAllWritings,
   getUserByUID,
   getAllUsers,
-  text,
 } from "../services/firebase";
-import { gerneType, getFirestoreUser } from "../type";
+import { getFirestoreUser } from "../type";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
 import { AnimatePresence, motion } from "framer-motion";
 import WriterRecommandation from "../components/WriterRecommandation";
 import BestWritings from "../components/BestWritings";
-import { useNavigate } from "react-router-dom";
 import SearchAutoComplete from "../SearchAutoComplete/SearchAutoComplete";
-import { genreMatching } from "./Writing";
 import FormatResultWriting from "../SearchAutoComplete/FormatResultWriting";
 import FormatResultUser from "../SearchAutoComplete/FormatResultUser";
 
 const Community = () => {
   const { user: contextUser } = useContext(UserContext);
   const dispatch = useDispatch();
-  const navigator = useNavigate();
   // Header context userInfo
   const setUserInfo = (userInfo: getFirestoreUser) => {
     dispatch(userInfoAction.setUserInfo({ userInfo }));
@@ -60,6 +56,7 @@ const Community = () => {
       });
     getAllWritings();
   }, [contextUser.uid]);
+
   useEffect(() => {
     const handleGetAllBestWritingInfo = async () => {
       setAllBestWritingInfo(await getBestWritings());
@@ -179,7 +176,7 @@ const Community = () => {
               {recommandedUsers.map((data, index) => (
                 <div
                   key={index}
-                  className="w-1/3 min-w-1/3 GalaxyS20Ultra:w-full GalaxyS20Ultra:min-w-full GalaxyS20Ultra:snap-center"
+                  className="w-full min-w-1/3 GalaxyS20Ultra:min-w-full GalaxyS20Ultra:snap-center"
                 >
                   <WriterRecommandation key={data.uid} data={data} />
                 </div>

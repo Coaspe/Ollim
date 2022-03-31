@@ -21,4 +21,4 @@ const firestore = getFirestore(Firebase);
 const storageRef = getStorage(Firebase);
 const rtDBRef = getDatabase(Firebase);
 
-export { firebase, firestore, FieldValue, storageRef, rtDBRef };
+export { Firebase, firebase, firestore, FieldValue, storageRef, rtDBRef };

@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import UserContext from "../context/user";
 import CustomNodeFlowRDOnly from "../diagram/RelationShipDiagramReadOnly";
@@ -44,7 +44,7 @@ export const genreMatching = {
 
 const Writing = () => {
   // User Info Variables
-  const { uid, genre, writingDocID } = useParams();
+  const { uid, writingDocID, commentDocID } = useParams();
 
   // ContextUser's information
   const { user: contextUser } = useContext(UserContext);
@@ -113,7 +113,7 @@ const Writing = () => {
   // alarm state
   // alarm[0] : alarm message, alarm[1] : alarm type, alarm[2] : alarm on, off
   const alarm = useSelector((state: RootState) => state.setAlarm.alarm);
-
+  const test = useRef(false);
   // useEffect to get context user's information
   useEffect(() => {
     if (contextUser && contextUser.email) {
@@ -139,7 +139,10 @@ const Writing = () => {
 
   // Get writing info and set relevant states
   useEffect(() => {
-    if (writingDocID && genre && (table === "OVERVIEW" || table === "WRITE")) {
+    if (
+      writingDocID &&
+      (table === "OVERVIEW" || table === "WRITE" || table === "BROWSE")
+    ) {
       getWritingInfo(writingDocID).then((res: any) => {
         if (res.genre !== "POEM") {
           // Poem doesn't have diagram, diagram's elements fields
@@ -256,9 +259,12 @@ const Writing = () => {
       setWidthSize(window.innerWidth);
     };
   }, []);
+  useEffect(() => {
+    commentDocID && navigator(`/writings/${uid}/${writingDocID}`);
+  }, []);
   return (
     <>
-      {Object.keys(writingInfo).length > 0 && uid && genre && writingDocID && (
+      {Object.keys(writingInfo).length > 0 && uid && writingDocID && (
         <div className="w-full bg-opacity-30 relative writing-container font-noto">
           {/* Alarm */}
           <AnimatePresence>
@@ -403,7 +409,7 @@ const Writing = () => {
 
           {/* Table OVERVIEW */}
           {table === "OVERVIEW" &&
-            (genre === "POEM" ? (
+            (writingInfo.genre === "POEM" ? (
               <div className="w-full h-full flex flex-col items-start px-20 mt-20 GalaxyS20Ultra:px-10">
                 {/* Synopsis div */}
                 <div className="flex flex-col w-2/3 GalaxyS20Ultra:w-full">
@@ -473,7 +479,12 @@ const Writing = () => {
               <SlateEditorRDOnly
                 writingDocID={writingDocID}
                 genre={writingInfo.genre}
+                contextUserInfo={contextUserInfo}
                 widthSize={widthSize}
+                alarmCommentDocID={
+                  commentDocID === undefined ? "" : commentDocID
+                }
+                test={test}
               />
             </div>
           )}

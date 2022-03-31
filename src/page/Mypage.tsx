@@ -8,10 +8,11 @@ import {
   getUserByUID,
   getFollowersInfinite,
   getFollowingsInfinite,
+  getContetsArrayInfo,
 } from "../services/firebase";
 import Compressor from "compressorjs";
 import { signOutAuth } from "../helpers/auth-OAuth2";
-import NewWritingModal from "../components/NewWritingModal";
+import NewWritingModal from "../modals/NewWritingModal";
 import CustomNodeFlow from "../diagram/RelationShipDiagram";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
@@ -20,6 +21,8 @@ import {
   getFirestoreWriting,
   getFirestoreUser,
   getFirestoreUserWritings,
+  getFirestoreContest,
+  contestType,
 } from "../type";
 import { alarmAction, userInfoAction, widthSizeAction } from "../redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -31,6 +34,9 @@ import FollowingRow from "../components/FollowingRow";
 import FollowerRow from "../components/FollowerRow";
 import FollowersFollowingsSkeleton from "../components/FollowersFollowingsSkeleton";
 import Header from "../components/Header";
+import Select from "react-select";
+import NewContestModal from "../modals/NewContestModal";
+import ContestRow from "../components/ContestRow";
 
 const Mypage = () => {
   // Profile owner's uid
@@ -65,8 +71,13 @@ const Mypage = () => {
   );
   // New Writing modal state
   const [newWritingModalOpen, setNewWritingModalOpen] = useState(false);
-  // Category state
+  // New Contest modal state
+  const [newContestModalOpen, setNewContestModalOpen] = useState(false);
+  // Writing category state
   const [onWritingCategory, setOnWritingCategory] = useState("TOTAL");
+  // Contest category state
+  const [contestCategory, setContestCategory] = useState<contestType>("TOTAL");
+
   // Does User Follow Profile Owner?
   const [doseUserFollow, setDoseUserFollow] = useState(false);
   // Profile owner's poems list
@@ -80,6 +91,9 @@ const Mypage = () => {
     Array<getFirestoreWriting>
   >([]);
 
+  const [totalContests, setTotalContests] = useState<
+    Array<getFirestoreContest>
+  >([]);
   const navigator = useNavigate();
   const dispatch = useDispatch();
 
@@ -149,8 +163,6 @@ const Mypage = () => {
 
   useEffect(() => {
     window.onresize = () => {
-      console.log(window.innerWidth);
-
       setWidthSize(window.innerWidth);
     };
   }, []);
@@ -217,12 +229,25 @@ const Mypage = () => {
           .sort((a, b) => b.dateCreated - a.dateCreated)
       );
     };
+    const getContests = async (contestsDocID: {
+      host: string[];
+      participation: string[];
+    }) => {
+      const host = contestsDocID["host"];
+      const participation = contestsDocID["participation"];
+      console.log(Array.prototype.concat(host, participation));
 
+      const tmp: Array<any> = contestsDocID
+        ? await getContetsArrayInfo(Array.prototype.concat(host, participation))
+        : [];
+      tmp && setTotalContests(tmp);
+    };
     // Get user information
     getUserByUID(uid as string).then((res: any) => {
       const data = res.docs[0].data();
       setProfileOwnerInfo(data);
       setProfileImage(data.profileImg);
+      getContests(data.contests);
       getUserWritings(data.uid).then((writings: any) => {
         setUserWritings(writings as getFirestoreUserWritings);
         getWritings(writings);
@@ -307,7 +332,11 @@ const Mypage = () => {
       y: -10,
     },
   };
-
+  const options: Array<{ value: contestType; label: string }> = [
+    { value: "PARTICIPATION", label: "참가" },
+    { value: "HOST", label: "개최" },
+    { value: "TOTAL", label: "전체" },
+  ];
   return (
     <>
       {/* Followers Modal */}
@@ -436,14 +465,16 @@ const Mypage = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
+      {/* New Writing Modal */}
+      {newWritingModalOpen && (
+        <NewWritingModal setNewWritingModalOpen={setNewWritingModalOpen} />
+      )}
+      {/* New Writing Modal */}
+      {newContestModalOpen && (
+        <NewContestModal setNewContestModalOpen={setNewContestModalOpen} />
+      )}
       {profileOwnerInfo && profileImage ? (
-        <div className="relative w-full font-noto bg-opacity-30">
-          {/* New Writing Modal */}
-          {newWritingModalOpen && (
-            <NewWritingModal setNewWritingModalOpen={setNewWritingModalOpen} />
-          )}
-
+        <div className="relative w-full h-full font-noto bg-opacity-30">
           {/* Header */}
           <Header userInfo={userInfo} />
 
@@ -484,14 +515,15 @@ const Mypage = () => {
                         origin
                           ? (followersLength.current -= 1)
                           : (followersLength.current += 1);
-                        axios.post(
-                          `https://ollim.herokuapp.com/updateFollowing`,
-                          {
-                            followingUserEmail: userInfo.userEmail,
-                            followedUserEmail: profileOwnerInfo.userEmail,
-                            followingState: origin,
-                          }
-                        );
+                        // https://ollim.herokuapp.com
+                        axios.post(`http://localhost:3001/updateFollowing`, {
+                          followingUserEmail: userInfo.userEmail,
+                          followedUserEmail: profileOwnerInfo.userEmail,
+                          followingUserUID: userInfo.uid,
+                          followedUserUID: profileOwnerInfo.uid,
+                          followingUsername: userInfo.username,
+                          followingState: origin,
+                        });
                         return !origin;
                       });
                     }}
@@ -564,18 +596,31 @@ const Mypage = () => {
                   </div>
                 </div>
               }
-              <div className="flex w-full items-center justify-center my-10">
-                {widthSize > 500 && (
+              <div className="flex w-full items-center justify-center my-10 space-x-5">
+                {widthSize > 500 && contextUser && uid === contextUser.uid && (
                   <motion.button
                     onClick={() => {
                       setNewWritingModalOpen(true);
                     }}
                     whileHover={{ y: "-10%" }}
-                    className="mr-5 px-4 py-3 rounded-2xl bg-white shadow-md font-semibold"
+                    className="px-4 py-3 rounded-2xl bg-white shadow-md font-semibold"
                   >
                     새 작품 추가
                   </motion.button>
                 )}
+                {contextUser &&
+                  uid === contextUser.uid &&
+                  userInfo.contestAuth && (
+                    <motion.button
+                      onClick={() => {
+                        setNewContestModalOpen(true);
+                      }}
+                      whileHover={{ y: "-10%" }}
+                      className="px-4 py-3 rounded-2xl bg-white shadow-md font-semibold"
+                    >
+                      공모전 개최
+                    </motion.button>
+                  )}
                 <motion.button
                   onClick={handleGoToCommunity}
                   whileHover={{ y: "-10%" }}
@@ -592,14 +637,24 @@ const Mypage = () => {
               />
 
               {/* On writing */}
-              <div className="flex items-center flex-col my-20 w-2/3 GalaxyS20Ultra:my-10">
-                <div className="w-full grid grid-cols-3 items-center mb-20 GalaxyS20Ultra:flex GalaxyS20Ultra:flex-col GalaxyS20Ultra:items-center GalaxyS20Ultra:space-y-10 GalaxyS20Ultra:mb-10">
+              <div className="flex px-5 py-5 items-center flex-col my-20 w-2/3 GalaxyS20Ultra:my-10">
+                <div className="w-full grid grid-cols-3 items-center mb-10 GalaxyS20Ultra:flex GalaxyS20Ultra:flex-col GalaxyS20Ultra:items-center GalaxyS20Ultra:space-y-10">
                   <span className="text-2xl font-bold justify-center col-start-2 w-full text-center">
                     작가의 글
                   </span>
                   <div className="flex items-center place-self-end col-start-3 gap-4 text-sm GalaxyS20Ultra:w-full GalaxyS20Ultra:justify-center">
                     <Tooltip title="소설" placement="top" arrow>
-                      <span
+                      <motion.span
+                        animate={{
+                          color:
+                            onWritingCategory === "NOVEL"
+                              ? "#334155"
+                              : "#94a3b8",
+                          backgroundColor:
+                            onWritingCategory === "NOVEL"
+                              ? "#f5e1db"
+                              : "transparent",
+                        }}
                         onClick={() => {
                           setOnWritingCategory("NOVEL");
                         }}
@@ -611,57 +666,78 @@ const Mypage = () => {
                         }`}
                       >
                         menu_book
-                      </span>
+                      </motion.span>
                     </Tooltip>
                     <Tooltip title="시" placement="top" arrow>
-                      <span
+                      <motion.span
+                        animate={{
+                          color:
+                            onWritingCategory === "POEM"
+                              ? "#334155"
+                              : "#94a3b8",
+                          backgroundColor:
+                            onWritingCategory === "POEM"
+                              ? "#f5e1db"
+                              : "transparent",
+                        }}
                         onClick={() => {
                           setOnWritingCategory("POEM");
                         }}
                         style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
-                        className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${
-                          onWritingCategory === "POEM"
-                            ? "text-slate-700 bg-genreSelectedBG"
-                            : "text-slate-400"
-                        }`}
+                        className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor`}
                       >
                         history_edu
-                      </span>
+                      </motion.span>
                     </Tooltip>
                     <Tooltip title="시나리오" placement="top" arrow>
-                      <span
+                      <motion.span
+                        animate={{
+                          color:
+                            onWritingCategory === "SCENARIO"
+                              ? "#334155"
+                              : "#94a3b8",
+                          backgroundColor:
+                            onWritingCategory === "SCENARIO"
+                              ? "#f5e1db"
+                              : "transparent",
+                        }}
                         onClick={() => {
                           setOnWritingCategory("SCENARIO");
                         }}
                         style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
-                        className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${
-                          onWritingCategory === "SCENARIO"
-                            ? "text-slate-700 bg-genreSelectedBG"
-                            : "text-slate-400"
-                        }`}
+                        className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor`}
                       >
                         adf_scanner
-                      </span>
+                      </motion.span>
                     </Tooltip>
                     <Tooltip title="전체" placement="top" arrow>
-                      <span
+                      <motion.span
+                        animate={{
+                          color:
+                            onWritingCategory === "TOTAL"
+                              ? "#334155"
+                              : "#94a3b8",
+                          backgroundColor:
+                            onWritingCategory === "TOTAL"
+                              ? "#f5e1db"
+                              : "transparent",
+                        }}
                         onClick={() => {
                           setOnWritingCategory("TOTAL");
                         }}
                         style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
-                        className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${
-                          onWritingCategory === "TOTAL"
-                            ? "text-slate-700 bg-genreSelectedBG"
-                            : "text-slate-400"
-                        }`}
+                        className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor`}
                       >
                         clear_all
-                      </span>
+                      </motion.span>
                     </Tooltip>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 items-center justify-between w-full gap-5 GalaxyS20Ultra:flex GalaxyS20Ultra:flex-col GalaxyS20Ultra:items-center GalaxyS20Ultra:overflow-y-scroll GalaxyS20Ultra:max-h-72 GalaxyS20Ultra:py-5 GalaxyS20Ultra:px-3">
+                <motion.div
+                  layout
+                  className="grid grid-cols-3 items-center justify-between w-full gap-5 GalaxyS20Ultra:flex GalaxyS20Ultra:flex-col GalaxyS20Ultra:items-center GalaxyS20Ultra:overflow-y-scroll GalaxyS20Ultra:max-h-72 GalaxyS20Ultra:py-5 GalaxyS20Ultra:px-3"
+                >
                   {onWritingCategory === "NOVEL" &&
                     novels &&
                     novels.map((data) => (
@@ -691,7 +767,7 @@ const Mypage = () => {
                     ))}
                   {onWritingCategory === "TOTAL" &&
                     totalWritings &&
-                    totalWritings.map((data, index) => {
+                    totalWritings.map((data) => {
                       return (
                         <MypageWriting
                           key={data.dateCreated}
@@ -700,7 +776,39 @@ const Mypage = () => {
                         />
                       );
                     })}
+                </motion.div>
+              </div>
+
+              {/* Contest */}
+              <div className="flex items-center flex-col mb-20 w-2/3 GalaxyS20Ultra:mb-10">
+                <div className="w-full grid grid-cols-3 items-center mb-10 GalaxyS20Ultra:flex GalaxyS20Ultra:flex-col GalaxyS20Ultra:items-center GalaxyS20Ultra:space-y-10">
+                  <span className="text-2xl font-bold justify-center col-start-2 w-full text-center">
+                    올림 문예지
+                  </span>
+                  <div className="flex items-center place-self-end col-start-3 text-sm GalaxyS20Ultra:w-full GalaxyS20Ultra:justify-center">
+                    <Select
+                      options={options}
+                      defaultValue={options[2]}
+                      onChange={(e) => {
+                        e && setContestCategory(e.value);
+                      }}
+                    />
+                  </div>
                 </div>
+
+                <motion.div
+                  layout
+                  className="grid grid-cols-3 items-center justify-between w-full gap-5 GalaxyS20Ultra:flex GalaxyS20Ultra:flex-col GalaxyS20Ultra:items-center GalaxyS20Ultra:overflow-y-scroll GalaxyS20Ultra:max-h-72 GalaxyS20Ultra:py-5 GalaxyS20Ultra:px-3"
+                >
+                  {contestCategory === "TOTAL" &&
+                    totalContests.map((data) => (
+                      <ContestRow
+                        key={data.dateCreated}
+                        data={data}
+                        widthSize={widthSize}
+                      />
+                    ))}
+                </motion.div>
               </div>
             </div>
           </div>

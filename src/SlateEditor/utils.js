@@ -7,7 +7,6 @@ export const Leaf = ({ attributes, children, leaf }) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>;
   }
-  console.log(leaf);
   if (leaf.code) {
     children = <code>{children}</code>;
   }

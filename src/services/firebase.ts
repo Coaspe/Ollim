@@ -1,4 +1,4 @@
-import { firebase, firestore, rtDBRef } from "../lib/firebase";
+import { firestore, rtDBRef } from "../lib/firebase";
 import {
   doc,
   getDoc,
@@ -8,13 +8,12 @@ import {
   query,
   where,
   getDocs,
-  DocumentData,
-  updateDoc,
   orderBy,
 } from "firebase/firestore";
 import { toObjectElements } from "../type";
+import { ref, remove } from "firebase/database";
 
-export const singInWithGoogleInfoToFB = (info: any) => {
+export const signInWithGoogleInfo = (info: any) => {
   setDoc(doc(firestore, "writings", info.user.uid), {
     novelDocID: [],
     poemDocID: [],
@@ -30,6 +29,7 @@ export const singInWithGoogleInfoToFB = (info: any) => {
     dateCreated: Date.now(),
     profileImg: info.user.photoURL,
     profileCaption: "",
+    contestAuth: false,
   });
 };
 
@@ -93,7 +93,17 @@ export const getFollowingsInfinite = async (
     query(collection(firestore, "users"), where("__name__", "in", tmp))
   );
 };
+export const getCommentsInfinite = (commentsDocID: string[], key: number) => {
+  let tmp = commentsDocID
+    .slice()
+    .reverse()
+    .slice(key, key + 5);
+  console.log(tmp);
 
+  return getDocs(
+    query(collection(firestore, "comments"), where("__name__", "in", tmp))
+  );
+};
 export const getComments = (commentsDocID: string[]) => {
   return getDocs(
     query(
@@ -120,7 +130,7 @@ export const getBestWritings = async () => {
     }
   });
 
-  returnValue.sort((b: any, a: any) => b.likes.length - a.likes.length);
+  returnValue.sort((a: any, b: any) => b.likes.length - a.likes.length);
 
   return returnValue.slice(0, 3);
 };
@@ -141,79 +151,18 @@ export const getAllUsers = async () => {
   return returnValue;
 };
 
-export const text = async () => {
-  const docs = (
-    await getDoc(doc(firestore, "poem", "Fi37T65kdJXOGnt61647"))
-  ).data();
-  setDoc(doc(firestore, "allWritings", "Fi37T65kdJXOGnt61647"), { ...docs });
+export const getContetsArrayInfo = (contestsDocID: string[]) => {
+  return Promise.all(
+    contestsDocID.map(async (docID: string) => {
+      const tmp = await getDoc(doc(firestore, "contests", docID));
+      if (tmp.exists()) {
+        const data = tmp.data();
+        return { ...data, contestDocID: tmp.id };
+      }
+    })
+  );
 };
-// export const copyPasteCommits = async () => {
-//   let s = await getDocs(collection(firestore, "poem"));
-//   s.forEach(async (document: DocumentData) => {
-//     const currentCommits = (
-//       (await getDoc(doc(firestore, "poem", document.id))).data() as DocumentData
-//     ).commits;
-//     const currentTempSave = (
-//       (await getDoc(doc(firestore, "poem", document.id))).data() as DocumentData
-//     ).tempSave;
-//     const update: any = {};
-//     update["isCollection"] = false;
-//     update["collection.1.commits"] = currentCommits;
-//     update["collection.1.tempSave"] = currentTempSave;
-//     updateDoc(doc(firestore, "poem", document.id), update);
-//   });
-// };
 
-// export const copyPasteCommitsNovel = async () => {
-//   let s = await getDocs(collection(firestore, "novel"));
-//   s.forEach(async (document: DocumentData) => {
-//     const currentCommits = (
-//       (
-//         await getDoc(doc(firestore, "novel", document.id))
-//       ).data() as DocumentData
-//     ).commits;
-//     const currentTempSave = (
-//       (
-//         await getDoc(doc(firestore, "novel", document.id))
-//       ).data() as DocumentData
-//     ).tempSave;
-//     const update: any = {};
-//     update["isCollection"] = false;
-//     update["collection.1.commits"] = currentCommits;
-//     update["collection.1.tempSave"] = currentTempSave;
-//     updateDoc(doc(firestore, "novel", document.id), update);
-//   });
-// };
-
-// export const edit = async () => {
-//   let s = (
-//     (await getDoc(
-//       doc(firestore, "poem", "fjaG0EG64pq39AFWHFp3")
-//     )) as DocumentData
-//   ).data();
-//   let objec: any = Object.values(s.collection)[0];
-//   let update: any = {};
-//   update["collection.1"] = objec;
-//   updateDoc(doc(firestore, "poem", "fjaG0EG64pq39AFWHFp3"), update);
-// };
-
-// export const integration = async () => {
-//   const novelDocs = await getDocs(collection(firestore, "novel"));
-//   const poemDocs = await getDocs(collection(firestore, "poem"));
-//   novelDocs.forEach((data) => {
-//     setDoc(doc(firestore, "allWritings", data.id), data.data());
-//   });
-//   poemDocs.forEach((data) => {
-//     setDoc(doc(firestore, "allWritings", data.id), data.data());
-//   });
-// };
-
-// export const giveLikesLength = async () => {
-//   const docs = await getDocs(collection(firestore, "allWritings"));
-//   docs.forEach((data) => {
-//     setDoc(doc(firestore, "allWritings", data.id), {
-//       ...data.data(),
-//       likesLength: 0,
-//     });
-//   });
-// };
+export const removeAlarm = (alarmID: string, userUID: string) => {
+  return remove(ref(rtDBRef, `alarms/${userUID}/${alarmID}`));
+};

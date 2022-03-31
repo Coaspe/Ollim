@@ -3,7 +3,6 @@ import useAuthListner from "./hooks/useAuth";
 import { lazy, Suspense } from "react";
 import UserContext from "./context/user";
 import IsUserLoggedIn from "./helpers/Is-user-logged-in";
-import ProtectedRoute from "./helpers/Protected-route";
 import Community from "./page/Community";
 import Writing from "./page/Writing";
 
@@ -39,17 +38,10 @@ const App = () => {
               }
             />
             <Route
-              path="/writings/:uid/:genre/:writingDocID"
+              path="/writings/:uid/:writingDocID/:commentDocID"
               element={<Writing />}
             />
-            {/* <Route
-              path="/signup"
-              element={
-                <IsUserLoggedIn user={user}>
-                  <Signup />
-                </IsUserLoggedIn>
-              }
-            /> */}
+            <Route path="/writings/:uid/:writingDocID" element={<Writing />} />
           </Routes>
         </Suspense>
       </Router>

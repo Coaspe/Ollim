@@ -5,7 +5,32 @@ export type genre = "SCENARIO" | "POEM" | "NOVEL";
 export type tableType = "OVERVIEW" | "WRITE" | "SETTING" | "BROWSE";
 export type gerneType = "NOVEL" | "POEM" | "SCENARIO";
 export type alarmType = "error" | "warning" | "info" | "success";
-
+export type contestType = "HOST" | "PARTICIPATION" | "TOTAL";
+export type alarmCategory = "ADDCOMMENT" | "FOLLOWING" | "NEWWRITING";
+export type alarmCommitInfo = {
+  commitKey: number;
+  writingDocID: string;
+  writingTitle: string;
+  writingOwnerUID: string;
+};
+export type alarmAddCommentInfo = {
+  commentDocID: string;
+  commentUserUID: string;
+  commentUsername: string;
+  writingOwnerUID: string;
+  writingDocID: string;
+  writingTitle: string;
+};
+export type alarmFollowingInfo = {
+  followingUserUID: string;
+  followingUsername: string;
+};
+export type alarmAddWritingInfo = {
+  writingDocID: string;
+  writingTitle: string;
+  writingOwnerUID: string;
+  writingOwnerUsername: string;
+};
 export type getFirestoreUser = {
   dateCreated: number;
   followers: Array<string>;
@@ -16,6 +41,16 @@ export type getFirestoreUser = {
   userEmail: string;
   username: string;
   writingDocID: Array<string>;
+  contestAuth: boolean;
+  contests: Array<string>;
+};
+
+export type getFirestoreAlarmType = {
+  category: alarmCategory;
+  dateCreated: number;
+  seen: boolean;
+  key: string;
+  info?: alarmAddCommentInfo | alarmFollowingInfo | alarmAddWritingInfo;
 };
 
 export type getFirestoreUserWritings = {
@@ -51,7 +86,19 @@ export type addWritingArg = {
   disclosure: string;
   writingUID?: string;
 };
-
+export interface addContestArg {
+  limitNumOfPeople: number;
+  title: string;
+  genre: genre;
+  description: string;
+  hostEmail: string;
+  deadline: string;
+  writings: { [key: string]: { writingDocID: string; updateDate: number } };
+  dateCreated: number;
+}
+export interface getFirestoreContest extends addContestArg {
+  contestDocID: string;
+}
 export type getFirestoreWriting = {
   collection: collectionType;
   dateCreated: number;

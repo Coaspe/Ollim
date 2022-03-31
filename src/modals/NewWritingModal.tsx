@@ -6,14 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import DiagramNewWritings from "../diagram/RelationShipDiagramNewWritings";
 import { alarmAction, elementsAction } from "../redux";
 import { RootState } from "../redux/store";
-import {
-  addWritingArg,
-  commitType,
-  genre,
-  page,
-  disclosure,
-  alarmType,
-} from "../type";
+import { addWritingArg, genre, page, disclosure, alarmType } from "../type";
 interface NewWritingProps {
   setNewWritingModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -85,6 +78,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
         }
       });
   };
+
   return (
     <motion.div
       onClick={() => {

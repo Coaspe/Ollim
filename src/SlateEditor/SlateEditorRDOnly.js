@@ -1,21 +1,28 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { Editable, withReact, Slate, ReactEditor } from "slate-react";
 import { createEditor } from "slate";
 import { withHistory } from "slate-history";
 import { cx, css } from "@emotion/css";
-import { getComments, getWritingInfo } from "../services/firebase";
+import { getCommentsInfinite, getWritingInfo } from "../services/firebase";
 import { AnimatePresence, motion } from "framer-motion";
 import { Leaf } from "./utils";
 import ParagraphWithoutNum from "./paragraphWithoutNum";
 import CommentRow from "../components/CommentRow";
 import axios from "axios";
-import UserContext from "../context/user";
 import SpinningSvg from "../components/SpinningSvg";
 import { Tooltip } from "@mui/material";
 import { isFullScreenAction } from "../redux";
 import { useDispatch, useSelector } from "react-redux";
 
-const SlateEditorRDOnly = ({ writingDocID, genre, widthSize }) => {
+const SlateEditorRDOnly = ({
+  writingDocID,
+  genre,
+  widthSize,
+  contextUserInfo,
+  alarmCommentDocID,
+  test,
+}) => {
+  const [commentLoading, setCommentLoading] = useState(false);
   // SlateEditor value state
   const [value, setValue] = useState([]);
   // Selected commit key
@@ -42,7 +49,6 @@ const SlateEditorRDOnly = ({ writingDocID, genre, widthSize }) => {
 
   // Comment Text state
   const [commentText, setCommentText] = useState("");
-  const { user } = useContext(UserContext);
 
   // Now selected collection num state
   const [nowCollectionNum, setNowCollectionNum] = useState(0);
@@ -88,26 +94,29 @@ const SlateEditorRDOnly = ({ writingDocID, genre, widthSize }) => {
     getWritingInfo(writingDocID).then((res) => {
       setWritingInfo(res);
       nowCollectionNum === 0 && setNowCollectionNum(1);
-      setCommentsDocID(res.comments ? Object.values(res.comments) : []);
+      setCommentsDocID(
+        res.comments
+          ? Object.values(
+              Object.keys(res.comments)
+                .sort()
+                .reduce((newObj, key) => {
+                  newObj[key] = res.comments[key];
+                  return newObj;
+                }, {})
+            )
+          : []
+      );
     });
+    test.current = false;
   }, []);
-
-  // After getting commetsDocID in writing's information, request comments information to firestore
-  useEffect(() => {
-    if (commentsDocID.length !== 0) {
-      getComments(commentsDocID).then((res) => {
-        setComments(
-          res.docs.map((data) => ({ ...data.data(), docID: data.id }))
-        );
-      });
-    }
-  }, [commentsDocID]);
 
   // Get writing's collection's lastest value
   useEffect(() => {
     if (Object.keys(writingInfo).length !== 0 && nowCollectionNum) {
-      const elementCommits = writingInfo.collection[nowCollectionNum].commits;
-      if (Object.keys(elementCommits).length !== 0) {
+      setLoading(false);
+      const elementCommits =
+        writingInfo.collection[nowCollectionNum.toString()].commits;
+      if (elementCommits.length > 0) {
         // Get lastest commit
         const keys = Object.keys(elementCommits);
         const lastestCommit = elementCommits[keys[keys.length - 1]];
@@ -118,8 +127,17 @@ const SlateEditorRDOnly = ({ writingDocID, genre, widthSize }) => {
             : lastestCommitKey[1];
         setValue(lastestCommit[lastDate]);
         setSelectedKey(lastDate);
+      } else {
+        setValue([
+          {
+            children: [
+              { fontSize: 16, fontSytle: "font-noto", text: "", type: "text" },
+            ],
+            type: "paragraph",
+          },
+        ]);
+        setSelectedKey("");
       }
-      setLoading(true);
     }
   }, [writingInfo, nowCollectionNum]);
 
@@ -127,6 +145,36 @@ const SlateEditorRDOnly = ({ writingDocID, genre, widthSize }) => {
   useEffect(() => {
     value.length > 0 && setLoading(true);
   }, [value]);
+
+  // Loaded Comments Count key
+  const commetsKey = useRef(0);
+  const commentLoadFirst = useRef(true);
+
+  const handleMoreComments = useCallback(() => {
+    if (commentLoadFirst.current) {
+      commentLoadFirst.current = false;
+    }
+    setCommentLoading(true);
+    if (commentsDocID.length > 0 && commetsKey.current < commentsDocID.length) {
+      getCommentsInfinite(commentsDocID, commetsKey.current).then((res) => {
+        let tmp = res.docs
+          .map((doc) => ({
+            ...doc.data(),
+            docID: doc.id,
+          }))
+          .sort((a, b) => b.dateCreated - a.dateCreated);
+        setComments((origin) => {
+          return [...origin, ...tmp];
+        });
+        commetsKey.current += tmp.length;
+      });
+    }
+  }, [commentsDocID]);
+  useEffect(() => {
+    if (openCommentsModal && commentLoadFirst.current) {
+      handleMoreComments();
+    }
+  }, [openCommentsModal]);
 
   // Comment modal framer-motion variant
   const commentsModalVariants = {
@@ -144,24 +192,24 @@ const SlateEditorRDOnly = ({ writingDocID, genre, widthSize }) => {
   const handleAddComment = () => {
     setCommentText("");
     setCommentButtonDisabled(true);
-
     const dateCreated = new Date().getTime();
     const commentInfo = {
       replies: {},
       content: commentText,
-      commentOwnerUID: user.uid,
+      commentOwnerUID: contextUserInfo.uid,
       likes: [],
       dateCreated,
     };
+    // https://ollim.herokuapp.com/addComment
     axios
-      .post("https://ollim.herokuapp.com/addComment", {
+      .post("http://localhost:3001/addComment", {
         writingDocID,
-        genre,
+        writingTitle: writingInfo.title,
+        writingOwnerUID: writingInfo.userUID,
         commentInfo: JSON.stringify(commentInfo),
+        commentUserInfo: JSON.stringify(contextUserInfo),
       })
       .then((res) => {
-        console.log(res);
-
         if (res.data[1] === "success") {
           commentInfo["docID"] = res.data[3];
           setComments((origin) => [commentInfo, ...origin]);
@@ -169,7 +217,9 @@ const SlateEditorRDOnly = ({ writingDocID, genre, widthSize }) => {
         setCommentButtonDisabled(false);
       });
   };
-
+  useEffect(() => {
+    comments.length > 0 && setCommentLoading(false);
+  }, [comments]);
   return (
     <>
       <AnimatePresence>
@@ -186,22 +236,36 @@ const SlateEditorRDOnly = ({ writingDocID, genre, widthSize }) => {
               layout
               className="w-full h-full gap-5 overflow-y-scroll py-2 px-4 flex flex-col items-center"
             >
-              {comments.length !== 0 ? (
-                comments.map((comment, index) => (
-                  <CommentRow
-                    genre={genre}
-                    writingDocID={writingDocID}
-                    key={comment.dateCreated}
-                    replies={comment.replies}
-                    content={comment.content}
-                    commentOwnerUID={comment.commentOwnerUID}
-                    likes={comment.likes}
-                    dateCreated={comment.dateCreated}
-                    docID={comment.docID}
-                    index={index}
-                    setComments={setComments}
-                  />
-                ))
+              {commentsDocID.length !== 0 ? (
+                <>
+                  {comments.map((comment, index) => (
+                    <CommentRow
+                      genre={genre}
+                      writingDocID={writingDocID}
+                      key={comment.dateCreated}
+                      replies={comment.replies}
+                      content={comment.content}
+                      commentOwnerUID={comment.commentOwnerUID}
+                      likes={comment.likes}
+                      dateCreated={comment.dateCreated}
+                      docID={comment.docID}
+                      index={index}
+                      setComments={setComments}
+                      isAlarmComment={comment.docID === alarmCommentDocID}
+                    />
+                  ))}
+                  {/* Load more followings button */}
+                  {commetsKey.current < commentsDocID.length && (
+                    <div
+                      onClick={handleMoreComments}
+                      className={`${
+                        commentLoading && "pointer-events-none"
+                      } font-semibold text-sm shadow-inner cursor-pointer w-1/2 bg-white h-10 flex items-center justify-center rounded-xl text-gray-500`}
+                    >
+                      {!commentLoading && "Load more..."}
+                    </div>
+                  )}
+                </>
               ) : (
                 <p className="text-2xl font-bold text-gray-400 font-Nanum_Gothic mt-5">
                   댓글이 없습니다. ㅠㅠ
@@ -370,6 +434,7 @@ const SlateEditorRDOnly = ({ writingDocID, genre, widthSize }) => {
       )}
       {loading ? (
         <Slate
+          readOnly
           editor={editor}
           value={value}
           onChange={(value) => {

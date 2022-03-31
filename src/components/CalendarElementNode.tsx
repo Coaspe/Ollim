@@ -6,8 +6,6 @@ interface props {
   elementCommits: { [key: number]: string[] };
 }
 const CalendarElementNode: React.FC<props> = ({ date, elementCommits }) => {
-  console.log(elementCommits[parseInt(date)]);
-
   type bgColorType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
   const bgColor = {
     1: "rgb(251 207 232)",

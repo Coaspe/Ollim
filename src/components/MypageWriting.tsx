@@ -21,10 +21,9 @@ const MypageWriting: React.FC<props> = ({ data, widthSize }) => {
   return (
     <motion.div
       layout
+      animate={{ opacity: [0, 1] }}
       onClick={() => {
-        navigator(
-          `/writings/${data.userUID}/${data.genre}/${data.writingDocID}`
-        );
+        navigator(`/writings/${data.userUID}/${data.writingDocID}`);
       }}
       onHoverStart={() => {
         setTimer(

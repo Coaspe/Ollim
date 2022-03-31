@@ -13,6 +13,7 @@ interface props extends commentType {
   index: number;
   genre: string;
   setComments: React.Dispatch<React.SetStateAction<any[]>>;
+  isAlarmComment?: boolean;
 }
 
 const CommentRow: React.FC<props> = ({
@@ -26,6 +27,7 @@ const CommentRow: React.FC<props> = ({
   setComments,
   writingDocID,
   genre,
+  isAlarmComment,
 }) => {
   const [commentOwnerInfo, setCommentOwnerInfo] = useState(
     {} as getFirestoreUser
@@ -131,7 +133,10 @@ const CommentRow: React.FC<props> = ({
     <AnimatePresence>
       <motion.div
         layout
-        animate={{ opacity: [0, 1] }}
+        animate={{
+          opacity: [0, 1],
+          backgroundColor: isAlarmComment ? ["#fff", "#aaa", "#fff"] : [],
+        }}
         className="flex flex-col items-start justify-center w-full h-fit border-t border-opacity-10 shadow-md px-3 py-3"
       >
         <div className="flex items-center justify-between mb-3 w-full">
