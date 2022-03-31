@@ -36,7 +36,7 @@ const AddCommentAlarmRow: React.FC<props> = ({
         onClick={(e) => {
           e.stopPropagation();
           axios
-            .post("http://localhost:3001/makeAlarmSeen", {
+            .post("https://ollim.herokuapp.com/makeAlarmSeen", {
               alarmKey: `${data.dateCreated}_ADDCOMMENT_${info.commentUserUID}`,
               userUID: user.uid,
             })

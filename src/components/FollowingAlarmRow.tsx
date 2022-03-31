@@ -32,7 +32,7 @@ const FollowingAlarmRow: React.FC<props> = ({
       onClick={(e) => {
         e.stopPropagation();
         axios
-          .post("http://localhost:3001/makeAlarmSeen", {
+          .post("https://ollim.herokuapp.com/makeAlarmSeen", {
             alarmKey: `${data.dateCreated}_FOLLOWING_${info.followingUserUID}`,
             userUID: user.uid,
           })

@@ -202,7 +202,7 @@ const SlateEditorRDOnly = ({
     };
     // https://ollim.herokuapp.com/addComment
     axios
-      .post("http://localhost:3001/addComment", {
+      .post("https://ollim.herokuapp.com/addComment", {
         writingDocID,
         writingTitle: writingInfo.title,
         writingOwnerUID: writingInfo.userUID,

@@ -516,14 +516,17 @@ const Mypage = () => {
                           ? (followersLength.current -= 1)
                           : (followersLength.current += 1);
                         // https://ollim.herokuapp.com
-                        axios.post(`http://localhost:3001/updateFollowing`, {
-                          followingUserEmail: userInfo.userEmail,
-                          followedUserEmail: profileOwnerInfo.userEmail,
-                          followingUserUID: userInfo.uid,
-                          followedUserUID: profileOwnerInfo.uid,
-                          followingUsername: userInfo.username,
-                          followingState: origin,
-                        });
+                        axios.post(
+                          `https://ollim.herokuapp.com/updateFollowing`,
+                          {
+                            followingUserEmail: userInfo.userEmail,
+                            followedUserEmail: profileOwnerInfo.userEmail,
+                            followingUserUID: userInfo.uid,
+                            followedUserUID: profileOwnerInfo.uid,
+                            followingUsername: userInfo.username,
+                            followingState: origin,
+                          }
+                        );
                         return !origin;
                       });
                     }}
