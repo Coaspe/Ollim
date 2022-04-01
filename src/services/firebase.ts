@@ -8,7 +8,6 @@ import {
   query,
   where,
   getDocs,
-  orderBy,
 } from "firebase/firestore";
 import { toObjectElements } from "../type";
 import { ref, remove } from "firebase/database";
@@ -80,7 +79,7 @@ export const getFollowersInfinite = async (
 ) => {
   const tmp = followersEmailArr.slice(key, key + 5);
   return await getDocs(
-    query(collection(firestore, "users"), where("__name__", "in", tmp))
+    query(collection(firestore, "users"), where("uid", "in", tmp))
   );
 };
 
@@ -90,7 +89,7 @@ export const getFollowingsInfinite = async (
 ) => {
   const tmp = followingsEmailArr.slice(key, key + 5);
   return await getDocs(
-    query(collection(firestore, "users"), where("__name__", "in", tmp))
+    query(collection(firestore, "users"), where("uid", "in", tmp))
   );
 };
 export const getCommentsInfinite = (commentsDocID: string[], key: number) => {
@@ -98,12 +97,11 @@ export const getCommentsInfinite = (commentsDocID: string[], key: number) => {
     .slice()
     .reverse()
     .slice(key, key + 5);
-  console.log(tmp);
-
   return getDocs(
     query(collection(firestore, "comments"), where("__name__", "in", tmp))
   );
 };
+
 export const getComments = (commentsDocID: string[]) => {
   return getDocs(
     query(
@@ -124,6 +122,7 @@ export const getBestWritings = async () => {
   let writingData = await getWritingsArrayInfo(rankArray);
   return writingData;
 };
+
 export const getAllWritings = async () => {
   const docs = await getDocs(collection(firestore, "allWritings"));
   let returnValue: any = [];
@@ -134,6 +133,7 @@ export const getAllWritings = async () => {
 
   return returnValue;
 };
+
 export const getAllUsers = async () => {
   const docs = await getDocs(collection(firestore, "users"));
   let returnValue: any = [];

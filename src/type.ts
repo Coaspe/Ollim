@@ -10,12 +10,19 @@ export type alarmCategory =
   | "ADDCOMMENT"
   | "FOLLOWING"
   | "NEWWRITING"
-  | "RANKIN";
+  | "RANKIN"
+  | "NEWCOMMIT";
 export type rankInType =
   | "NEW"
   | "THIRDTOSECOND"
   | "SECONDTOFIRST"
   | "THIRDTOFIRST";
+export type alarmNewCommit = {
+  writingTitle: string;
+  writingDocID: string;
+  writingOwnerUID: string;
+  writingOwnerUsername: string;
+};
 export type alarmRankInInfo = {
   rankedInWritingTitle: string;
   type: rankInType;

@@ -50,7 +50,6 @@ const SlateEditor = ({
   const [tempSaveModal, setTempSaveModal] = useState(false);
   const dispatch = useDispatch();
   const isInitialMount = useRef(0);
-
   // Writing Info loading state
   const [loading, setLoading] = useState(false);
 
@@ -166,13 +165,14 @@ const SlateEditor = ({
   // Handle Commit function
   const handleRequestCommit = () => {
     axios
-      .post("https://ollim.herokuapp.com/commit", {
+      // https://ollim.herokuapp.com
+      .post("http://localhost:3001/commit", {
         contents: JSON.stringify(value),
-        writingDocID,
         userUID: writingInfo.userUID,
+        writingDocID,
+        title: writingInfo.title,
         memo: commitDescription,
         collectionNum: nowCollectionNum,
-        genre: writingInfo.genre,
       })
       .then((res) => {
         commitSuccess.current = !commitSuccess.current;

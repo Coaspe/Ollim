@@ -98,11 +98,11 @@ const AddCommentAlarmRow: React.FC<props> = ({
           <span className="text-sm font-bold">
             {(data.info as alarmAddCommentInfo).writingTitle}
           </span>
-          <span className="text-sm">
+          <span style={{ fontSize: "0.7rem" }}>
             <span className="font-bold text-slate-600">
               {(data.info as alarmAddCommentInfo).commentUsername}
             </span>
-            님의 새 댓글
+            <span> 님의 새 댓글</span>
           </span>
         </div>
       </motion.div>

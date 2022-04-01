@@ -4,6 +4,7 @@ import { useContext, useState } from "react";
 import AddCommentAlarmRow from "../alarmrows/AddCommentAlarmRow";
 import AddWritingAlarmRow from "../alarmrows/AddWritingAlarmRow";
 import FollowingAlarmRow from "../alarmrows/FollowingAlarmRow";
+import NewCommitAlarm from "../alarmrows/NewCommitAlarm";
 import RankInAlarmRow from "../alarmrows/RankInAlarmRow";
 import SpinningSvg from "../components/SpinningSvg";
 import UserContext from "../context/user";
@@ -27,7 +28,7 @@ const AlarmModal: React.FC<props> = ({
   const [removeAllBtnDisable, setRemoveAllBtnDisable] = useState(false);
   const [confirmAllBtnDisable, setComfirmAllBtnDisable] = useState(false);
   const { user } = useContext(UserContext);
-  const handleMakeAllAlarmsSeen = (
+  const handleMakeAllAlarmsConfirm = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     setComfirmAllBtnDisable(true);
@@ -87,7 +88,7 @@ const AlarmModal: React.FC<props> = ({
             {!confirmAllBtnDisable ? (
               <motion.button
                 whileHover={{ backgroundColor: "#aaa" }}
-                onClick={handleMakeAllAlarmsSeen}
+                onClick={handleMakeAllAlarmsConfirm}
                 className="mr-3 rounded-2xl px-2 py-1 border"
               >
                 모두 읽음 표시
@@ -142,11 +143,13 @@ const AlarmModal: React.FC<props> = ({
               />;
             } else {
               return (
-                <AddWritingAlarmRow
-                  key={`${index}_NEWWRITING`}
+                <NewCommitAlarm
+                  key={`${index}_NEWCOMMIT`}
                   data={data}
                   index={index}
                   setAlarmValues={setAlarmValues}
+                  setAlarmKeys={setAlarmKeys}
+                  setUnConfirmedAlarms={setUnConfirmedAlarms}
                 />
               );
             }

@@ -70,7 +70,6 @@ const Header: React.FC<props> = ({ userInfo }) => {
           return originKeys;
         });
         setAlarmValues((originValues) => {
-
           let tmp: string[] = [];
           originValues.forEach((data) => {
             tmp.push(data.key);

@@ -1,18 +1,19 @@
-import axios from "axios";
 import { motion } from "framer-motion";
 import { memo, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../context/user";
 import { removeAlarm } from "../services/firebase";
-import { alarmFollowingInfo, getFirestoreAlarmType } from "../type";
+import { alarmNewCommit, getFirestoreAlarmType } from "../type";
+import axios from "axios";
+
 interface props {
   data: getFirestoreAlarmType;
   index: number;
-  setAlarmValues: React.Dispatch<React.SetStateAction<getFirestoreAlarmType[]>>;
+  setAlarmValues: React.Dispatch<React.SetStateAction<any[]>>;
   setAlarmKeys: React.Dispatch<React.SetStateAction<(string | null)[]>>;
   setUnConfirmedAlarms: React.Dispatch<React.SetStateAction<string[]>>;
 }
-const FollowingAlarmRow: React.FC<props> = ({
+const NewCommitAlarm: React.FC<props> = ({
   data,
   index,
   setAlarmValues,
@@ -20,20 +21,22 @@ const FollowingAlarmRow: React.FC<props> = ({
   setUnConfirmedAlarms,
 }) => {
   const { user } = useContext(UserContext);
+  const [info, setInfo] = useState<alarmNewCommit>(data.info as alarmNewCommit);
   const navigator = useNavigate();
-  const [info, setInfo] = useState(data.info as alarmFollowingInfo);
-
   return (
     <motion.div
       layout
+      animate={{
+        opacity: [0, 1],
+      }}
       whileHover={{ backgroundColor: "#eee" }}
       transition={{ type: "ease" }}
-      className="relative flex border rounded-md px-3 py-3 items-center justify-center w-full h-fit"
+      className="relative flex border rounded-md px-3 py-3 items-center w-full h-fit"
       onClick={(e) => {
         e.stopPropagation();
         axios
           .post("https://ollim.herokuapp.com/makeAlarmSeen", {
-            alarmKey: `${data.dateCreated}_FOLLOWING_${info.followingUserUID}`,
+            alarmKey: `${data.dateCreated}_NEWCOMMIT_${info.writingDocID}`,
             userUID: user.uid,
           })
           .then(() => {
@@ -48,7 +51,7 @@ const FollowingAlarmRow: React.FC<props> = ({
               return tmp;
             });
           });
-        navigator(`/${info.followingUserUID}`);
+        navigator(`/writings/${info.writingOwnerUID}/${info.writingDocID}`);
       }}
     >
       <div
@@ -60,7 +63,7 @@ const FollowingAlarmRow: React.FC<props> = ({
         onClick={(e) => {
           e.stopPropagation();
           removeAlarm(
-            `${data.dateCreated}_FOLLOWING_${info.followingUserUID}`,
+            `${data.dateCreated}_NEWCOMMIT_${info.writingDocID}`,
             user.uid
           ).then(() => {
             setAlarmValues((origin) => {
@@ -86,14 +89,15 @@ const FollowingAlarmRow: React.FC<props> = ({
       >
         close
       </span>
-      <span className="material-icons">account_circle</span>
+      <span className="material-icons">chat</span>
       <div className="h-full border-l border-l-gray-300 mx-3" />
-      <span className="text-sm font-bold">
-        {info.followingUsername}
-        <span style={{ fontSize: "0.7rem" }}> 님이 회원님을 팔로우합니다.</span>
-      </span>
+      <div className="flex flex-col text-sm">
+        <span className="font-bold">{info.writingOwnerUsername}</span>
+        <span className="text-gray-500 font-bold">{info.writingTitle}</span>
+        <span style={{ fontSize: "0.7rem" }}>새로운 제출이 있습니다</span>
+      </div>
     </motion.div>
   );
 };
 
-export default memo(FollowingAlarmRow);
+export default memo(NewCommitAlarm);

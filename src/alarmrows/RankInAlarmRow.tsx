@@ -95,20 +95,22 @@ const RankInAlarmRow: React.FC<props> = ({
         <div className="flex flex-fol h-full">
           <span className="text-sm font-bold">{info.rankedInWritingTitle}</span>
           {info.type === "NEW" && (
-            <span className="text-sm">작가님의 작품이 랭크에 올라갔습니다</span>
+            <span style={{ fontSize: "0.7rem" }}>
+              작가님의 작품이 랭크에 올라갔습니다
+            </span>
           )}
           {info.type === "THIRDTOSECOND" && (
-            <span className="text-sm">
+            <span style={{ fontSize: "0.7rem" }}>
               작가님의 작품이 3등에서 2등이 되었습니다
             </span>
           )}
           {info.type === "THIRDTOFIRST" && (
-            <span className="text-sm">
+            <span style={{ fontSize: "0.7rem" }}>
               작가님의 작품이 3등에서 1등이 되었습니다
             </span>
           )}
           {info.type === "SECONDTOFIRST" && (
-            <span className="text-sm">
+            <span style={{ fontSize: "0.7rem" }}>
               작가님의 작품이 2등에서 1등이 되었습니다
             </span>
           )}
