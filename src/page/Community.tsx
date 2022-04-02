@@ -87,7 +87,7 @@ const Community = () => {
       {/* Search Div */}
       {!loading ? (
         <>
-          <div className="border w-1/3 max-w-lg rounded-3xl bg-opacity-90 px-3 py-2 flex items-center justify-center shadow-md GalaxyS20Ultra:w-2/3">
+          <div className="search border w-1/3 max-w-lg rounded-3xl bg-opacity-90 px-3 py-2 flex items-center justify-center shadow-md GalaxyS20Ultra:w-2/3">
             {recommandedUsers.length > 0 && (
               <div className="w-full flex items-center">
                 <div className="relative">
@@ -131,6 +131,7 @@ const Community = () => {
                 </div>
                 <div className="relative w-full h-full">
                   <SearchAutoComplete
+                    searchNowText={searchNowText}
                     matchNumber={2}
                     items={
                       searchNowText === "text_snippet"

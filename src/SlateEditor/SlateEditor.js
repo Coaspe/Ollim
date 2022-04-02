@@ -165,7 +165,6 @@ const SlateEditor = ({
   // Handle Commit function
   const handleRequestCommit = () => {
     axios
-      // https://ollim.herokuapp.com
       .post("https://ollim.herokuapp.com/commit", {
         contents: JSON.stringify(value),
         userUID: writingInfo.userUID,
@@ -259,8 +258,6 @@ const SlateEditor = ({
   useEffect(() => {
     setLoading(false);
   }, [value]);
-
-  useEffect(() => {}, []);
 
   // window.addEventListener("beforeunload", function (e) {
   //   var confirmationMessage = "o/";

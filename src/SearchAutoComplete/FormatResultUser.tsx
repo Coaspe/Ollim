@@ -10,10 +10,10 @@ const FormatResultUser: React.FC<props> = ({ item }) => {
     <motion.div
       animate={{ opacity: [0, 1] }}
       layout
-      onClick={() => {
+      onClick={(e) => {
         navigator(`/${item.uid}`);
       }}
-      className="px-5 py-2 flex items-center font-noto cursor-pointer hover:bg-gray-200 focus:bg-gray-200"
+      className="px-5 py-2 flex items-center font-noto cursor-pointer hover:bg-gray-200 focus:bg-gray-200 z-50"
     >
       <img
         src={item.profileImg}

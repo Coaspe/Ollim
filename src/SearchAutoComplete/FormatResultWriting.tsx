@@ -14,10 +14,11 @@ const FormatResultWriting: React.FC<props> = ({ item }) => {
       animate={{ opacity: [0, 1] }}
       layout
       key={item.writingUID}
-      onClick={() => {
-        navigator(`/writings/${item.userUID}/${item.genre}/${item.writingUID}`);
+      onClick={(e) => {
+        e.stopPropagation();
+        navigator(`/writings/${item.userUID}/${item.writingUID}`);
       }}
-      className="px-5 py-2 space-x-2 flex items-center font-noto cursor-pointer hover:bg-gray-200 focus:bg-gray-200"
+      className="w-full px-5 py-2 space-x-2 flex items-center font-noto cursor-pointer hover:bg-gray-200 focus:bg-gray-200"
     >
       <span className="font-bold">
         {genreMatching[item.genre as gerneType]}
