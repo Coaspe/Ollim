@@ -166,7 +166,7 @@ const SlateEditor = ({
   const handleRequestCommit = () => {
     axios
       // https://ollim.herokuapp.com
-      .post("http://localhost:3001/commit", {
+      .post("https://ollim.herokuapp.com/commit", {
         contents: JSON.stringify(value),
         userUID: writingInfo.userUID,
         writingDocID,
