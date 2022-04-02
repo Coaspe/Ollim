@@ -235,7 +235,6 @@ const Mypage = () => {
     }) => {
       const host = contestsDocID["host"];
       const participation = contestsDocID["participation"];
-      console.log(Array.prototype.concat(host, participation));
 
       const tmp: Array<any> = contestsDocID
         ? await getContetsArrayInfo(Array.prototype.concat(host, participation))
@@ -265,7 +264,7 @@ const Mypage = () => {
       getUserByUID(contextUser.uid).then((res: any) => {
         const data = res.docs[0].data();
         setUserInfo(data);
-        setDoseUserFollow(data.followings.includes(profileOwnerInfo.userEmail));
+        setDoseUserFollow(data.followings.includes(profileOwnerInfo.uid));
       });
   }, [profileOwnerInfo, contextUser]);
 

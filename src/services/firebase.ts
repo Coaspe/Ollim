@@ -74,20 +74,20 @@ export const getDiagram = (writingDocID: string) => {
 };
 
 export const getFollowersInfinite = async (
-  followersEmailArr: string[],
+  followersUIDArr: string[],
   key: number
 ) => {
-  const tmp = followersEmailArr.slice(key, key + 5);
+  const tmp = followersUIDArr.slice(key, key + 5);
   return await getDocs(
     query(collection(firestore, "users"), where("uid", "in", tmp))
   );
 };
 
 export const getFollowingsInfinite = async (
-  followingsEmailArr: string[],
+  followingsUIDArr: string[],
   key: number
 ) => {
-  const tmp = followingsEmailArr.slice(key, key + 5);
+  const tmp = followingsUIDArr.slice(key, key + 5);
   return await getDocs(
     query(collection(firestore, "users"), where("uid", "in", tmp))
   );
