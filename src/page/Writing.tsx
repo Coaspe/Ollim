@@ -478,7 +478,6 @@ const Writing = () => {
             >
               <SlateEditorRDOnly
                 writingDocID={writingDocID}
-                genre={writingInfo.genre}
                 contextUserInfo={contextUserInfo}
                 widthSize={widthSize}
                 alarmCommentDocID={

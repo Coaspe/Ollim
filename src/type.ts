@@ -3,6 +3,7 @@ export type disclosure = "PUBLIC" | "PRIVATE" | "FOLLOWERS";
 export type page = "MAIN" | "DIAGRAM";
 export type genre = "SCENARIO" | "POEM" | "NOVEL";
 export type tableType = "OVERVIEW" | "WRITE" | "SETTING" | "BROWSE";
+export type contestTableType = "OVERVIEW" | "BROWSE" | "VOTE" | "SETTING";
 export type gerneType = "NOVEL" | "POEM" | "SCENARIO";
 export type alarmType = "error" | "warning" | "info" | "success";
 export type contestType = "HOST" | "PARTICIPATION" | "TOTAL";
@@ -115,14 +116,21 @@ export interface addContestArg {
   title: string;
   genre: genre;
   description: string;
-  hostEmail: string;
+  hostUID: string;
   deadline: string;
-  writings: { [key: string]: { writingDocID: string; updateDate: number } };
+  writings: { [key: string]: contestWriting };
   dateCreated: number;
 }
 export interface getFirestoreContest extends addContestArg {
   contestDocID: string;
 }
+export type contestWriting = {
+  writingDocID: string;
+  updateDate: number;
+  vote: number;
+  synopsis: string;
+  title: string;
+};
 export type getFirestoreWriting = {
   collection: collectionType;
   dateCreated: number;

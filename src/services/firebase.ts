@@ -152,7 +152,9 @@ export const getContetsArrayInfo = (contestsDocID: string[]) => {
     })
   );
 };
-
+export const getContestInfo = (contestDocID: string) => {
+  return getDoc(doc(firestore, "contests", contestDocID));
+};
 export const removeAlarm = (alarmID: string, userUID: string) => {
   return remove(ref(rtDBRef, `alarms/${userUID}/${alarmID}`));
 };

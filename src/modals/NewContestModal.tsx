@@ -55,7 +55,7 @@ const NewContestModal: React.FC<NewContestProps> = ({
       title,
       description,
       genre: genrnState,
-      hostEmail: userInfo.userEmail,
+      hostUID: userInfo.uid,
       deadline,
       dateCreated: new Date().getTime(),
       writings: {},
@@ -229,7 +229,7 @@ const NewContestModal: React.FC<NewContestProps> = ({
                 <input
                   style={{ borderColor: "#e4d0ca" }}
                   className="font-md border-2 py-2 px-3 mt-5 rounded-xl w-full placeholder:italic focus:outline-none"
-                  placeholder="백일장의 이름을 입력하세요"
+                  placeholder="백일장의 이름"
                   type="text"
                   value={title}
                   onChange={(e) => {
@@ -259,8 +259,8 @@ const NewContestModal: React.FC<NewContestProps> = ({
               <span className="text-xl font-bold">백일장 설명</span>
               <textarea
                 style={{ borderColor: "#e4d0ca" }}
-                className="resize-none border-2 pt-2 px-3 mt-5 rounded-xl h-full w-full italic"
-                placeholder="백일장에 대한 설명을 입력하세요"
+                className="resize-none border-2 pt-2 px-3 mt-5 rounded-xl h-full w-full italic focus:outline-none"
+                placeholder="백일장에 대한 자세한 설명"
                 value={description}
                 spellCheck="false"
                 onChange={(e) => {
