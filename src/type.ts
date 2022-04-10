@@ -65,7 +65,7 @@ export type getFirestoreUser = {
   contestAuth: boolean;
   contests: Array<string>;
 };
-
+export type submissionTableType = "MAIN" | "";
 export type getFirestoreAlarmType = {
   category: alarmCategory;
   dateCreated: number;

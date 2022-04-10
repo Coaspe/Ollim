@@ -87,6 +87,7 @@ const SlateEditorRDOnly = ({
     },
     [dispatch]
   );
+  const [bottomMenuOpen, setBottomMenuOpen] = useState(true);
 
   // useEffect to get writing's information
   useEffect(() => {
@@ -488,72 +489,112 @@ const SlateEditorRDOnly = ({
               readOnly
             />
           </div>
-          <div
-            style={{ bottom: "5%", right: "5%", zIndex: 52 }}
-            className="fixed font-noto flex items-center space-x-5 > * + *"
-          >
-            {writingInfo.isCollection && isFullScreen && (
-              <Tooltip
-                arrow
-                placement="top"
-                title={`${nowCollectionNum}.${
-                  writingInfo.collection[nowCollectionNum.toString()].title
-                }`}
+          <AnimatePresence initial={false}>
+            {bottomMenuOpen ? (
+              <motion.div
+                key="Menu"
+                animate={{ y: ["100%", "0%"], opacity: [0, 1] }}
+                exit={{ y: ["0%", "100%"], opacity: [1, 0] }}
+                transition={{ duration: 0.1 }}
+                style={{ bottom: "5%", right: "5%", zIndex: 52 }}
+                className="fixed font-noto flex items-center space-x-5 > * + *"
               >
                 <motion.span
+                  whileHover={{ y: "-10%" }}
                   onClick={() => {
-                    setChangeCollectionElementModal(true);
+                    setBottomMenuOpen(false);
                   }}
                   style={{ fontSize: "2rem" }}
-                  whileHover={{ y: "-10%" }}
                   className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
                 >
-                  timeline
+                  expand_more
                 </motion.span>
-              </Tooltip>
+                {writingInfo.isCollection && isFullScreen && (
+                  <Tooltip
+                    arrow
+                    placement="top"
+                    title={`${nowCollectionNum}.${
+                      writingInfo.collection[nowCollectionNum.toString()].title
+                    }`}
+                  >
+                    <motion.span
+                      onClick={() => {
+                        setChangeCollectionElementModal(true);
+                      }}
+                      style={{ fontSize: "2rem" }}
+                      whileHover={{ y: "-10%" }}
+                      className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
+                    >
+                      timeline
+                    </motion.span>
+                  </Tooltip>
+                )}
+                <motion.span
+                  whileHover={{ y: "-10%" }}
+                  onClick={() => {
+                    const doc = document.querySelector(
+                      ".editor-container-browse"
+                    );
+                    if (doc) {
+                      document.fullscreenElement
+                        ? document.exitFullscreen()
+                        : doc.requestFullscreen({ navigationUI: "show" });
+                      setIsFullScreen(!document.fullscreenElement);
+                    }
+                  }}
+                  style={{ fontSize: "2rem" }}
+                  className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
+                >
+                  {isFullScreen ? "fullscreen_exit" : "fullscreen"}
+                </motion.span>
+                <motion.span
+                  whileHover={{ y: "-10%" }}
+                  onClick={() => {
+                    if (
+                      writingInfo.collection[nowCollectionNum.toString()]
+                        .commits.length !== 0
+                    ) {
+                      setOpenLoadCommitModal(true);
+                    }
+                  }}
+                  style={{ fontSize: "2rem" }}
+                  className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
+                >
+                  update
+                </motion.span>
+                <motion.span
+                  whileHover={{ y: "-10%" }}
+                  onClick={() => {
+                    setOpenCommentsModal((origin) => !origin);
+                  }}
+                  style={{ fontSize: "2rem" }}
+                  className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
+                >
+                  chat
+                </motion.span>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="key"
+                animate={{ y: ["100%", "0%"], opacity: [0, 1] }}
+                exit={{ y: ["0%", "100%"], opacity: [1, 0] }}
+                transition={{ duration: 0.1 }}
+                style={{ bottom: "0%", right: "50%", zIndex: 52 }}
+                className="fixed"
+              >
+                <span
+                  style={{ fontSize: "2rem" }}
+                  onClick={() => {
+                    setBottomMenuOpen(true);
+                  }}
+                  className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
+                >
+                  expand_less
+                </span>
+              </motion.div>
             )}
-            <motion.span
-              whileHover={{ y: "-10%" }}
-              onClick={() => {
-                const doc = document.querySelector(".editor-container-browse");
-                if (doc) {
-                  document.fullscreenElement
-                    ? document.exitFullscreen()
-                    : doc.requestFullscreen({ navigationUI: "show" });
-                  setIsFullScreen(!document.fullscreenElement);
-                }
-              }}
-              style={{ fontSize: "2rem" }}
-              className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
-            >
-              {isFullScreen ? "fullscreen_exit" : "fullscreen"}
-            </motion.span>
-            <motion.span
-              whileHover={{ y: "-10%" }}
-              onClick={() => {
-                if (
-                  writingInfo.collection[nowCollectionNum.toString()].commits
-                    .length !== 0
-                ) {
-                  setOpenLoadCommitModal(true);
-                }
-              }}
-              style={{ fontSize: "2rem" }}
-              className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
-            >
-              update
-            </motion.span>
-            <motion.span
-              whileHover={{ y: "-10%" }}
-              onClick={() => {
-                setOpenCommentsModal((origin) => !origin);
-              }}
-              style={{ fontSize: "2rem" }}
-              className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
-            >
-              chat
-            </motion.span>
-          </div>
+          </AnimatePresence>
+
           {writingInfo && writingInfo.bgm && (
             <div
               style={{ bottom: "5%", left: "1%", zIndex: 52 }}

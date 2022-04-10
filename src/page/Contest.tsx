@@ -50,7 +50,7 @@ const Contest = () => {
   const [contestInfo, setContestInfo] = useState<getFirestoreContest>(
     {} as getFirestoreContest
   );
-
+  const [submissionModalOpen, setSubmissionModalOpen] = useState(false);
   // Table State
   const [table, setTable] = useState<contestTableType>("OVERVIEW");
 
@@ -62,7 +62,7 @@ const Contest = () => {
   const [deadline, setDeadline] = useState("");
   // Title
   const [title, setTitle] = useState("");
-
+  const [doesParticipate, setDoesParticipate] = useState(false);
   const dispatch = useDispatch();
 
   const navigator = useNavigate();
@@ -111,6 +111,8 @@ const Contest = () => {
       getContestInfo(contestDocID).then((res: any) => {
         setContestInfo(res.data());
         setWritingDocInfo(Object.values(res.data().writings));
+        setDeadline(res.data().deadline);
+        setDescription(res.data().description);
       });
     }
   }, [table, contestDocID]);
@@ -207,6 +209,7 @@ const Contest = () => {
 
   return (
     <>
+      {/* {setSubmissionModalOpen && } */}
       {Object.keys(contestInfo).length > 0 &&
         Object.keys(contestHostInfo).length > 0 && (
           <div className="w-full bg-opacity-30 relative writing-container font-noto">
@@ -374,6 +377,32 @@ const Contest = () => {
                     {contestInfo.description}
                   </textarea>
                 </div>
+                {/* Participate, Submission div */}
+                <div className="flex flex-col mb-20 w-2/3 GalaxyS20Ultra:w-full">
+                  <span className="text-2xl font-bold mb-10 flex items-center">
+                    {Object.keys(contestInfo.writings).includes(contextUser.uid)
+                      ? "제출하기"
+                      : "참가하기"}
+                    <motion.span
+                      whileHover={{ backgroundColor: "rgb(209 213 219)" }}
+                      transition={{ ease: "linear" }}
+                      className="material-icons px-1 py-1 rounded-full cursor-pointer ml-2"
+                    >
+                      manage_search
+                    </motion.span>
+                  </span>
+                  {contestInfo.writings[contextUser.uid].writingDocID ? (
+                    <span className="font-bold text-xl text-gray-400">
+                      제출한 작품이 여기에 표시됩니다
+                    </span>
+                  ) : (
+                    <ContestWriting
+                      data={contestInfo.writings[contextUser.uid]}
+                      widthSize={widthSize}
+                      handleOnClick={handleOnClick}
+                    />
+                  )}
+                </div>
               </div>
             )}
             {table === "BROWSE" && selectedWritingInfo && (
@@ -416,17 +445,7 @@ const Contest = () => {
                   </motion.div>
                 </div>
                 {/* Synopsis div */}
-                <div className="flex flex-col mb-20 w-2/3 GalaxyS20Ultra:w-full">
-                  <span className="text-2xl font-bold mb-10">백일장 설명</span>
-                  <textarea
-                    value={contestInfo.description}
-                    style={{ backgroundColor: "#FAF6F5" }}
-                    readOnly
-                    className="border-opacity-5 border-black shadow-lg px-3 py-3 resize-none border w-full h-72 overflow-y-scroll focus:outline-none"
-                  >
-                    {contestInfo.description}
-                  </textarea>
-                </div>
+                <div className="flex flex-col mb-20 w-2/3 GalaxyS20Ultra:w-full"></div>
               </div>
             )}
 
