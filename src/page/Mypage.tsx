@@ -1,16 +1,13 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import MypageWriting from "../components/MypageWriting";
 import UserContext from "../context/user";
 import {
   getUserWritings,
   getWritingsArrayInfo,
   getUserByUID,
-  getFollowersInfinite,
-  getFollowingsInfinite,
   getContetsArrayInfo,
 } from "../services/firebase";
-import Compressor from "compressorjs";
 import { signOutAuth } from "../helpers/auth-OAuth2";
 import NewWritingModal from "../modals/NewWritingModal";
 import CustomNodeFlow from "../diagram/RelationShipDiagram";
@@ -37,6 +34,8 @@ import Header from "../components/Header";
 import Select from "react-select";
 import NewContestModal from "../modals/NewContestModal";
 import ContestRow from "../components/ContestRow";
+import useGetFollowers from "../hooks/useGetFollowers";
+import useImageCompress from "../hooks/useImageCompress";
 
 const Mypage = () => {
   // Profile owner's uid
@@ -45,39 +44,31 @@ const Mypage = () => {
   const [profileOwnerInfo, setProfileOwnerInfo] = useState<getFirestoreUser>(
     {} as getFirestoreUser
   );
-  const [profileImage, setProfileImage] = useState("");
 
-  // To Prevent unnecessary re-rendering, use useRef
-  // Load 5 followers, followings every "Load More" request.
-  // Below two variables indicate how many followers, followings loaded now
-  const followersKey = useRef(0);
-  const followingsKey = useRef(0);
-
+  const [loading, setLoading] = useState(false);
+  
   // For more natural UI of the number of followers of followings, followers
   const followingsLength = useRef(0);
   const followersLength = useRef(0);
 
   // Profile owner's followers, followings datas and modal open states
-  const [followers, setFollowers] = useState<getFirestoreUser[]>([]);
-  const [followings, setFollowings] = useState<getFirestoreUser[]>([]);
   const [followersModal, setFollowersModal] = useState(false);
   const [followingsModal, setFollowingsModal] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   // Context user
   const { user: contextUser } = useContext(UserContext);
   const [userWritings, setUserWritings] = useState(
     {} as getFirestoreUserWritings
-  );
-  // New Writing modal state
-  const [newWritingModalOpen, setNewWritingModalOpen] = useState(false);
-  // New Contest modal state
-  const [newContestModalOpen, setNewContestModalOpen] = useState(false);
-  // Writing category state
-  const [onWritingCategory, setOnWritingCategory] = useState("TOTAL");
-  // Contest category state
+    );
+    // New Writing modal state
+    const [newWritingModalOpen, setNewWritingModalOpen] = useState(false);
+    // New Contest modal state
+    const [newContestModalOpen, setNewContestModalOpen] = useState(false);
+    // Writing category state
+    const [onWritingCategory, setOnWritingCategory] = useState("TOTAL");
+    // Contest category state
   const [contestCategory, setContestCategory] = useState<contestType>("TOTAL");
-
+  
   // Does User Follow Profile Owner?
   const [doseUserFollow, setDoseUserFollow] = useState(false);
   // Profile owner's poems list
@@ -88,15 +79,14 @@ const Mypage = () => {
   const [scenarioes, setScenarioes] = useState<Array<getFirestoreWriting>>([]);
   // Profile owner's total writings list
   const [totalWritings, setTotalWritings] = useState<
-    Array<getFirestoreWriting>
+  Array<getFirestoreWriting>
   >([]);
-
   const [totalContests, setTotalContests] = useState<
-    Array<getFirestoreContest>
+  Array<getFirestoreContest>
   >([]);
   const navigator = useNavigate();
   const dispatch = useDispatch();
-
+  
   // Header context userInfo
   const setUserInfo = (userInfo: getFirestoreUser) => {
     dispatch(userInfoAction.setUserInfo({ userInfo }));
@@ -116,78 +106,15 @@ const Mypage = () => {
   const setAlarm = (alarm: [string, alarmType, boolean]) => {
     dispatch(alarmAction.setAlarm({ alarm }));
   };
+  const {followersKey, followingsKey, followers, followings, handleMoreFollowers, handleMoreFollowings} = useGetFollowers(setLoading, profileOwnerInfo, followersModal, followingsModal)
+  const {profileImage, setProfileImage, handleProfileImgOnChange} = useImageCompress(profileOwnerInfo, setAlarm)
 
-  // Load more profile owner's followers, followings
-  const handleMoreFollowers = useCallback(() => {
-    setLoading(true);
-    if (
-      profileOwnerInfo.followers.length > 0 &&
-      followersKey.current < profileOwnerInfo.followers.length
-    ) {
-      getFollowersInfinite(
-        profileOwnerInfo.followers,
-        followersKey.current
-      ).then((res) => {
-        let tmp = res.docs.map((doc: any) => ({
-          ...doc.data(),
-          docID: doc.id,
-        }));
-        setFollowers((origin: any) => {
-          return [...origin, ...tmp];
-        });
-        followersKey.current += tmp.length;
-      });
-    }
-  }, [profileOwnerInfo.followers]);
-  const handleMoreFollowings = useCallback(() => {
-    setLoading(true);
-    if (
-      profileOwnerInfo.followings.length > 0 &&
-      followingsKey.current < profileOwnerInfo.followings.length
-    ) {
-      getFollowingsInfinite(
-        profileOwnerInfo.followings,
-        followingsKey.current
-      ).then((res) => {
-        let tmp = res.docs.map((doc: any) => ({
-          ...doc.data(),
-          docID: doc.id,
-        }));
-        setFollowings((origin: any) => {
-          return [...origin, ...tmp];
-        });
-        followingsKey.current += tmp.length;
-      });
-    }
-  }, [profileOwnerInfo.followings]);
-
+  // Window size changed detect!
   useEffect(() => {
     window.onresize = () => {
       setWidthSize(window.innerWidth);
     };
   }, []);
-
-  // Loading more followers, followings completed, set loading false
-  useEffect(() => {
-    followers.length > 0 && setLoading(false);
-  }, [followers]);
-  useEffect(() => {
-    followings.length > 0 && setLoading(false);
-  }, [followings]);
-
-  // When modal closed, reset followers, followings keys and list
-  useEffect(() => {
-    if (!followersModal && followersKey.current !== 0) {
-      followersKey.current = 0;
-      setFollowers([]);
-    }
-  }, [followersModal]);
-  useEffect(() => {
-    if (!followingsModal && followingsKey.current !== 0) {
-      followingsKey.current = 0;
-      setFollowings([]);
-    }
-  }, [followingsModal]);
 
   // Uid param change detection
   useEffect(() => {
@@ -267,49 +194,6 @@ const Mypage = () => {
         setDoseUserFollow(data.followings.includes(profileOwnerInfo.uid));
       });
   }, [profileOwnerInfo, contextUser]);
-
-  // Image Compress process
-  const handleProfileImgOnChange = (event: any) => {
-    const element = event.target.files[0];
-
-    let qual = 0.45;
-
-    if (element.size >= 4000000) {
-      qual = 0.1;
-    } else if (element.size >= 2000000) {
-      qual = 0.2;
-    } else if (element.size >= 1000000) {
-      qual = 0.4;
-    }
-
-    new Compressor(element, {
-      quality: qual,
-      width: 800,
-      height: 800,
-      success(result: any) {
-        const url = URL.createObjectURL(result);
-
-        const formData = new FormData();
-        formData.append("userUID", profileOwnerInfo.uid);
-        formData.append("userEmail", profileOwnerInfo.userEmail);
-        formData.append("file", result);
-
-        axios
-          .post(`https://ollim.herokuapp.com/updateProfileImage`, formData)
-          .then((res) => {
-            setAlarm(res.data);
-            setTimeout(() => {
-              setAlarm(["", "success", false]);
-            }, 3000);
-          });
-        setProfileImage(url);
-      },
-      error(err) {
-        console.log(err.message);
-        return;
-      },
-    });
-  };
 
   // Navigate to community
   const handleGoToCommunity = () => {

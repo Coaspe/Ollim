@@ -10,6 +10,7 @@ const useAuthListner = () => {
 
   useEffect(() => {
     const auth = getAuth()
+    
     onAuthStateChanged(auth, (authUser) => {
       // we have a user... therefore we can store the user in localstorage
       if (authUser) {
@@ -22,6 +23,7 @@ const useAuthListner = () => {
       }
     });
   }, [firebase]);
+
   return { user } ;
 };
 
