@@ -1,33 +1,30 @@
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useContext, useState } from "react";
-import AddCommentAlarmRow from "../alarmrows/AddCommentAlarmRow";
-import AddWritingAlarmRow from "../alarmrows/AddWritingAlarmRow";
-import FollowingAlarmRow from "../alarmrows/FollowingAlarmRow";
-import NewCommitAlarm from "../alarmrows/NewCommitAlarm";
-import RankInAlarmRow from "../alarmrows/RankInAlarmRow";
 import SpinningSvg from "../components/SpinningSvg";
 import UserContext from "../context/user";
 import { getFirestoreAlarmType } from "../type";
+import AlarmRow from "../alarmrows/AlarmRow";
 interface props {
-  alarmValues: getFirestoreAlarmType[];
-  setAlarmValues: React.Dispatch<React.SetStateAction<getFirestoreAlarmType[]>>;
-  setAlarmKeys: React.Dispatch<React.SetStateAction<(string | null)[]>>;
-  alarmKeys: (string | null)[];
   open: boolean;
-  setUnConfirmedAlarms: React.Dispatch<React.SetStateAction<string[]>>;
+  alarmMap: Map<string, getFirestoreAlarmType>;
+  setAlarmMap: React.Dispatch<
+    React.SetStateAction<Map<string, getFirestoreAlarmType>>
+  >;
+  setUnConfirmedAlarms: React.Dispatch<
+    React.SetStateAction<Map<string, getFirestoreAlarmType>>
+  >;
 }
 const AlarmModal: React.FC<props> = ({
-  alarmValues,
-  setAlarmValues,
-  setAlarmKeys,
-  alarmKeys,
   open,
+  alarmMap,
+  setAlarmMap,
   setUnConfirmedAlarms,
 }) => {
   const [removeAllBtnDisable, setRemoveAllBtnDisable] = useState(false);
   const [confirmAllBtnDisable, setComfirmAllBtnDisable] = useState(false);
   const { user } = useContext(UserContext);
+
   const handleMakeAllAlarmsConfirm = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -36,40 +33,43 @@ const AlarmModal: React.FC<props> = ({
     if (setUnConfirmedAlarms.length !== 0) {
       axios
         .post("https://ollim.herokuapp.com/makeAllAlarmsSeen", {
-          alarmKeys: JSON.stringify(alarmKeys),
+          alarmKeys: JSON.stringify(Array.from(alarmMap.keys())),
           userUID: user.uid,
         })
         .then(() => {
           setComfirmAllBtnDisable(false);
-          setAlarmValues((origin) => {
-            return origin.map((value) => {
-              let tmp = Object.assign({}, value);
-              tmp.seen = true;
-              return tmp;
+          setAlarmMap((origin) => {
+            let tmp = new Map(origin);
+            origin.forEach((data, key) => {
+              let tempVal = data;
+              tempVal.seen = true;
+              tmp.set(key, tempVal);
             });
+            return tmp;
           });
-          setUnConfirmedAlarms([]);
+          setUnConfirmedAlarms(new Map());
         });
     }
   };
+
   const handleRemoveAllAlarms = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     setRemoveAllBtnDisable(true);
     e.stopPropagation();
-    if (alarmValues.length > 0) {
+    if (alarmMap.size > 0) {
       axios.post("https://ollim.herokuapp.com/removeAllAlarms", {
-        alarmKeys: JSON.stringify(alarmKeys),
+        alarmKeys: JSON.stringify(Array.from(alarmMap.keys())),
         userUID: user.uid,
       });
       setTimeout(() => {
-        setAlarmValues([]);
-        setAlarmKeys([]);
-        setUnConfirmedAlarms([]);
+        setAlarmMap(new Map());
+        setUnConfirmedAlarms(new Map());
         setRemoveAllBtnDisable(false);
       }, 1000);
     }
   };
+
   return (
     <AnimatePresence>
       {open && (
@@ -109,51 +109,15 @@ const AlarmModal: React.FC<props> = ({
             )}
           </div>
 
-          {alarmValues.map((data, index) => {
-            if (data.category === "ADDCOMMENT") {
-              return (
-                <AddCommentAlarmRow
-                  key={`${index}_ADDCOMMENT`}
-                  data={data}
-                  index={index}
-                  setAlarmValues={setAlarmValues}
-                  setAlarmKeys={setAlarmKeys}
-                  setUnConfirmedAlarms={setUnConfirmedAlarms}
-                />
-              );
-            } else if (data.category === "FOLLOWING") {
-              return (
-                <FollowingAlarmRow
-                  key={`${index}_FOLLOWING`}
-                  data={data}
-                  index={index}
-                  setAlarmValues={setAlarmValues}
-                  setAlarmKeys={setAlarmKeys}
-                  setUnConfirmedAlarms={setUnConfirmedAlarms}
-                />
-              );
-            } else if (data.category === "RANKIN") {
-              <RankInAlarmRow
-                key={`${index}_RANKIN`}
-                data={data}
-                index={index}
-                setAlarmValues={setAlarmValues}
-                setAlarmKeys={setAlarmKeys}
-                setUnConfirmedAlarms={setUnConfirmedAlarms}
-              />;
-            } else {
-              return (
-                <NewCommitAlarm
-                  key={`${index}_NEWCOMMIT`}
-                  data={data}
-                  index={index}
-                  setAlarmValues={setAlarmValues}
-                  setAlarmKeys={setAlarmKeys}
-                  setUnConfirmedAlarms={setUnConfirmedAlarms}
-                />
-              );
-            }
-          })}
+          {Array.from(alarmMap.entries()).map(([key, value]) => (
+            <AlarmRow
+              key={key}
+              identity={key}
+              data={value}
+              setAlarmMap={setAlarmMap}
+              setUnConfirmedAlarms={setUnConfirmedAlarms}
+            />
+          ))}
         </motion.div>
       )}
     </AnimatePresence>

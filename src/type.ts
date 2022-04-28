@@ -18,6 +18,14 @@ export type rankInType =
   | "THIRDTOSECOND"
   | "SECONDTOFIRST"
   | "THIRDTOFIRST";
+export type totalAlarmType =
+  | alarmNewCommit
+  | alarmRankInInfo
+  | alarmCommitInfo
+  | alarmAddCommentInfo
+  | alarmFollowingInfo
+  | alarmAddWritingInfo;
+
 export type alarmNewCommit = {
   writingTitle: string;
   writingDocID: string;

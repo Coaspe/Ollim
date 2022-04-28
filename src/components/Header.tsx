@@ -15,75 +15,70 @@ const Header: React.FC<props> = ({ userInfo }) => {
   const controls = useAnimation();
   const navigator = useNavigate();
 
-  const [unConfirmedAlarms, setUnConfirmedAlarms] = useState<string[]>([]);
-  const [alarmValues, setAlarmValues] = useState<getFirestoreAlarmType[]>([]);
-  const [alarmKeys, setAlarmKeys] = useState<(string | null)[]>([]);
+  const [unConfirmedAlarms, setUnConfirmedAlarms] = useState<
+    Map<string, getFirestoreAlarmType>
+  >(new Map<string, getFirestoreAlarmType>());
+  const [alarmMap, setAlarmMap] = useState<Map<string, getFirestoreAlarmType>>(
+    new Map<string, getFirestoreAlarmType>()
+  );
   const [alarmModalOpen, setAlarmModalOpen] = useState(false);
 
   useEffect(() => {
     if (userInfo.uid) {
       get(ref(rtDBRef, "alarms/" + userInfo.uid)).then((snapshot) => {
         if (snapshot.exists()) {
-          const snap = snapshot.val();
-          const keys = Object.keys(snap);
-          const values = Object.values(snap).map((data: any, index) => ({
-            ...data,
-            key: keys[index],
-          }));
-          const unConfirmedTmp: string[] = [];
-
-          values.forEach((data: any, index) => {
-            if (!data.seen) {
-              unConfirmedTmp.push(keys[index]);
-            }
+          const snap = snapshot.val() as {
+            [key: string]: getFirestoreAlarmType;
+          };
+          // Init Alarm Map
+          setAlarmMap(() => {
+            let tmp = new Map();
+            const unConfirmedTmp = new Map<string, getFirestoreAlarmType>();
+            Object.entries(snap).forEach(([key, value]) => {
+              tmp.set(key, value);
+              !value.seen && unConfirmedTmp.set(key, value);
+            });
+            setUnConfirmedAlarms(unConfirmedTmp);
+            return tmp;
           });
-          setUnConfirmedAlarms(unConfirmedTmp);
-          setAlarmKeys(keys);
-          setAlarmValues(
-            values.sort((a: any, b: any) => b.dateCreated - a.dateCreated)
-          );
         }
       });
     }
   }, [userInfo.uid]);
 
   useEffect(() => {
+    console.log(alarmMap);
+  }, [alarmMap]);
+
+  useEffect(() => {
     const q = query(ref(rtDBRef, "alarms/" + userInfo.uid), limitToLast(1));
     onChildAdded(q, (onChildAddedSnapshot) => {
       if (onChildAddedSnapshot.exists()) {
         setUnConfirmedAlarms((originComfirmed) => {
-          if (!originComfirmed.includes(onChildAddedSnapshot.key as string)) {
-            let tmp = originComfirmed.slice();
-            tmp.push(onChildAddedSnapshot.key as string);
+          if (!originComfirmed.has(onChildAddedSnapshot.key as string)) {
+            let tmp = new Map(originComfirmed);
+            tmp.set(
+              onChildAddedSnapshot.key as string,
+              onChildAddedSnapshot.val()
+            );
             return tmp;
           }
           return originComfirmed;
         });
-        setAlarmKeys((originKeys) => {
-          if (!originKeys.includes(onChildAddedSnapshot.key as string)) {
+        setAlarmMap((origin) => {
+          if (!alarmMap.has(onChildAddedSnapshot.key as string)) {
             controls.start({
               fill: "#d84742",
               y: ["0%", "-30%", "0%", "0%", "-30%", "0%"],
             });
-            return [onChildAddedSnapshot.key, ...originKeys];
+            let tmp = new Map(origin);
+            tmp.set(
+              onChildAddedSnapshot.key as string,
+              onChildAddedSnapshot.val()
+            );
+            return tmp;
           }
-          return originKeys;
-        });
-        setAlarmValues((originValues) => {
-          let tmp: string[] = [];
-          originValues.forEach((data) => {
-            tmp.push(data.key);
-          });
-          if (!tmp.includes(onChildAddedSnapshot.key as string)) {
-            return [
-              {
-                ...onChildAddedSnapshot.val(),
-                key: onChildAddedSnapshot.key,
-              },
-              ...originValues,
-            ];
-          }
-          return originValues;
+          return origin;
         });
       }
     });
@@ -126,13 +121,13 @@ const Header: React.FC<props> = ({ userInfo }) => {
             {userInfo.username}
           </span>
           <div className="relative" style={{ zIndex: 1000 }}>
-            <Tooltip title={unConfirmedAlarms.length} placement="top" arrow>
+            <Tooltip title={unConfirmedAlarms.size} placement="top" arrow>
               <motion.svg
-                fill={unConfirmedAlarms.length === 0 ? "#555" : "#d84742"}
-                key={unConfirmedAlarms.length}
+                fill={unConfirmedAlarms.size === 0 ? "#555" : "#d84742"}
+                key={unConfirmedAlarms.size}
                 animate={controls}
                 className={`w-5 ${
-                  unConfirmedAlarms.length > 0 && "animate-pulse"
+                  unConfirmedAlarms.size > 0 && "animate-pulse"
                 }`}
                 x="0px"
                 y="0px"
@@ -148,12 +143,10 @@ const Header: React.FC<props> = ({ userInfo }) => {
             </Tooltip>
             <AlarmModal
               key="alarmModal"
-              alarmValues={alarmValues}
               open={alarmModalOpen}
-              alarmKeys={alarmKeys}
-              setAlarmValues={setAlarmValues}
+              alarmMap={alarmMap}
+              setAlarmMap={setAlarmMap}
               setUnConfirmedAlarms={setUnConfirmedAlarms}
-              setAlarmKeys={setAlarmKeys}
             />
           </div>
         </div>

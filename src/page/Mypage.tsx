@@ -2,12 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useContext, useEffect, useRef, useState } from "react";
 import MypageWriting from "../components/MypageWriting";
 import UserContext from "../context/user";
-import {
-  getUserWritings,
-  getWritingsArrayInfo,
-  getUserByUID,
-  getContetsArrayInfo,
-} from "../services/firebase";
+import { getUserByUID, getContetsArrayInfo } from "../services/firebase";
 import { signOutAuth } from "../helpers/auth-OAuth2";
 import NewWritingModal from "../modals/NewWritingModal";
 import CustomNodeFlow from "../diagram/RelationShipDiagram";
@@ -15,9 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import {
   alarmType,
-  getFirestoreWriting,
   getFirestoreUser,
-  getFirestoreUserWritings,
   getFirestoreContest,
   contestType,
 } from "../type";
@@ -36,6 +29,7 @@ import NewContestModal from "../modals/NewContestModal";
 import ContestRow from "../components/ContestRow";
 import useGetFollowers from "../hooks/useGetFollowers";
 import useImageCompress from "../hooks/useImageCompress";
+import useGetWritings from "../hooks/useGetWritings";
 
 const Mypage = () => {
   // Profile owner's uid
@@ -46,7 +40,7 @@ const Mypage = () => {
   );
 
   const [loading, setLoading] = useState(false);
-  
+
   // For more natural UI of the number of followers of followings, followers
   const followingsLength = useRef(0);
   const followersLength = useRef(0);
@@ -57,36 +51,25 @@ const Mypage = () => {
 
   // Context user
   const { user: contextUser } = useContext(UserContext);
-  const [userWritings, setUserWritings] = useState(
-    {} as getFirestoreUserWritings
-    );
-    // New Writing modal state
-    const [newWritingModalOpen, setNewWritingModalOpen] = useState(false);
-    // New Contest modal state
-    const [newContestModalOpen, setNewContestModalOpen] = useState(false);
-    // Writing category state
-    const [onWritingCategory, setOnWritingCategory] = useState("TOTAL");
-    // Contest category state
+
+  // New Writing modal state
+  const [newWritingModalOpen, setNewWritingModalOpen] = useState(false);
+  // New Contest modal state
+  const [newContestModalOpen, setNewContestModalOpen] = useState(false);
+  // Writing category state
+  const [onWritingCategory, setOnWritingCategory] = useState("TOTAL");
+  // Contest category state
   const [contestCategory, setContestCategory] = useState<contestType>("TOTAL");
-  
+
   // Does User Follow Profile Owner?
   const [doseUserFollow, setDoseUserFollow] = useState(false);
-  // Profile owner's poems list
-  const [poems, setPoems] = useState<Array<getFirestoreWriting>>([]);
-  // Profile owner's novels list
-  const [novels, setNovels] = useState<Array<getFirestoreWriting>>([]);
-  // Profile owner's scenarioes list
-  const [scenarioes, setScenarioes] = useState<Array<getFirestoreWriting>>([]);
-  // Profile owner's total writings list
-  const [totalWritings, setTotalWritings] = useState<
-  Array<getFirestoreWriting>
-  >([]);
+
   const [totalContests, setTotalContests] = useState<
-  Array<getFirestoreContest>
+    Array<getFirestoreContest>
   >([]);
   const navigator = useNavigate();
   const dispatch = useDispatch();
-  
+
   // Header context userInfo
   const setUserInfo = (userInfo: getFirestoreUser) => {
     dispatch(userInfoAction.setUserInfo({ userInfo }));
@@ -106,8 +89,21 @@ const Mypage = () => {
   const setAlarm = (alarm: [string, alarmType, boolean]) => {
     dispatch(alarmAction.setAlarm({ alarm }));
   };
-  const {followersKey, followingsKey, followers, followings, handleMoreFollowers, handleMoreFollowings} = useGetFollowers(setLoading, profileOwnerInfo, followersModal, followingsModal)
-  const {profileImage, setProfileImage, handleProfileImgOnChange} = useImageCompress(profileOwnerInfo, setAlarm)
+  const {
+    followersKey,
+    followingsKey,
+    followers,
+    followings,
+    handleMoreFollowers,
+    handleMoreFollowings,
+  } = useGetFollowers(
+    setLoading,
+    profileOwnerInfo,
+    followersModal,
+    followingsModal
+  );
+  const { profileImage, setProfileImage, handleProfileImgOnChange } =
+    useImageCompress(profileOwnerInfo, setAlarm);
 
   // Window size changed detect!
   useEffect(() => {
@@ -121,41 +117,11 @@ const Mypage = () => {
     followingsLength.current = 0;
     followersLength.current = 0;
   }, [uid]);
+  const { poems, novels, scenarioes, totalWritings, userWritings } =
+    useGetWritings(uid);
 
   // Get profileOwner's user information and user's writings information
   useEffect(() => {
-    // Get and Set profileOwner's writings information function
-    const getWritings = async (userWritings: getFirestoreUserWritings) => {
-      const poems = userWritings.poemDocID
-        ? (
-            (await getWritingsArrayInfo(
-              userWritings.poemDocID
-            )) as Array<getFirestoreWriting>
-          ).sort((a, b) => b.dateCreated - a.dateCreated)
-        : [];
-      const novel = userWritings.novelDocID
-        ? (
-            (await getWritingsArrayInfo(
-              userWritings.novelDocID
-            )) as Array<getFirestoreWriting>
-          ).sort((a, b) => b.dateCreated - a.dateCreated)
-        : [];
-      const scenario = userWritings.scenarioDocID
-        ? (
-            (await getWritingsArrayInfo(
-              userWritings.scenarioDocID
-            )) as Array<getFirestoreWriting>
-          ).sort((a, b) => b.dateCreated - a.dateCreated)
-        : [];
-      setPoems(poems);
-      setNovels(novel);
-      setScenarioes(scenario);
-      setTotalWritings(
-        Array.prototype
-          .concat(poems, novel, scenario)
-          .sort((a, b) => b.dateCreated - a.dateCreated)
-      );
-    };
     const getContests = async (contestsDocID: {
       host: string[];
       participation: string[];
@@ -174,10 +140,6 @@ const Mypage = () => {
       setProfileOwnerInfo(data);
       setProfileImage(data.profileImg);
       getContests(data.contests);
-      getUserWritings(data.uid).then((writings: any) => {
-        setUserWritings(writings as getFirestoreUserWritings);
-        getWritings(writings);
-      });
       followersLength.current = data.followers.length;
       followingsLength.current = data.followings.length;
     });

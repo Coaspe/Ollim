@@ -3,9 +3,12 @@ import { useState } from "react";
 import { alarmType, getFirestoreUser } from "../type";
 import Compressor from "compressorjs";
 
-const useImageCompress = (profileOwnerInfo: getFirestoreUser, setAlarm: (alarm: [string, alarmType, boolean]) => void) => {
-    const [profileImage, setProfileImage] = useState("");
-    // Image Compress process
+const useImageCompress = (
+  profileOwnerInfo: getFirestoreUser,
+  setAlarm: (alarm: [string, alarmType, boolean]) => void
+) => {
+  const [profileImage, setProfileImage] = useState("");
+  // Image Compress process
   const handleProfileImgOnChange = (event: any) => {
     const element = event.target.files[0];
 
@@ -46,8 +49,8 @@ const useImageCompress = (profileOwnerInfo: getFirestoreUser, setAlarm: (alarm: 
         return;
       },
     });
+  };
+  return { profileImage, setProfileImage, handleProfileImgOnChange };
 };
-return {profileImage, setProfileImage, handleProfileImgOnChange}
-}
 
 export default useImageCompress;
