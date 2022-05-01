@@ -24,7 +24,6 @@ const ContestSubmissionModal: React.FC<NewContestProps> = ({
   const [limitNumOfPeople, setLimitNumOfPeople] = useState<number | "">(5);
   const [deadline, setDeadline] = useState<string>(new Date().toString());
   const dispatch = useDispatch();
-  // const [table, setTable] = useState<submissionTableType>();
 
   const userInfo = useSelector(
     (state: RootState) => state.setUserInfo.userInfo
@@ -49,7 +48,6 @@ const ContestSubmissionModal: React.FC<NewContestProps> = ({
   const setAlarm = (alarm: [string, alarmType, boolean]) => {
     dispatch(alarmAction.setAlarm({ alarm }));
   };
-  // https://ollim.herokuapp.com
   const handleAddContest = () => {
     const data: addContestArg = {
       limitNumOfPeople: limitNumOfPeople as number,

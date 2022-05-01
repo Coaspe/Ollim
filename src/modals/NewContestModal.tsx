@@ -64,7 +64,7 @@ const NewContestModal: React.FC<NewContestProps> = ({
     //localhost:3000/addContest
     //ollim.herokuapp.com/addContest
     axios
-      .post(`http://localhost:3001/addContest`, {
+      .post(`http://ollim.herokuapp.com/addContest`, {
         data: JSON.stringify(data),
       })
       .then((res) => {
