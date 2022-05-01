@@ -26,6 +26,7 @@ import ContestSetting from "../components/ContestSetting";
 import { css, cx } from "@emotion/css";
 import SlateEditorContest from "../SlateEditor/SlateEditorContest";
 import ContestWriting from "../components/ContestWriting";
+import ContestParticipantModal from "../modals/ContestParticipantModal";
 
 export const genreMatching = {
   NOVEL: "소설",
@@ -46,11 +47,12 @@ const Contest = () => {
   const [contestHostInfo, setContestHostInfo] = useState<getFirestoreUser>(
     {} as getFirestoreUser
   );
-
+  // Contest Information
   const [contestInfo, setContestInfo] = useState<getFirestoreContest>(
     {} as getFirestoreContest
   );
-  const [submissionModalOpen, setSubmissionModalOpen] = useState(false);
+  const [participateModalOpen, setParticipateModalOpen] = useState(false);
+
   // Table State
   const [table, setTable] = useState<contestTableType>("OVERVIEW");
 
@@ -62,15 +64,23 @@ const Contest = () => {
   const [deadline, setDeadline] = useState("");
   // Title
   const [title, setTitle] = useState("");
-  const [doesParticipate, setDoesParticipate] = useState(false);
+
+  // The work I submitted
+  const [submittedWriting, setSubmittedWriting] = useState(
+    {} as contestWriting
+  );
+  // Submitted writings contained others
+  const [writingDocInfo, setWritingDocInfo] = useState<contestWriting[]>([]);
+
+  // Browse submitted writing
+  const [selectedWritingDocID, setSelectedWritingDocID] = useState("");
+  const [selectedWritingInfo, setSelectedWritingInfo] =
+    useState<getFirestoreWriting>({} as getFirestoreWriting);
+
   const dispatch = useDispatch();
 
   const navigator = useNavigate();
 
-  const [writingDocInfo, setWritingDocInfo] = useState<contestWriting[]>([]);
-  const [selectedWritingDocID, setSelectedWritingDocID] = useState("");
-  const [selectedWritingInfo, setSelectedWritingInfo] =
-    useState<getFirestoreWriting>({} as getFirestoreWriting);
   const handleOnClick = (selectedWritingDocID: string) => {
     setSelectedWritingDocID(selectedWritingDocID);
     setTable("BROWSE");
@@ -109,10 +119,13 @@ const Contest = () => {
   useEffect(() => {
     if (contestDocID) {
       getContestInfo(contestDocID).then((res: any) => {
-        setContestInfo(res.data());
-        setWritingDocInfo(Object.values(res.data().writings));
-        setDeadline(res.data().deadline);
-        setDescription(res.data().description);
+        const data = res.data();
+        setContestInfo(data);
+        setWritingDocInfo(Object.values(data.writings));
+        setDeadline(data.deadline);
+        setDescription(data.description);
+        data.writings[contextUser.uid] &&
+          setSubmittedWriting(data.writings[contextUser.uid]);
       });
     }
   }, [table, contestDocID]);
@@ -129,6 +142,10 @@ const Contest = () => {
       }
     }
   }, []);
+  useEffect(() => {
+    console.log(writingDocInfo);
+  }, [writingDocInfo]);
+  // Browse writing
   useEffect(() => {
     if (selectedWritingDocID) {
       getWritingInfo(selectedWritingDocID).then((res: any) => {
@@ -209,7 +226,17 @@ const Contest = () => {
 
   return (
     <>
-      {/* {setSubmissionModalOpen && } */}
+      {contextUser.uid && contestInfo.genre && (
+        <ContestParticipantModal
+          uid={contextUser.uid}
+          genre={contestInfo.genre}
+          open={participateModalOpen}
+          setOpen={setParticipateModalOpen}
+          contestDocID={contestDocID as string}
+          setSubmittedWriting={setSubmittedWriting}
+          deadline={contestInfo.deadline}
+        />
+      )}
       {Object.keys(contestInfo).length > 0 &&
         Object.keys(contestHostInfo).length > 0 && (
           <div className="w-full bg-opacity-30 relative writing-container font-noto">
@@ -232,7 +259,7 @@ const Contest = () => {
             {/* Header */}
             <Header userInfo={contextUserInfo} />
 
-            {/* Writing title, genre, owner's name,  */}
+            {/* Contest title Navigation bar*/}
             <div className="flex flex-col items-start px-20 GalaxyS20Ultra:px-10">
               <div className="flex flex-col items-start justify-center font-bold mb-10">
                 <div className="flex items-center justify-center space-x-2">
@@ -349,8 +376,19 @@ const Contest = () => {
                     </div>
                   </div>
                   <div className="flex flex-col GalaxyS20Ultra:w-full">
-                    <span className="text-2xl font-bold mb-10">마감 일자</span>
-                    <span>{contestInfo.deadline}</span>
+                    <div className="flex items-center mb-10">
+                      <span className="text-2xl font-bold mr-3">마감 일자</span>
+                      {new Date(contestInfo.deadline).getTime() >=
+                      new Date().getTime() ? (
+                        <div className="w-2 h-2 rounded-full bg-green-500" />
+                      ) : (
+                        <div className="w-2 h-2 rounded-full bg-red-500" />
+                      )}
+                    </div>
+                    <span>
+                      {contestInfo.deadline.split("T")[0]}{" "}
+                      {contestInfo.deadline.split("T")[1].split(".")[0]}
+                    </span>
                   </div>
                   <div className="flex flex-col GalaxyS20Ultra:w-full">
                     <span className="text-2xl font-bold mb-10">제한 인원</span>
@@ -365,7 +403,7 @@ const Contest = () => {
                   </div>
                 </div>
 
-                {/* Synopsis div */}
+                {/* Description div */}
                 <div className="flex flex-col mb-20 w-2/3 GalaxyS20Ultra:w-full">
                   <span className="text-2xl font-bold mb-10">백일장 설명</span>
                   <textarea
@@ -377,30 +415,36 @@ const Contest = () => {
                     {contestInfo.description}
                   </textarea>
                 </div>
+
                 {/* Participate, Submission div */}
                 <div className="flex flex-col mb-20 w-2/3 GalaxyS20Ultra:w-full">
                   <span className="text-2xl font-bold mb-10 flex items-center">
                     {Object.keys(contestInfo.writings).includes(contextUser.uid)
-                      ? "제출하기"
+                      ? "제출 목록"
                       : "참가하기"}
-                    <motion.span
-                      whileHover={{ backgroundColor: "rgb(209 213 219)" }}
-                      transition={{ ease: "linear" }}
-                      className="material-icons px-1 py-1 rounded-full cursor-pointer ml-2"
-                    >
-                      manage_search
-                    </motion.span>
+                    {!Object.keys(submittedWriting).length && (
+                      <motion.span
+                        whileHover={{ backgroundColor: "rgb(209 213 219)" }}
+                        transition={{ ease: "linear" }}
+                        onClick={() => {
+                          setParticipateModalOpen(true);
+                        }}
+                        className="material-icons px-1 py-1 rounded-full cursor-pointer ml-2"
+                      >
+                        manage_search
+                      </motion.span>
+                    )}
                   </span>
-                  {contestInfo.writings[contextUser.uid].writingDocID ? (
-                    <span className="font-bold text-xl text-gray-400">
-                      제출한 작품이 여기에 표시됩니다
-                    </span>
-                  ) : (
+                  {Object.keys(submittedWriting).length ? (
                     <ContestWriting
-                      data={contestInfo.writings[contextUser.uid]}
+                      data={submittedWriting}
                       widthSize={widthSize}
                       handleOnClick={handleOnClick}
                     />
+                  ) : (
+                    <span className="font-bold text-xl text-gray-400">
+                      제출한 작품이 여기에 표시됩니다
+                    </span>
                   )}
                 </div>
               </div>
@@ -426,6 +470,7 @@ const Contest = () => {
                 />
               </div>
             )}
+
             {/* Table VOTE */}
             {table === "VOTE" && (
               <div className="w-full flex flex-col items-start px-20 mt-10 GalaxyS20Ultra:px-10">
@@ -435,13 +480,17 @@ const Contest = () => {
                     layout
                     className="grid grid-cols-3 items-center justify-between w-full gap-5 GalaxyS20Ultra:flex GalaxyS20Ultra:flex-col GalaxyS20Ultra:items-center GalaxyS20Ultra:overflow-y-scroll GalaxyS20Ultra:max-h-72 GalaxyS20Ultra:py-5 GalaxyS20Ultra:px-3"
                   >
-                    {writingDocInfo.map((val) => (
-                      <ContestWriting
-                        data={val}
-                        widthSize={widthSize}
-                        handleOnClick={handleOnClick}
-                      />
-                    ))}
+                    {writingDocInfo.length ? (
+                      writingDocInfo.map((val) => (
+                        <ContestWriting
+                          data={val}
+                          widthSize={widthSize}
+                          handleOnClick={handleOnClick}
+                        />
+                      ))
+                    ) : (
+                      <span>참가자가 없습니다</span>
+                    )}
                   </motion.div>
                 </div>
                 {/* Synopsis div */}

@@ -47,10 +47,6 @@ const Header: React.FC<props> = ({ userInfo }) => {
   }, [userInfo.uid]);
 
   useEffect(() => {
-    console.log(alarmMap);
-  }, [alarmMap]);
-
-  useEffect(() => {
     const q = query(ref(rtDBRef, "alarms/" + userInfo.uid), limitToLast(1));
     onChildAdded(q, (onChildAddedSnapshot) => {
       if (onChildAddedSnapshot.exists()) {
@@ -90,7 +86,7 @@ const Header: React.FC<props> = ({ userInfo }) => {
   };
 
   return (
-    <div className="select-none flex w-full items-center justify-between px-20 GalaxyS20Ultra:px-10 GalaxyS20Ultra:my-5">
+    <header className="select-none flex w-full items-center justify-between px-20 GalaxyS20Ultra:px-10 GalaxyS20Ultra:my-5">
       {/* logo */}
       <img
         onClick={() => {
@@ -177,7 +173,7 @@ const Header: React.FC<props> = ({ userInfo }) => {
           </svg>
         </div>
       )}
-    </div>
+    </header>
   );
 };
 

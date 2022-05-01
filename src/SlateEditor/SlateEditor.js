@@ -91,7 +91,7 @@ const SlateEditor = ({
 
   const [openNewCollectionElementModal, setOpenNewCollectionElementModal] =
     useState(false);
-  const [nowCollectionNum, setNowCollectionNum] = useState(0);
+  const [nowCollectionNum, setNowCollectionNum] = useState(1);
   const [collectionNumArray, setCollectionNumArray] = useState([]);
   const [newCollectionElementTitle, setNewCollectionElementTitle] =
     useState("");

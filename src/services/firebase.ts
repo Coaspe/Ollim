@@ -8,8 +8,10 @@ import {
   query,
   where,
   getDocs,
+  updateDoc,
+  writeBatch,
 } from "firebase/firestore";
-import { toObjectElements } from "../type";
+import { contestWriting, getFirestoreWriting, toObjectElements } from "../type";
 import { ref, remove } from "firebase/database";
 
 export const signInWithGoogleInfo = (info: any) => {
@@ -157,4 +159,40 @@ export const getContestInfo = (contestDocID: string) => {
 };
 export const removeAlarm = (alarmID: string, userUID: string) => {
   return remove(ref(rtDBRef, `alarms/${userUID}/${alarmID}`));
+};
+
+export const participateContest = async (
+  contestDocID: string,
+  data: getFirestoreWriting,
+  collectionNum?: number
+) => {
+  let tmp = Object.assign({}, data);
+  if (collectionNum) {
+    tmp.isCollection = false;
+    tmp.collection = { 1: tmp.collection[collectionNum] };
+  }
+  try {
+    const newDocID = (await addDoc(collection(firestore, "allWritings"), tmp))
+      .id;
+
+    const ref = doc(firestore, "contests", contestDocID);
+    const update: {
+      [key: string]: contestWriting;
+    } = {};
+
+    update[`writings.${data.userUID}`] = {
+      title: data.title,
+      updateDate: new Date().getTime(),
+      synopsis: data.synopsis,
+      writingDocID: newDocID,
+      vote: 0,
+      collectionTitle: collectionNum ? tmp.collection[1].title : "",
+    };
+
+    updateDoc(ref, update);
+    return newDocID;
+  } catch (error) {
+    console.log(error);
+  }
+  return "";
 };

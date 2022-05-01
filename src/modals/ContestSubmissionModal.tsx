@@ -57,6 +57,7 @@ const ContestSubmissionModal: React.FC<NewContestProps> = ({
       description,
       genre: genrnState,
       hostUID: userInfo.uid,
+      hostEmail: userInfo.userEmail,
       deadline,
       dateCreated: new Date().getTime(),
       writings: {},

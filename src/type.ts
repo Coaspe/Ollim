@@ -5,6 +5,7 @@ export type genre = "SCENARIO" | "POEM" | "NOVEL";
 export type tableType = "OVERVIEW" | "WRITE" | "SETTING" | "BROWSE";
 export type contestTableType = "OVERVIEW" | "BROWSE" | "VOTE" | "SETTING";
 export type gerneType = "NOVEL" | "POEM" | "SCENARIO";
+export type gerneDocIDType = "novelDocID" | "poemDocID" | "scenarioDocID";
 export type alarmType = "error" | "warning" | "info" | "success";
 export type contestType = "HOST" | "PARTICIPATION" | "TOTAL";
 export type alarmCategory =
@@ -125,6 +126,7 @@ export interface addContestArg {
   genre: genre;
   description: string;
   hostUID: string;
+  hostEmail: string;
   deadline: string;
   writings: { [key: string]: contestWriting };
   dateCreated: number;
@@ -138,6 +140,7 @@ export type contestWriting = {
   vote: number;
   synopsis: string;
   title: string;
+  collectionTitle?: string;
 };
 export type getFirestoreWriting = {
   collection: collectionType;

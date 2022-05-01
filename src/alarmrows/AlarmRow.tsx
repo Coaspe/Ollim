@@ -3,7 +3,7 @@ import { memo, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../context/user";
 import { removeAlarm } from "../services/firebase";
-import { alarmNewCommit, getFirestoreAlarmType, totalAlarmType } from "../type";
+import { getFirestoreAlarmType, totalAlarmType } from "../type";
 import axios from "axios";
 import { alarmNavigator } from "../helpers/alarm-navigator";
 import AlarmContent from "./AlarmContent";
@@ -39,17 +39,17 @@ const AlarmRow: React.FC<props> = ({
       className="relative flex border rounded-md px-3 py-3 items-center w-full h-fit"
       onClick={(e) => {
         e.stopPropagation();
+        setUnConfirmedAlarms((origin) => {
+          const tmp = new Map(origin);
+          tmp.delete(identity);
+          return tmp;
+        });
         axios
           .post("https://ollim.herokuapp.com/makeAlarmSeen", {
             alarmKey: identity,
             userUID: user.uid,
           })
           .then(() => {
-            setUnConfirmedAlarms((origin) => {
-              const tmp = new Map(origin);
-              tmp.delete(identity);
-              return tmp;
-            });
             alarmNavigator(info, data.category, navigator);
           });
       }}
@@ -62,20 +62,19 @@ const AlarmRow: React.FC<props> = ({
       <span
         onClick={(e) => {
           e.stopPropagation();
-          removeAlarm(identity, user.uid).then(() => {
-            if (!data.seen) {
-              setUnConfirmedAlarms((origin) => {
-                const tmp = new Map(origin);
-                tmp.delete(identity);
-                return tmp;
-              });
-            }
-            setAlarmMap((origin) => {
+          if (!data.seen) {
+            setUnConfirmedAlarms((origin) => {
               const tmp = new Map(origin);
               tmp.delete(identity);
               return tmp;
             });
+          }
+          setAlarmMap((origin) => {
+            const tmp = new Map(origin);
+            tmp.delete(identity);
+            return tmp;
           });
+          removeAlarm(identity, user.uid);
         }}
         className="material-icons absolute top-0.5 right-0.5 text-sm text-gray-500"
       >

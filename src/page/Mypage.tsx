@@ -70,7 +70,7 @@ const Mypage = () => {
   const navigator = useNavigate();
   const dispatch = useDispatch();
 
-  // Header context userInfo
+  // Header context redux userInfo
   const setUserInfo = (userInfo: getFirestoreUser) => {
     dispatch(userInfoAction.setUserInfo({ userInfo }));
   };
@@ -198,7 +198,17 @@ const Mypage = () => {
               setFollowersModal(false);
             }}
           >
-            <div className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg GalaxyS20Ultra:w-1/2 GalaxyS20Ultra:w-4/5">
+            <motion.div
+              animate={{
+                scale: ["80%", "100%"],
+                opacity: ["0%", "100%"],
+              }}
+              transition={{
+                duration: 0.2,
+                type: "spring",
+              }}
+              className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg GalaxyS20Ultra:w-1/2 GalaxyS20Ultra:w-4/5"
+            >
               <span className="text-xl font-bold text-gray-500 mb-5">
                 팔로워
               </span>
@@ -234,7 +244,7 @@ const Mypage = () => {
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -253,7 +263,17 @@ const Mypage = () => {
               setFollowingsModal(false);
             }}
           >
-            <div className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg GalaxyS20Ultra:w-4/5">
+            <motion.div
+              animate={{
+                scale: ["80%", "100%"],
+                opacity: ["0%", "100%"],
+              }}
+              transition={{
+                duration: 0.2,
+                type: "spring",
+              }}
+              className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg GalaxyS20Ultra:w-4/5"
+            >
               <span className="text-xl font-bold text-gray-500 mb-5">
                 팔로우
               </span>
@@ -290,7 +310,7 @@ const Mypage = () => {
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -310,6 +330,7 @@ const Mypage = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
       {/* New Writing Modal */}
       {newWritingModalOpen && (
         <NewWritingModal setNewWritingModalOpen={setNewWritingModalOpen} />
@@ -360,7 +381,6 @@ const Mypage = () => {
                         origin
                           ? (followersLength.current -= 1)
                           : (followersLength.current += 1);
-                        // https://ollim.herokuapp.com
                         axios.post(
                           `https://ollim.herokuapp.com/updateFollowing`,
                           {

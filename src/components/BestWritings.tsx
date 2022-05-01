@@ -1,10 +1,12 @@
 import { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { genre, medal } from "../type";
+
 interface props {
   data: any;
-  medal: medal;
+  medal?: medal;
 }
+
 const BestWriting: React.FC<props> = ({ data, medal }) => {
   const gerneType = {
     SCENARIO: "시나리오",
@@ -31,7 +33,9 @@ const BestWriting: React.FC<props> = ({ data, medal }) => {
               {gerneType[data.genre as genre]}
             </span>
           </div>
-          <img className="w-7" src={`/svg/${medal}.svg`} alt={medal} />
+          {medal && (
+            <img className="w-7" src={`/svg/${medal}.svg`} alt={medal} />
+          )}
         </div>
         <textarea
           value={data.synopsis}

@@ -12,6 +12,7 @@ const Mypage = lazy(() => import("./page/Mypage"));
 
 const App = () => {
   const { user } = useAuthListner();
+
   return (
     <UserContext.Provider value={{ user }}>
       <Router>
