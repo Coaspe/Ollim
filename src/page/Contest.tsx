@@ -142,9 +142,7 @@ const Contest = () => {
       }
     }
   }, []);
-  useEffect(() => {
-    console.log(writingDocInfo);
-  }, [writingDocInfo]);
+
   // Browse writing
   useEffect(() => {
     if (selectedWritingDocID) {
@@ -329,7 +327,7 @@ const Contest = () => {
                           isServerClosedComment === "서버 닫힘"
                         }
                         onClick={isOpened}
-                        className={`text-white flex flex-col items-center justify-center cursor-pointer ml-5 h-8 rounded-2xl px-2 
+                        className={`text-white flex flex-col items-center justify-center cursor-pointer ml-5 h-8 rounded-2xl px-2
                             ${
                               isServerClosedComment === "서버 닫힘" &&
                               "bg-red-400"
@@ -380,9 +378,9 @@ const Contest = () => {
                       <span className="text-2xl font-bold mr-3">마감 일자</span>
                       {new Date(contestInfo.deadline).getTime() >=
                       new Date().getTime() ? (
-                        <div className="w-2 h-2 rounded-full bg-green-500" />
+                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                       ) : (
-                        <div className="w-2 h-2 rounded-full bg-red-500" />
+                        <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                       )}
                     </div>
                     <span>
@@ -449,6 +447,8 @@ const Contest = () => {
                 </div>
               </div>
             )}
+
+            {/* Table BROWSE */}
             {table === "BROWSE" && selectedWritingInfo && (
               <div
                 className={cx(

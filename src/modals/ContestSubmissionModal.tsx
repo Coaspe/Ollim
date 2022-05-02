@@ -35,6 +35,7 @@ const ContestSubmissionModal: React.FC<NewContestProps> = ({
       document.body.style.overflow = "visible";
     };
   }, []);
+
   const handleNumOfPeople = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.target.validity.valid &&
       setLimitNumOfPeople(() => {

@@ -118,7 +118,7 @@ export const getBestWritings = async () => {
   const year = date.getFullYear();
   const month = (date.getMonth() + 1) % 12 === 0 ? 12 : date.getMonth();
   const data: any = (
-    await getDoc(doc(firestore, "Rank", `${year}.${month}`))
+    await getDoc(doc(firestore, "Rank", `${year}.${3}`))
   ).data();
   const rankArray = [data["FIRST"], data["SECOND"], data["THIRD"]];
   let writingData = await getWritingsArrayInfo(rankArray);

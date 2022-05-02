@@ -18,7 +18,11 @@ const FollowerRow: React.FC<props> = ({ data, setFollowersModal }) => {
       }}
       className="w-full flex items-center cursor-pointer shadow-lg px-2 py-1 rounded-2xl"
     >
-      <img className="w-7 rounded-full" src={data.profileImg} alt="follower" />
+      <img
+        className="w-7 h-7 rounded-full object-cover"
+        src={data.profileImg}
+        alt="follower"
+      />
       <span className="ml-3">{data.username}</span>
     </motion.div>
   );

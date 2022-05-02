@@ -38,6 +38,7 @@ const MypageWriting: React.FC<props> = ({ data, widthSize }) => {
         setInfoVisible(false);
         timer && clearTimeout(timer);
       }}
+      style={{ maxWidth: "500px" }}
       className="relative w-full h-full"
     >
       <AnimateSharedLayout>
@@ -52,20 +53,20 @@ const MypageWriting: React.FC<props> = ({ data, widthSize }) => {
             </span>
           )}
           <div className="mb-3 flex items-center justify-between GalaxyS20Ultra:flex-col">
-            <div className="flex items-center space-x-3">
-              <span className="text-xl font-black GalaxyS20Ultra:text-sm">
-                {data.title.length > 9
-                  ? `${data.title.slice(0, 10)} ...`
-                  : data.title}
-              </span>
-              <span className="font-bold text-lg">·</span>
-              <span className="text-sm text-gray-700 font-black GalaxyS20Ultra:text-xs">
+            <span className="text-xl font-black GalaxyS20Ultra:text-sm">
+              {data.title.length > 9
+                ? `${data.title.slice(0, 10)} ...`
+                : data.title}
+            </span>
+            <div className="flex items-center space-x-2 text-gray-400">
+              <span className="text-sm font-black GalaxyS20Ultra:text-xs">
                 {gerneType[data.genre as genre]}
               </span>
+              <span className="font-bold text-lg">·</span>
+              <span style={{ fontSize: "0.7rem" }} className="text-gray-400">
+                {data.likes.length} 좋아요
+              </span>
             </div>
-            <span style={{ fontSize: "0.7rem" }} className="text-gray-400">
-              {data.likes.length} 좋아요
-            </span>
           </div>
           {widthSize > 500 && (
             <motion.textarea
