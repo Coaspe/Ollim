@@ -60,6 +60,7 @@ const NewContestModal: React.FC<NewContestProps> = ({
       deadline,
       dateCreated: new Date().getTime(),
       writings: {},
+      whoVoted: {},
     };
     axios
       .post(`http://ollim.herokuapp.com/addContest`, {
@@ -92,7 +93,15 @@ const NewContestModal: React.FC<NewContestProps> = ({
       transition={{ duration: 0.2, ease: "easeIn" }}
     >
       {userInfo && (
-        <div
+        <motion.div
+          animate={{
+            scale: ["80%", "100%"],
+            opacity: ["0%", "100%"],
+          }}
+          transition={{
+            duration: 0.2,
+            type: "spring",
+          }}
           style={{ backgroundColor: "#faf6f5" }}
           className="relative w-1/2 h-3/4 flex flex-col items-center justify-center rounded-xl"
         >
@@ -105,7 +114,9 @@ const NewContestModal: React.FC<NewContestProps> = ({
           <AnimatePresence>
             {title && new Date(deadline).getTime() > new Date().getTime() && (
               <motion.svg
-                whileHover={{ y: "-10%" }}
+                whileHover={{
+                  y: "-10%",
+                }}
                 x="0px"
                 y="0px"
                 fill="none"
@@ -270,7 +281,7 @@ const NewContestModal: React.FC<NewContestProps> = ({
               />
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
     </motion.div>
   );

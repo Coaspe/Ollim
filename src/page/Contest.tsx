@@ -1,5 +1,11 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useContext, useEffect, useState } from "react";
+import {
+  ContextType,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import UserContext from "../context/user";
 import {
@@ -14,6 +20,7 @@ import {
   contestTableType,
   getFirestoreWriting,
   contestWriting,
+  genreMatching,
 } from "../type";
 import { useDispatch, useSelector } from "react-redux";
 import { isFullScreenAction, widthSizeAction } from "../redux";
@@ -25,14 +32,8 @@ import SpinningSvg from "../components/SpinningSvg";
 import ContestSetting from "../components/ContestSetting";
 import { css, cx } from "@emotion/css";
 import SlateEditorContest from "../SlateEditor/SlateEditorContest";
-import ContestWriting from "../components/ContestWriting";
+import ContestWriting from "../writingComponents/ContestWriting";
 import ContestParticipantModal from "../modals/ContestParticipantModal";
-
-export const genreMatching = {
-  NOVEL: "소설",
-  POEM: "시",
-  SCENARIO: "시나리오",
-};
 
 const Contest = () => {
   // User Info Variables
@@ -52,11 +53,11 @@ const Contest = () => {
     {} as getFirestoreContest
   );
   const [participateModalOpen, setParticipateModalOpen] = useState(false);
-
+  const [numOfEntry, setNumOfEntry] = useState(0);
   // Table State
   const [table, setTable] = useState<contestTableType>("OVERVIEW");
 
-  // Writing informations that can be editted by user are assigned to useState ex. title ...
+  const [userVote, setUserVote] = useState("");
 
   // Synopsis State
   const [description, setDescription] = useState("");
@@ -96,61 +97,6 @@ const Contest = () => {
   // alarm state
   // alarm[0] : alarm message, alarm[1] : alarm type, alarm[2] : alarm on, off
   const alarm = useSelector((state: RootState) => state.setAlarm.alarm);
-
-  // useEffect to get context user's information
-  useEffect(() => {
-    if (contextUser && contextUser.email) {
-      getUserByEmail(contextUser.email as string).then((res) => {
-        setContextUserInfo(res.data() as getFirestoreUser);
-      });
-    }
-  }, [contextUser]);
-
-  // useEffect to get writing owner's information
-  useEffect(() => {
-    if (contestInfo && contestInfo.hostUID) {
-      getUserByUID(contestInfo.hostUID).then((res) => {
-        setContestHostInfo(res.docs[0].data() as getFirestoreUser);
-      });
-    }
-  }, [contestInfo]);
-
-  // Get writing info and set relevant states
-  useEffect(() => {
-    if (contestDocID) {
-      getContestInfo(contestDocID).then((res: any) => {
-        const data = res.data();
-        setContestInfo(data);
-        setWritingDocInfo(Object.values(data.writings));
-        setDeadline(data.deadline);
-        setDescription(data.description);
-        data.writings[contextUser.uid] &&
-          setSubmittedWriting(data.writings[contextUser.uid]);
-      });
-    }
-  }, [table, contestDocID]);
-
-  // Detect full screen change and Set fullscreen redux state
-  useEffect(() => {
-    if (document.addEventListener) {
-      document.addEventListener("fullscreenchange", exitHandler, false);
-    }
-    function exitHandler() {
-      if (!document.fullscreenElement) {
-        // Run code on exit
-        setIsFullScreen(false);
-      }
-    }
-  }, []);
-
-  // Browse writing
-  useEffect(() => {
-    if (selectedWritingDocID) {
-      getWritingInfo(selectedWritingDocID).then((res: any) => {
-        setSelectedWritingInfo(res);
-      });
-    }
-  }, [selectedWritingDocID]);
 
   // Alert modal framer-motion variant
   const alertVariants = {
@@ -216,6 +162,68 @@ const Contest = () => {
   const widthSize = useSelector(
     (state: RootState) => state.setWidthSize.widthSize
   );
+
+  ////////////////////////////////////////////////////// useEffects /////////////////////////////////////////
+  // useEffect to get context user's information
+  useEffect(() => {
+    if (contextUser && contextUser.email) {
+      getUserByEmail(contextUser.email as string).then((res) => {
+        setContextUserInfo(res.data() as getFirestoreUser);
+      });
+    }
+  }, [contextUser]);
+
+  // useEffect to get writing owner's information
+  useEffect(() => {
+    if (contestInfo && contestInfo.hostUID) {
+      getUserByUID(contestInfo.hostUID).then((res) => {
+        setContestHostInfo(res.docs[0].data() as getFirestoreUser);
+      });
+    }
+  }, [contestInfo]);
+
+  // Get writing info and set relevant states
+  useEffect(() => {
+    if (contestDocID) {
+      getContestInfo(contestDocID).then((res: any) => {
+        const data: getFirestoreContest = res.data();
+        setNumOfEntry(Object.keys(data.writings).length);
+        setWritingDocInfo(Object.values(data.writings));
+        setDeadline(data.deadline);
+        setDescription(data.description);
+        setTitle(data.title);
+        data.writings[contextUser.uid] &&
+          setSubmittedWriting(data.writings[contextUser.uid]);
+        Object.keys(data.whoVoted).includes(contextUser.uid) &&
+          setUserVote(data.whoVoted[contextUser.uid]);
+        setContestInfo(data);
+      });
+    }
+  }, [table, contestDocID]);
+
+  // Detect full screen change and Set fullscreen redux state
+  useEffect(() => {
+    if (document.addEventListener) {
+      document.addEventListener("fullscreenchange", exitHandler, false);
+    }
+    function exitHandler() {
+      if (!document.fullscreenElement) {
+        // Run code on exit
+        setIsFullScreen(false);
+      }
+    }
+  }, []);
+
+  // Browse writing
+  useEffect(() => {
+    if (selectedWritingDocID) {
+      getWritingInfo(selectedWritingDocID).then((res: any) => {
+        setSelectedWritingInfo(res);
+      });
+    }
+  }, [selectedWritingDocID]);
+
+  // Window size change detect
   useEffect(() => {
     window.onresize = () => {
       setWidthSize(window.innerWidth);
@@ -233,9 +241,11 @@ const Contest = () => {
           contestDocID={contestDocID as string}
           setSubmittedWriting={setSubmittedWriting}
           deadline={contestInfo.deadline}
+          setNumOfEntry={setNumOfEntry}
         />
       )}
       {Object.keys(contestInfo).length > 0 &&
+        contestDocID &&
         Object.keys(contestHostInfo).length > 0 && (
           <div className="w-full bg-opacity-30 relative writing-container font-noto">
             {/* Alarm */}
@@ -281,20 +291,22 @@ const Contest = () => {
                 >
                   summarize
                 </span>
-
-                {Object.keys(selectedWritingInfo).length > 0 && (
-                  <span
-                    className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${
-                      table === "BROWSE" &&
-                      "text-hoverSpanMenu shadow-hoverSpanMenu"
-                    }`}
-                    onClick={() => {
-                      setTable("BROWSE");
-                    }}
-                  >
-                    play_circle
-                  </span>
-                )}
+                <AnimatePresence>
+                  {Object.keys(selectedWritingInfo).length > 0 && (
+                    <motion.span
+                      animate={{ y: ["0%", "-20%", "0%", "-20%", "0%"] }}
+                      className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${
+                        table === "BROWSE" &&
+                        "text-hoverSpanMenu shadow-hoverSpanMenu"
+                      }`}
+                      onClick={() => {
+                        setTable("BROWSE");
+                      }}
+                    >
+                      play_circle
+                    </motion.span>
+                  )}
+                </AnimatePresence>
                 <span
                   onClick={() => {
                     setTable("VOTE");
@@ -366,7 +378,7 @@ const Contest = () => {
                       className="flex w-fit items-center justify-between cursor-pointer text-xl font-bold"
                     >
                       <img
-                        className="w-9 rounded-full mr-2"
+                        className="w-7 h-7 object-cover rounded-full mr-2"
                         src={contestHostInfo.profileImg}
                         alt="writing owner"
                       />
@@ -391,8 +403,7 @@ const Contest = () => {
                   <div className="flex flex-col GalaxyS20Ultra:w-full">
                     <span className="text-2xl font-bold mb-10">제한 인원</span>
                     <span>
-                      {Object.keys(contestInfo.writings).length}/
-                      {contestInfo.limitNumOfPeople}
+                      {numOfEntry}/{contestInfo.limitNumOfPeople}
                     </span>
                   </div>
                   <div className="flex flex-col GalaxyS20Ultra:w-full">
@@ -438,6 +449,11 @@ const Contest = () => {
                       data={submittedWriting}
                       widthSize={widthSize}
                       handleOnClick={handleOnClick}
+                      contestDocID={contestDocID}
+                      contextUserUID={contextUser.uid}
+                      deadline={deadline}
+                      userVote={userVote}
+                      setUserVote={setUserVote}
                     />
                   ) : (
                     <span className="font-bold text-xl text-gray-400">
@@ -486,6 +502,11 @@ const Contest = () => {
                           data={val}
                           widthSize={widthSize}
                           handleOnClick={handleOnClick}
+                          contestDocID={contestDocID}
+                          contextUserUID={contextUser.uid}
+                          deadline={deadline}
+                          userVote={userVote}
+                          setUserVote={setUserVote}
                         />
                       ))
                     ) : (

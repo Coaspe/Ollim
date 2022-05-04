@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useContext, useEffect, useRef, useState } from "react";
-import MypageWriting from "../components/MypageWriting";
+import MypageWriting from "../writingComponents/MypageWriting";
 import UserContext from "../context/user";
 import { getUserByUID, getContetsArrayInfo } from "../services/firebase";
 import { signOutAuth } from "../helpers/auth-OAuth2";
@@ -129,10 +129,13 @@ const Mypage = () => {
       const host = contestsDocID["host"];
       const participation = contestsDocID["participation"];
 
-      const tmp: Array<any> = contestsDocID
-        ? await getContetsArrayInfo(Array.prototype.concat(host, participation))
-        : [];
-      tmp && setTotalContests(tmp);
+      const tmp: Array<any> =
+        host || participation
+          ? await getContetsArrayInfo(
+              Array.prototype.concat(host, participation)
+            )
+          : [];
+      setTotalContests(tmp);
     };
     // Get user information
     getUserByUID(uid as string).then((res: any) => {
@@ -207,7 +210,7 @@ const Mypage = () => {
                 duration: 0.2,
                 type: "spring",
               }}
-              className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg GalaxyS20Ultra:w-1/2 GalaxyS20Ultra:w-4/5"
+              className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg GalaxyS20Ultra:w-4/5"
             >
               <span className="text-xl font-bold text-gray-500 mb-5">
                 팔로워
@@ -648,10 +651,10 @@ const Mypage = () => {
               </div>
 
               {/* Contest */}
-              <div className="flex items-center flex-col mb-20 w-2/3 GalaxyS20Ultra:mb-10">
+              <div className="flex px-5 items-center flex-col mb-20 w-2/3 GalaxyS20Ultra:mb-10">
                 <div className="w-full grid grid-cols-3 items-center mb-10 GalaxyS20Ultra:flex GalaxyS20Ultra:flex-col GalaxyS20Ultra:items-center GalaxyS20Ultra:space-y-10">
                   <span className="text-2xl font-bold justify-center col-start-2 w-full text-center">
-                    올림 문예지
+                    올림 백일장
                   </span>
                   <div className="flex items-center place-self-end col-start-3 text-sm GalaxyS20Ultra:w-full GalaxyS20Ultra:justify-center">
                     <Select

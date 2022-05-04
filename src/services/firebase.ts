@@ -2,26 +2,32 @@ import { firestore, rtDBRef } from "../lib/firebase";
 import {
   doc,
   getDoc,
-  setDoc,
   addDoc,
   collection,
   query,
   where,
   getDocs,
   updateDoc,
+  arrayUnion,
+  increment,
   writeBatch,
 } from "firebase/firestore";
 import { contestWriting, getFirestoreWriting, toObjectElements } from "../type";
 import { ref, remove } from "firebase/database";
 
 export const signInWithGoogleInfo = (info: any) => {
-  setDoc(doc(firestore, "writings", info.user.uid), {
+  const batch = writeBatch(firestore);
+
+  batch.set(doc(firestore, "writings", info.user.uid), {
     novelDocID: [],
     poemDocID: [],
     scenarioDocID: [],
     totalCommits: {},
   });
-  return setDoc(doc(firestore, "users", info.user.email), {
+
+  batch.set(doc(firestore, "users", info.user.email), {
+    likeWritings: [],
+    contests: { host: [], participation: [] },
     userEmail: info.user.email.toLowerCase(),
     uid: info.user.uid,
     username: info.user.displayName.toLowerCase(),
@@ -32,6 +38,7 @@ export const signInWithGoogleInfo = (info: any) => {
     profileCaption: "",
     contestAuth: false,
   });
+  return batch.commit();
 };
 
 export async function doesEmailExist(userEmail: string) {
@@ -172,10 +179,15 @@ export const participateContest = async (
     tmp.collection = { 1: tmp.collection[collectionNum] };
   }
   try {
+    const batch = writeBatch(firestore);
     const newDocID = (await addDoc(collection(firestore, "allWritings"), tmp))
       .id;
 
     const ref = doc(firestore, "contests", contestDocID);
+    const userRef = doc(firestore, "users", data.userEmail);
+    const userUpdate: any = {};
+    userUpdate[`contests.participation`] = arrayUnion(contestDocID);
+
     const update: {
       [key: string]: contestWriting;
     } = {};
@@ -187,12 +199,33 @@ export const participateContest = async (
       writingDocID: newDocID,
       vote: 0,
       collectionTitle: collectionNum ? tmp.collection[1].title : "",
+      userUID: data.userUID,
     };
 
-    updateDoc(ref, update);
+    batch.update(ref, update);
+    batch.update(userRef, userUpdate);
+
+    batch.commit();
+
     return newDocID;
   } catch (error) {
     console.log(error);
   }
   return "";
+};
+
+export const vote = (
+  contestDocID: string,
+  userUID: string,
+  writingOwnerUID: string,
+  writingDocID: string
+) => {
+  try {
+    let update: any = {};
+    update[`whoVoted.${userUID}`] = writingDocID;
+    update[`writings.${writingOwnerUID}.vote`] = increment(1);
+    return updateDoc(doc(firestore, "contests", contestDocID), update);
+  } catch (error) {
+    throw new Error("There is an error!");
+  }
 };

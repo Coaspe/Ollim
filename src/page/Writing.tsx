@@ -16,6 +16,7 @@ import {
   getFirestoreUser,
   toObjectElements,
   editorValue,
+  genreMatching,
 } from "../type";
 import { cx, css } from "@emotion/css";
 import SlateEditorRDOnly from "../SlateEditor/SlateEditorRDOnly";
@@ -35,12 +36,6 @@ import Header from "../components/Header";
 import axios from "axios";
 import SpinningSvg from "../components/SpinningSvg";
 import WritingWrite from "../components/WritingWrite";
-
-export const genreMatching = {
-  NOVEL: "소설",
-  POEM: "시",
-  SCENARIO: "시나리오",
-};
 
 const Writing = () => {
   // User Info Variables

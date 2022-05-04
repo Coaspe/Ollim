@@ -7,12 +7,16 @@ interface props {
   contestDocID: string;
   setSubmittedWriting: React.Dispatch<React.SetStateAction<contestWriting>>;
   deadline: string;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setNumOfEntry: React.Dispatch<React.SetStateAction<number>>;
 }
 const ContestParticipantWritingRow: React.FC<props> = ({
   data,
   contestDocID,
   setSubmittedWriting,
   deadline,
+  setOpen,
+  setNumOfEntry,
 }) => {
   const gerneType = {
     SCENARIO: "시나리오",
@@ -55,20 +59,27 @@ const ContestParticipantWritingRow: React.FC<props> = ({
     collectionTitle: string = ""
   ) => {
     if (new Date().getTime() <= new Date(deadline).getTime()) {
-      let newDocID: string = await participateContest(
-        contestDocID,
-        data,
-        idx + 1
-      );
-      const update: contestWriting = {
-        title: data.title,
-        updateDate: new Date().getTime(),
-        synopsis: data.synopsis,
-        writingDocID: newDocID,
-        collectionTitle,
-        vote: 0,
-      };
-      setSubmittedWriting(update);
+      try {
+        let newDocID: string = await participateContest(
+          contestDocID,
+          data,
+          idx + 1
+        );
+        const update: contestWriting = {
+          title: data.title,
+          updateDate: new Date().getTime(),
+          synopsis: data.synopsis,
+          writingDocID: newDocID,
+          collectionTitle,
+          vote: 0,
+          userUID: data.userUID,
+        };
+        setNumOfEntry((origin) => origin + 1);
+        setSubmittedWriting(update);
+        setOpen(false);
+      } catch (error) {
+        console.log(error);
+      }
     } else {
       //
     }

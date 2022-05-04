@@ -105,7 +105,7 @@ const Header: React.FC<props> = ({ userInfo }) => {
               navigator(`/${userInfo.uid}`);
             }}
             src={userInfo.profileImg}
-            className="w-7 rounded-full"
+            className="w-7 h-7 object-cover rounded-full"
             alt="user profile"
           />
           <span

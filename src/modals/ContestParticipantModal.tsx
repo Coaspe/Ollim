@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import useGetGenreWritings from "../hooks/useGetGenreWritings";
 import { contestWriting, gerneType } from "../type";
-import ContestParticipantWritingRow from "../writingRows/ContestParticipantWritingRow";
+import ContestParticipantWritingRow from "../writingComponents/ContestParticipantWritingRow";
 
 interface props {
   uid: string;
@@ -12,6 +12,7 @@ interface props {
   contestDocID: string;
   setSubmittedWriting: React.Dispatch<React.SetStateAction<contestWriting>>;
   deadline: string;
+  setNumOfEntry: React.Dispatch<React.SetStateAction<number>>;
 }
 const ContestParticipantModal: React.FC<props> = ({
   uid,
@@ -21,6 +22,7 @@ const ContestParticipantModal: React.FC<props> = ({
   contestDocID,
   setSubmittedWriting,
   deadline,
+  setNumOfEntry,
 }) => {
   // Context User's writings lists that fits the genre
   const writingsInfo = useGetGenreWritings(uid, genre);
@@ -45,7 +47,7 @@ const ContestParticipantModal: React.FC<props> = ({
   };
   return (
     <AnimatePresence>
-      {writingsInfo && open && (
+      {open && (
         <motion.div
           animate={{
             backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],
@@ -63,7 +65,7 @@ const ContestParticipantModal: React.FC<props> = ({
               e.stopPropagation();
             }}
             animate={{
-              scale: ["80%", "100%"],
+              scale: ["90%", "100%"],
               opacity: ["0%", "100%"],
             }}
             transition={{
@@ -74,18 +76,22 @@ const ContestParticipantModal: React.FC<props> = ({
           >
             <div className="grid grid-cols-5 w-full px-10 items-center">
               <div className="text-lg font-bold text-gray-500 col-start-2 col-span-3 justify-self-center">
-                <AnimatePresence>
+                <AnimatePresence exitBeforeEnter>
                   {!inputOpened ? (
-                    <span className="inline-block w-full px-2 py-1">
-                      제출 선택
-                    </span>
-                  ) : (
-                    <motion.input
-                      animate={{ scaleX: ["0%", "100%"] }}
+                    <motion.span
+                      animate={{ opacity: [0, 1] }}
                       transition={{
                         duration: 0.2,
-                        type: "spring",
-                        bounce: 0.5,
+                      }}
+                      className="inline-block w-full px-2 py-1"
+                    >
+                      제출 선택
+                    </motion.span>
+                  ) : (
+                    <motion.input
+                      animate={{ opacity: [0, 1] }}
+                      transition={{
+                        duration: 0.2,
                       }}
                       className="w-full border border-gray-400 rounded px-2 py-1 focus:outline-none"
                       autoFocus
@@ -121,15 +127,21 @@ const ContestParticipantModal: React.FC<props> = ({
               }}
               className="overflow-y-scroll flex flex-col items-center w-full h-full px-10 py-5 gap-3 overflow-y-scrolll"
             >
-              {searchedWritings.map((data) => (
-                <ContestParticipantWritingRow
-                  contestDocID={contestDocID as string}
-                  key={data.writingDocID}
-                  data={data}
-                  setSubmittedWriting={setSubmittedWriting}
-                  deadline={deadline}
-                />
-              ))}
+              {writingsInfo.length ? (
+                searchedWritings.map((data) => (
+                  <ContestParticipantWritingRow
+                    contestDocID={contestDocID as string}
+                    key={data.writingDocID}
+                    data={data}
+                    setNumOfEntry={setNumOfEntry}
+                    setSubmittedWriting={setSubmittedWriting}
+                    deadline={deadline}
+                    setOpen={setOpen}
+                  />
+                ))
+              ) : (
+                <span className="text-lg">조건에 맞는 작품이 없습니다</span>
+              )}
             </div>
           </motion.div>
         </motion.div>

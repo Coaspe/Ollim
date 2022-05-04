@@ -92,7 +92,15 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
     >
       {/* First page: Decide Gerne, Title, Synopsis*/}
       {page === "MAIN" && userInfo && (
-        <div
+        <motion.div
+          animate={{
+            scale: ["80%", "100%"],
+            opacity: ["0%", "100%"],
+          }}
+          transition={{
+            duration: 0.2,
+            type: "spring",
+          }}
           onClick={(e) => {
             e.stopPropagation();
           }}
@@ -482,7 +490,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
               />
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* (if Novel and Scenario) Second page: Decide Characters relationships diagram */}

@@ -53,17 +53,14 @@ const MypageWriting: React.FC<props> = ({ data, widthSize }) => {
             </span>
           )}
           <div className="mb-3 flex items-center justify-between GalaxyS20Ultra:flex-col">
-            <span className="text-xl font-black GalaxyS20Ultra:text-sm">
-              {data.title.length > 9
-                ? `${data.title.slice(0, 10)} ...`
-                : data.title}
+            <span className="w-3/5 overflow-hidden block whitespace-nowrap text-ellipsis text-xl font-black GalaxyS20Ultra:text-sm">
+              {data.title}
             </span>
-            <div className="flex items-center space-x-2 text-gray-400">
+            <div className="flex flex-col items-center text-gray-400">
               <span className="text-sm font-black GalaxyS20Ultra:text-xs">
                 {gerneType[data.genre as genre]}
               </span>
-              <span className="font-bold text-lg">·</span>
-              <span style={{ fontSize: "0.7rem" }} className="text-gray-400">
+              <span style={{ fontSize: "0.7rem" }}>
                 {data.likes.length} 좋아요
               </span>
             </div>

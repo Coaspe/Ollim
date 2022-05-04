@@ -1,4 +1,5 @@
 import { Elements } from "react-flow-renderer";
+
 export type disclosure = "PUBLIC" | "PRIVATE" | "FOLLOWERS";
 export type page = "MAIN" | "DIAGRAM";
 export type genre = "SCENARIO" | "POEM" | "NOVEL";
@@ -8,6 +9,7 @@ export type gerneType = "NOVEL" | "POEM" | "SCENARIO";
 export type gerneDocIDType = "novelDocID" | "poemDocID" | "scenarioDocID";
 export type alarmType = "error" | "warning" | "info" | "success";
 export type contestType = "HOST" | "PARTICIPATION" | "TOTAL";
+export type medal = "GOLD" | "SILVER" | "BRONZE";
 export type alarmCategory =
   | "ADDCOMMENT"
   | "FOLLOWING"
@@ -130,6 +132,7 @@ export interface addContestArg {
   deadline: string;
   writings: { [key: string]: contestWriting };
   dateCreated: number;
+  whoVoted: { [key: string]: string };
 }
 export interface getFirestoreContest extends addContestArg {
   contestDocID: string;
@@ -141,6 +144,7 @@ export type contestWriting = {
   synopsis: string;
   title: string;
   collectionTitle?: string;
+  userUID: string;
 };
 export type getFirestoreWriting = {
   collection: collectionType;
@@ -189,4 +193,8 @@ export type editorValue = {
   }[];
 };
 
-export type medal = "GOLD" | "SILVER" | "BRONZE";
+export const genreMatching = {
+  NOVEL: "소설",
+  POEM: "시",
+  SCENARIO: "시나리오",
+};

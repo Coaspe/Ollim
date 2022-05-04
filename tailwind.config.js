@@ -36,6 +36,7 @@ module.exports = {
         a4FullScreenHeight: "270mm",
       },
       screens: {
+        MypageWriting: { min: "500px", max: "1600px" },
         GalaxyS20Ultra: { min: "300px", max: "500px" },
       },
       minWidth: {
