@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { memo, useContext, useState } from "react";
+import { memo, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../context/user";
 import { removeAlarm } from "../services/firebase";
@@ -27,7 +27,9 @@ const AlarmRow: React.FC<props> = ({
   const { user } = useContext(UserContext);
   const [info, setInfo] = useState<totalAlarmType>(data.info as totalAlarmType);
   const navigator = useNavigate();
-
+  useEffect(() => {
+    console.log(info, data.category);
+  }, [info]);
   return (
     <motion.div
       layout
