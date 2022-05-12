@@ -10,7 +10,6 @@ const Calendar: React.FC<props> = ({ totalCommits, widthSize }) => {
   const [recent3MonthsCommits, setRecent3MonthsCommits] = useState<{
     [key: string]: number[];
   }>({});
-  console.log(widthSize);
 
   useEffect(() => {
     const initial = () => {

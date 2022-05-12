@@ -86,7 +86,7 @@ const Header: React.FC<props> = ({ userInfo }) => {
   };
 
   return (
-    <header className="select-none flex w-full items-center justify-between px-20 GalaxyS20Ultra:px-10 GalaxyS20Ultra:my-5">
+    <header className="font-noto select-none flex w-full items-center justify-between px-20 GalaxyS20Ultra:px-10 GalaxyS20Ultra:my-5">
       {/* logo */}
       <img
         onClick={() => {

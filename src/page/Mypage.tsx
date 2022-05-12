@@ -352,11 +352,10 @@ const Mypage = () => {
       {newContestModalOpen && (
         <NewContestModal setNewContestModalOpen={setNewContestModalOpen} />
       )}
+      {/* Header */}
+      {userInfo.uid && <Header userInfo={userInfo} />}
       {profileOwnerInfo && profileImage && !writingsLoading ? (
         <div className="relative w-full h-full font-noto bg-opacity-30">
-          {/* Header */}
-          <Header userInfo={userInfo} />
-
           <div className="w-full flex">
             {/* Profile div */}
             <div className="w-full flex flex-col items-center justify-between">
@@ -365,7 +364,9 @@ const Mypage = () => {
                 {/* Profile Image Edit */}
                 <label htmlFor="profileImg">
                   <div className="opacity-0 absolute flex items-center justify-center rounded-full w-full h-full cursor-pointer hover:opacity-20 hover:bg-black" />
-                  <img
+                  <motion.img
+                    animate={{ scale: [0, 1] }}
+                    transition={{ type: "spring", duration: 0.3 }}
                     className="rounded-full w-64 h-64 shadow-xl object-cover"
                     src={profileImage}
                     alt="profile"

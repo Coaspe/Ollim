@@ -121,7 +121,7 @@ const MypageSkeleton: React.FC<props> = ({ widthSize }) => {
 
             <div className="grid grid-cols-3 items-center justify-between w-full gap-5 GalaxyS20Ultra:flex GalaxyS20Ultra:flex-col GalaxyS20Ultra:items-center GalaxyS20Ultra:overflow-y-scroll GalaxyS20Ultra:max-h-72 GalaxyS20Ultra:py-5 GalaxyS20Ultra:px-3">
               {Array.from({ length: 3 }, () => 0).map((v, idx) => (
-                <MypageWritingSkeleton key={idx} />
+                <MypageWritingSkeleton key={`${idx}_mypagewriting`} />
               ))}
             </div>
 

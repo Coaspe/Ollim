@@ -13,7 +13,11 @@ const MypageWritingSkeleton = () => {
           <span style={{ fontSize: "0.7rem" }}>0 좋아요</span>
         </div>
       </div>
-      <textarea className="text-sm text-gray-400 mb-3 font-semibold bg-transparent resize-none overflow-hidden pointer-events-none">
+      <textarea
+        readOnly
+        value="adwad"
+        className="text-sm text-gray-400 mb-3 font-semibold bg-transparent resize-none overflow-hidden pointer-events-none"
+      >
         adwad
       </textarea>
     </div>

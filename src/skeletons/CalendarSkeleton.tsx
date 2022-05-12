@@ -9,10 +9,9 @@ const CalendarSkeleton: React.FC<props> = ({ widthSize }) => {
     <>
       {widthSize > 500 ? (
         <div className="w-2/3 my-10 grid grid-cols-3 gap-4">
-          {recent3MonthsCommits &&
-            recent3MonthsCommits.map((commitsChunk) => (
-              <CalendarElementSkeleton key={commitsChunk} />
-            ))}
+          {recent3MonthsCommits.map((v, idx) => (
+            <CalendarElementSkeleton key={`${idx}_calendarElement`} />
+          ))}
         </div>
       ) : (
         <div className="w-2/3 flex items-center justify-center">

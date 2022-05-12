@@ -82,7 +82,6 @@ export const getWritingsArrayInfo = (docIDs: Array<string>) => {
       const tmp = await getDoc(doc(firestore, "allWritings", docID));
       if (tmp.exists()) {
         const data = tmp.data();
-        console.log(data);
         return { ...data, writingDocID: tmp.id };
       }
     })
