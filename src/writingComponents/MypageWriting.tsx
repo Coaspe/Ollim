@@ -1,18 +1,13 @@
 import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
 import { memo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { genre, getFirestoreWriting } from "../type";
+import { genre, genreMatching, getFirestoreWriting } from "../type";
 interface props {
   data: getFirestoreWriting;
   medal?: string;
   widthSize: number;
 }
 const MypageWriting: React.FC<props> = ({ data, widthSize }) => {
-  const gerneType = {
-    SCENARIO: "시나리오",
-    POEM: "시",
-    NOVEL: "소설",
-  };
   const [hoverExpandDetail, setHoverExpandDetail] = useState(false);
   const [timer, setTimer] = useState<NodeJS.Timeout>();
   const [infoVisible, setInfoVisible] = useState(false);
@@ -58,7 +53,7 @@ const MypageWriting: React.FC<props> = ({ data, widthSize }) => {
             </span>
             <div className="flex flex-col items-center text-gray-400">
               <span className="text-sm font-black GalaxyS20Ultra:text-xs">
-                {gerneType[data.genre as genre]}
+                {genreMatching[data.genre as genre]}
               </span>
               <span style={{ fontSize: "0.7rem" }}>
                 {data.likes.length} 좋아요

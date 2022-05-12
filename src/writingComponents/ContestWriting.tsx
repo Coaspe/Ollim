@@ -32,9 +32,7 @@ const ContestWriting: React.FC<props> = ({
   const navigator = useNavigate();
   useEffect(() => {
     const getWritingOwnerInfo = async () => {
-      const userInfo = (
-        await getUserByUID(data.userUID)
-      ).docs[0].data() as getFirestoreUser;
+      const userInfo = await getUserByUID(data.userUID);
       setWritingOwnerInfo(userInfo);
     };
     data.userUID && getWritingOwnerInfo();

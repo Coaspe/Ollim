@@ -1,13 +1,13 @@
 import { memo, useState, useRef, useEffect, useCallback } from "react";
 import { Handle, removeElements, isEdge } from "react-flow-renderer";
 import { motion, AnimatePresence } from "framer-motion";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import { elementsAction } from "../redux";
 import "../style/test.css";
 
 export default memo(({ id, data, isConnectable }) => {
-  const elements = useSelector((state) => state.setElements.elements);
-  const dispatch = useDispatch();
+  const elements = useAppSelector((state) => state.setElements.elements);
+  const dispatch = useAppDispatch();
   const [click, setClick] = useState(false);
   const [labelToggle, setLabelToggle] = useState(false);
   const [labelState, setLabelState] = useState(data.label);

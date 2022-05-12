@@ -20,7 +20,7 @@ import {
 } from "../type";
 import { cx, css } from "@emotion/css";
 import SlateEditorRDOnly from "../SlateEditor/SlateEditorRDOnly";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 import {
   diagramAction,
   elementsAction,
@@ -73,7 +73,7 @@ const Writing = () => {
   // BGM
   const [bgm, setBgm] = useState<string>("");
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const navigator = useNavigate();
 
@@ -83,7 +83,9 @@ const Writing = () => {
   );
 
   //  Diagram redux state
-  const diagram = useSelector((state: RootState) => state.setDiagram.diagram);
+  const diagram = useAppSelector(
+    (state: RootState) => state.setDiagram.diagram
+  );
   const setDiagram = useCallback(
     (diagram: toObjectElements) => {
       dispatch(diagramAction.setDiagram({ diagram }));
@@ -107,7 +109,7 @@ const Writing = () => {
   );
   // alarm state
   // alarm[0] : alarm message, alarm[1] : alarm type, alarm[2] : alarm on, off
-  const alarm = useSelector((state: RootState) => state.setAlarm.alarm);
+  const alarm = useAppSelector((state: RootState) => state.setAlarm.alarm);
   const test = useRef(false);
   // useEffect to get context user's information
   useEffect(() => {
@@ -127,7 +129,7 @@ const Writing = () => {
     // copyPasteCommits()
     if (uid) {
       getUserByUID(uid).then((res) => {
-        setWritingOwnerInfo(res.docs[0].data() as getFirestoreUser);
+        setWritingOwnerInfo(res);
       });
     }
   }, [uid]);
@@ -246,7 +248,7 @@ const Writing = () => {
   const setWidthSize = (widthSize: number) => {
     dispatch(widthSizeAction.setWidthSize({ widthSize }));
   };
-  const widthSize = useSelector(
+  const widthSize = useAppSelector(
     (state: RootState) => state.setWidthSize.widthSize
   );
   useEffect(() => {

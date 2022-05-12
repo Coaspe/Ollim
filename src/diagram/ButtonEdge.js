@@ -6,7 +6,7 @@ import {
 } from "react-flow-renderer";
 import { memo, useState, useCallback, useRef, useEffect } from "react";
 import { removeElements } from "react-flow-renderer";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
 import { elementsAction } from "../redux";
 
 export default memo(function CustomEdge({
@@ -31,8 +31,8 @@ export default memo(function CustomEdge({
     targetPosition,
   });
   const markerEnd = getMarkerEnd(arrowHeadType, markerEndId);
-  const elements = useSelector((state) => state.setElements.elements);
-  const dispatch = useDispatch();
+  const elements = useAppSelector((state) => state.setElements.elements);
+  const dispatch = useAppDispatch();
   const setElements = useCallback(
     (elements) => {
       dispatch(elementsAction.setElements({ elements: elements }));

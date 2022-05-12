@@ -1,33 +1,35 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from "react";
 import ReactFlow, {
   addEdge,
   MiniMap,
   Controls,
   ControlButton,
   Background,
-} from 'react-flow-renderer';
-import { useDispatch, useSelector } from 'react-redux';
-import ColorSelectorNode from './RelationShipDiagramNode';
-import { diagramAction, elementsAction } from '../redux';
-import { RootState } from '../redux/store';
-import ButtonEdge from './ButtonEdge';
+} from "react-flow-renderer";
+import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
+import ColorSelectorNode from "./RelationShipDiagramNode";
+import { diagramAction, elementsAction } from "../redux";
+import { RootState } from "../redux/store";
+import ButtonEdge from "./ButtonEdge";
 
-const initBgColor = '#faf6f5';
+const initBgColor = "#faf6f5";
 const edgeTypes = {
   buttonedge: ButtonEdge,
 };
-const connectionLineStyle = { stroke: '#000' };
+const connectionLineStyle = { stroke: "#000" };
 const snapGrid = [20, 20];
 const nodeTypes = {
   selectorNode: ColorSelectorNode,
 };
 
-const DiagramNewWritings= () => {
+const DiagramNewWritings = () => {
   const [reactflowInstance, setReactflowInstance] = useState<any>(null);
-  const pos = useRef([10, 10])
+  const pos = useRef([10, 10]);
 
-  const dispatch = useDispatch();
-  const elements = useSelector((state: RootState) => state.setElements.elements);
+  const dispatch = useAppDispatch();
+  const elements = useAppSelector(
+    (state: RootState) => state.setElements.elements
+  );
   const setElements = useCallback(
     (elements) => {
       dispatch(elementsAction.setElements({ elements: elements }));
@@ -35,13 +37,15 @@ const DiagramNewWritings= () => {
     [dispatch]
   );
   const setDiagram = useCallback(
-      (diagram) => {
+    (diagram) => {
       dispatch(diagramAction.setDiagram({ diagram }));
-      },
-      [dispatch]
+    },
+    [dispatch]
   );
-  const diagram = useSelector((state: RootState) => state.setDiagram.diagram)
-  
+  const diagram = useAppSelector(
+    (state: RootState) => state.setDiagram.diagram
+  );
+
   const onLoad = useCallback(
     (rfi) => {
       if (!reactflowInstance) {
@@ -52,46 +56,50 @@ const DiagramNewWritings= () => {
   );
 
   const addNode = () => {
+    let num = 0;
+    elements.forEach((data) => {
+      data.type && (num += 1);
+    });
 
-    let num = 0
-    elements.forEach((data) => { data.type && (num += 1) })
-    
     const addedNode = {
       id: (num + 1).toString(),
-      type: 'selectorNode',
-      dragHandle: '.custom-drag-handle',
-      data: { color: initBgColor, label: "", desc: ""},
+      type: "selectorNode",
+      dragHandle: ".custom-drag-handle",
+      data: { color: initBgColor, label: "", desc: "" },
       position: { x: pos.current[0], y: pos.current[1] },
-    }
-    pos.current[0] += 10
-    pos.current[1] += 10
-    setElements([...elements, addedNode])
-  }
+    };
+    pos.current[0] += 10;
+    pos.current[1] += 10;
+    setElements([...elements, addedNode]);
+  };
 
   const onConnect = (params: any) => {
-      setElements(
-        [...addEdge({ ...params, type: 'buttonedge', data: { label: "" } }, elements)]
-      )
-  }
+    setElements([
+      ...addEdge(
+        { ...params, type: "buttonedge", data: { label: "" } },
+        elements
+      ),
+    ]);
+  };
 
   const onNodeDragStop = (event: any, node: any) => {
-    let elementsTmp = diagram.elements.slice()
-    elementsTmp[(parseInt(node.id) - 1)] = node
-    setElements(elementsTmp)
+    let elementsTmp = diagram.elements.slice();
+    elementsTmp[parseInt(node.id) - 1] = node;
+    setElements(elementsTmp);
   };
-    // Fit view on mounted
-    useEffect(() => {
-      if (reactflowInstance) {
-        reactflowInstance.fitView();
-      }
-    }, [reactflowInstance]);
-  
+  // Fit view on mounted
   useEffect(() => {
-      if (reactflowInstance) {
-        setDiagram(reactflowInstance.toObject());
-      }
-  }, [elements])
-  
+    if (reactflowInstance) {
+      reactflowInstance.fitView();
+    }
+  }, [reactflowInstance]);
+
+  useEffect(() => {
+    if (reactflowInstance) {
+      setDiagram(reactflowInstance.toObject());
+    }
+  }, [elements]);
+
   return (
     <ReactFlow
       elements={elements}
@@ -107,21 +115,23 @@ const DiagramNewWritings= () => {
       defaultZoom={1.5}
     >
       <MiniMap
-        nodeStrokeColor={(n:any) => {
-          if (n.type === 'input') return '#0041d0';
-          if (n.type === 'selectorNode') return initBgColor as any;
-          if (n.type === 'output') return '#ff0072';
+        nodeStrokeColor={(n: any) => {
+          if (n.type === "input") return "#0041d0";
+          if (n.type === "selectorNode") return initBgColor as any;
+          if (n.type === "output") return "#ff0072";
         }}
         nodeColor={(n) => {
-          if (n.type === 'selectorNode') return "#d9bbb3";
-          return '#d9bbb3';
+          if (n.type === "selectorNode") return "#d9bbb3";
+          return "#d9bbb3";
         }}
       />
       <Controls>
         {/* Add node button */}
-        <ControlButton onClick={(e) => {
-          addNode()
-        }}>
+        <ControlButton
+          onClick={(e) => {
+            addNode();
+          }}
+        >
           ⬜
         </ControlButton>
       </Controls>

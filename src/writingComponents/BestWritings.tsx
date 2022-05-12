@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { useNavigate } from "react-router-dom";
-import { genre, medal } from "../type";
+import { genre, genreMatching, medal } from "../type";
 
 interface props {
   data: any;
@@ -8,11 +8,6 @@ interface props {
 }
 
 const BestWriting: React.FC<props> = ({ data, medal }) => {
-  const gerneType = {
-    SCENARIO: "시나리오",
-    POEM: "시",
-    NOVEL: "소설",
-  };
   const navigator = useNavigate();
 
   return (
@@ -30,7 +25,7 @@ const BestWriting: React.FC<props> = ({ data, medal }) => {
           <div className="flex items-center">
             <span className="text-xl font-black">{data.title}</span>
             <span className="text-sm text-gray-700 font-black ml-3">
-              {gerneType[data.genre as genre]}
+              {genreMatching[data.genre as genre]}
             </span>
           </div>
           {medal && (

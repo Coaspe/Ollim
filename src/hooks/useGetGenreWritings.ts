@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react";
 import { getUserWritings, getWritingsArrayInfo } from "../services/firebase";
-import {
-  gerneDocIDType,
-  getFirestoreUserWritings,
-  getFirestoreWriting,
-} from "../type";
+import { gerneDocIDType, getFirestoreWriting } from "../type";
 
 const useGetGenreWritings = (uid: string | undefined, genre: string) => {
   const [writingsInfo, setWritingsInfo] = useState<Array<getFirestoreWriting>>(
@@ -12,23 +8,29 @@ const useGetGenreWritings = (uid: string | undefined, genre: string) => {
   );
 
   // Get and Set profileOwner's writings information function
-  const getWritings = async (userWritings: getFirestoreUserWritings) => {
-    const writingsInfo = userWritings[
-      `${genre.toLocaleLowerCase()}DocID` as gerneDocIDType
-    ]
-      ? (
-          (await getWritingsArrayInfo(
-            userWritings[`${genre.toLocaleLowerCase()}DocID` as gerneDocIDType]
-          )) as Array<getFirestoreWriting>
-        ).sort((a, b) => b.dateCreated - a.dateCreated)
-      : [];
-    console.log(writingsInfo);
-    setWritingsInfo(writingsInfo);
+  const getWritings = async (uid: string) => {
+    try {
+      const userWritings = await getUserWritings(uid as string);
+      if (userWritings) {
+        const writingsInfo = userWritings[
+          `${genre.toLocaleLowerCase()}DocID` as gerneDocIDType
+        ]
+          ? (
+              (await getWritingsArrayInfo(
+                userWritings[
+                  `${genre.toLocaleLowerCase()}DocID` as gerneDocIDType
+                ]
+              )) as Array<getFirestoreWriting>
+            ).sort((a, b) => b.dateCreated - a.dateCreated)
+          : [];
+        setWritingsInfo(writingsInfo);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   useEffect(() => {
-    getUserWritings(uid as string).then((res) => {
-      getWritings(res as getFirestoreUserWritings);
-    });
+    uid && getWritings(uid);
   }, [uid]);
 
   return writingsInfo;

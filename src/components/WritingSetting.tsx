@@ -1,11 +1,11 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { alarmAction } from "../redux";
 import { alarmType, getFirestoreWriting, disclosure } from "../type";
 import { motion } from "framer-motion";
 import SpinningSvg from "./SpinningSvg";
+import { useAppDispatch } from "../hooks/useRedux";
 
 interface props {
   writingInfo: getFirestoreWriting;
@@ -32,7 +32,7 @@ const WritingSetting: React.FC<props> = ({
   bgm,
   setBgm,
 }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   // Delete modal variables
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);

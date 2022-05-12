@@ -33,7 +33,6 @@ const useImageCompress = (
         formData.append("userUID", profileOwnerInfo.uid);
         formData.append("userEmail", profileOwnerInfo.userEmail);
         formData.append("file", result);
-
         axios
           .post(`https://ollim.herokuapp.com/updateProfileImage`, formData)
           .then((res) => {

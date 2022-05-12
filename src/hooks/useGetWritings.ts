@@ -18,42 +18,47 @@ const useGetWritings = (uid: string | undefined) => {
   );
 
   // Get and Set profileOwner's writings information function
-  const getWritings = async (userWritings: getFirestoreUserWritings) => {
-    const poem = userWritings.poemDocID
-      ? (
-          (await getWritingsArrayInfo(
-            userWritings.poemDocID
-          )) as Array<getFirestoreWriting>
-        ).sort((a, b) => b.dateCreated - a.dateCreated)
-      : [];
-    const novel = userWritings.novelDocID
-      ? (
-          (await getWritingsArrayInfo(
-            userWritings.novelDocID
-          )) as Array<getFirestoreWriting>
-        ).sort((a, b) => b.dateCreated - a.dateCreated)
-      : [];
-    const scenario = userWritings.scenarioDocID
-      ? (
-          (await getWritingsArrayInfo(
-            userWritings.scenarioDocID
-          )) as Array<getFirestoreWriting>
-        ).sort((a, b) => b.dateCreated - a.dateCreated)
-      : [];
-    setPoems(poem);
-    setNovels(novel);
-    setScenarioes(scenario);
-    setTotalWritings(
-      Array.prototype
-        .concat(poem, novel, scenario)
-        .sort((a, b) => b.dateCreated - a.dateCreated)
-    );
+  const getWritings = async (uid: string) => {
+    try {
+      const userWritings = await getUserWritings(uid as string);
+      if (userWritings) {
+        setUserWritings(userWritings as getFirestoreUserWritings);
+        const poem = userWritings.poemDocID
+          ? (
+              (await getWritingsArrayInfo(
+                userWritings.poemDocID
+              )) as Array<getFirestoreWriting>
+            ).sort((a, b) => b.dateCreated - a.dateCreated)
+          : [];
+        const novel = userWritings.novelDocID
+          ? (
+              (await getWritingsArrayInfo(
+                userWritings.novelDocID
+              )) as Array<getFirestoreWriting>
+            ).sort((a, b) => b.dateCreated - a.dateCreated)
+          : [];
+        const scenario = userWritings.scenarioDocID
+          ? (
+              (await getWritingsArrayInfo(
+                userWritings.scenarioDocID
+              )) as Array<getFirestoreWriting>
+            ).sort((a, b) => b.dateCreated - a.dateCreated)
+          : [];
+        setPoems(poem);
+        setNovels(novel);
+        setScenarioes(scenario);
+        setTotalWritings(
+          Array.prototype
+            .concat(poem, novel, scenario)
+            .sort((a, b) => b.dateCreated - a.dateCreated)
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   useEffect(() => {
-    getUserWritings(uid as string).then((res) => {
-      getWritings(res as getFirestoreUserWritings);
-      setUserWritings(res as getFirestoreUserWritings);
-    });
+    uid && getWritings(uid);
   }, [uid]);
 
   return {

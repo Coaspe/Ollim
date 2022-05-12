@@ -1,6 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ContextType,
   useCallback,
   useContext,
   useEffect,
@@ -22,7 +21,7 @@ import {
   contestWriting,
   genreMatching,
 } from "../type";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 import { isFullScreenAction, widthSizeAction } from "../redux";
 import { RootState } from "../redux/store";
 import { Alert } from "@mui/material";
@@ -78,7 +77,7 @@ const Contest = () => {
   const [selectedWritingInfo, setSelectedWritingInfo] =
     useState<getFirestoreWriting>({} as getFirestoreWriting);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const navigator = useNavigate();
 
@@ -96,7 +95,7 @@ const Contest = () => {
 
   // alarm state
   // alarm[0] : alarm message, alarm[1] : alarm type, alarm[2] : alarm on, off
-  const alarm = useSelector((state: RootState) => state.setAlarm.alarm);
+  const alarm = useAppSelector((state: RootState) => state.setAlarm.alarm);
 
   // Alert modal framer-motion variant
   const alertVariants = {
@@ -159,7 +158,7 @@ const Contest = () => {
   const setWidthSize = (widthSize: number) => {
     dispatch(widthSizeAction.setWidthSize({ widthSize }));
   };
-  const widthSize = useSelector(
+  const widthSize = useAppSelector(
     (state: RootState) => state.setWidthSize.widthSize
   );
 
@@ -176,8 +175,10 @@ const Contest = () => {
   // useEffect to get writing owner's information
   useEffect(() => {
     if (contestInfo && contestInfo.hostUID) {
-      getUserByUID(contestInfo.hostUID).then((res) => {
-        setContestHostInfo(res.docs[0].data() as getFirestoreUser);
+      getUserByUID(contestInfo.hostUID).then((res: any) => {
+        if (res.uid) {
+          setContestHostInfo(res);
+        }
       });
     }
   }, [contestInfo]);

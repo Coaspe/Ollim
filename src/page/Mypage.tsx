@@ -6,7 +6,7 @@ import { getUserByUID, getContetsArrayInfo } from "../services/firebase";
 import { signOutAuth } from "../helpers/auth-OAuth2";
 import NewWritingModal from "../modals/NewWritingModal";
 import CustomNodeFlow from "../diagram/RelationShipDiagram";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 import { RootState } from "../redux/store";
 import {
   alarmType,
@@ -68,13 +68,13 @@ const Mypage = () => {
     Array<getFirestoreContest>
   >([]);
   const navigator = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   // Header context redux userInfo
   const setUserInfo = (userInfo: getFirestoreUser) => {
     dispatch(userInfoAction.setUserInfo({ userInfo }));
   };
-  const userInfo = useSelector(
+  const userInfo = useAppSelector(
     (state: RootState) => state.setUserInfo.userInfo
   );
 
@@ -82,7 +82,7 @@ const Mypage = () => {
   const setWidthSize = (widthSize: number) => {
     dispatch(widthSizeAction.setWidthSize({ widthSize }));
   };
-  const widthSize = useSelector(
+  const widthSize = useAppSelector(
     (state: RootState) => state.setWidthSize.widthSize
   );
 
@@ -139,12 +139,13 @@ const Mypage = () => {
     };
     // Get user information
     getUserByUID(uid as string).then((res: any) => {
-      const data = res.docs[0].data();
-      setProfileOwnerInfo(data);
-      setProfileImage(data.profileImg);
-      getContests(data.contests);
-      followersLength.current = data.followers.length;
-      followingsLength.current = data.followings.length;
+      if (res.username) {
+        setProfileOwnerInfo(res);
+        setProfileImage(res.profileImg);
+        getContests(res.contests);
+        followersLength.current = res.followers.length;
+        followingsLength.current = res.followings.length;
+      }
     });
   }, [uid]);
 
@@ -154,9 +155,10 @@ const Mypage = () => {
       contextUser &&
       contextUser.uid &&
       getUserByUID(contextUser.uid).then((res: any) => {
-        const data = res.docs[0].data();
-        setUserInfo(data);
-        setDoseUserFollow(data.followings.includes(profileOwnerInfo.uid));
+        if (res.uid) {
+          setUserInfo(res);
+          setDoseUserFollow(res.followings.includes(profileOwnerInfo.uid));
+        }
       });
   }, [profileOwnerInfo, contextUser]);
 
@@ -165,7 +167,7 @@ const Mypage = () => {
     navigator("/community");
   };
 
-  const alarm = useSelector((state: RootState) => state.setAlarm.alarm);
+  const alarm = useAppSelector((state: RootState) => state.setAlarm.alarm);
   const alertVariants = {
     initial: {
       opacity: 0,

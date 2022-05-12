@@ -1,23 +1,12 @@
 import { Tooltip } from "@mui/material";
 import Zoom from "@mui/material/Zoom";
 import { memo } from "react";
+import { bgColor, bgColorType } from "../type";
 interface props {
   date: string;
   elementCommits: { [key: number]: string[] };
 }
 const CalendarElementNode: React.FC<props> = ({ date, elementCommits }) => {
-  type bgColorType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-  const bgColor = {
-    1: "rgb(251 207 232)",
-    2: "rgb(249 168 212)",
-    3: "rgb(244 114 182)",
-    4: "rgb(236 72 153)",
-    5: "rgb(219 39 119)",
-    6: "rgb(190 24 93)",
-    7: "rgb(157 23 77)",
-    8: "rgb(131 24 67)",
-  };
-
   return (
     <>
       {elementCommits[parseInt(date)].length > 0 ? (

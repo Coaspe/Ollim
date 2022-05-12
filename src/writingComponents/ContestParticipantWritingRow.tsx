@@ -1,7 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { participateContest } from "../services/firebase";
-import { contestWriting, genre, getFirestoreWriting } from "../type";
+import {
+  contestWriting,
+  genre,
+  genreMatching,
+  getFirestoreWriting,
+} from "../type";
 interface props {
   data: getFirestoreWriting;
   contestDocID: string;
@@ -18,11 +23,6 @@ const ContestParticipantWritingRow: React.FC<props> = ({
   setOpen,
   setNumOfEntry,
 }) => {
-  const gerneType = {
-    SCENARIO: "시나리오",
-    POEM: "시",
-    NOVEL: "소설",
-  };
   const variants = {
     initial: {
       opacity: 0,
@@ -84,6 +84,7 @@ const ContestParticipantWritingRow: React.FC<props> = ({
       //
     }
   };
+
   return (
     <motion.div
       layout
@@ -139,7 +140,7 @@ const ContestParticipantWritingRow: React.FC<props> = ({
                 )
               ) : (
                 <span className="text-sm text-gray-700 font-black ml-3">
-                  {gerneType[data.genre as genre]}
+                  {genreMatching[data.genre as genre]}
                 </span>
               )}
             </AnimatePresence>

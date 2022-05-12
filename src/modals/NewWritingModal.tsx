@@ -2,7 +2,7 @@ import { Tooltip } from "@mui/material";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 import DiagramNewWritings from "../diagram/RelationShipDiagramNewWritings";
 import { alarmAction, elementsAction } from "../redux";
 import { RootState } from "../redux/store";
@@ -26,7 +26,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
   const [firstCollectionElementTitle, setFirstCollectionElementTitle] =
     useState("");
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const setElements = useCallback(
     (elements) => {
@@ -35,9 +35,11 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
     [dispatch]
   );
 
-  const diagram = useSelector((state: RootState) => state.setDiagram.diagram);
+  const diagram = useAppSelector(
+    (state: RootState) => state.setDiagram.diagram
+  );
 
-  const userInfo = useSelector(
+  const userInfo = useAppSelector(
     (state: RootState) => state.setUserInfo.userInfo
   );
 

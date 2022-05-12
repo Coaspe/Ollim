@@ -43,16 +43,17 @@ const useGetFollowers = (
     followings.length > 0 && setLoading(false);
   }, [followings]);
 
-  const handleMoreFollowers = useCallback(() => {
+  const handleMoreFollowers = useCallback(async () => {
     setLoading(true);
     if (
       profileOwnerInfo.followers.length > 0 &&
       followersKey.current < profileOwnerInfo.followers.length
     ) {
-      getFollowersInfinite(
-        profileOwnerInfo.followers,
-        followersKey.current
-      ).then((res) => {
+      try {
+        const res = await getFollowersInfinite(
+          profileOwnerInfo.followers,
+          followersKey.current
+        );
         let tmp = res.docs.map((doc: any) => ({
           ...doc.data(),
           docID: doc.id,
@@ -60,21 +61,23 @@ const useGetFollowers = (
         setFollowers((origin: any) => {
           return [...origin, ...tmp];
         });
-        followersKey.current += tmp.length;
-      });
+      } catch (error) {
+        console.log(error);
+      }
     }
   }, [profileOwnerInfo.followers]);
 
-  const handleMoreFollowings = useCallback(() => {
+  const handleMoreFollowings = useCallback(async () => {
     setLoading(true);
     if (
       profileOwnerInfo.followings.length > 0 &&
       followingsKey.current < profileOwnerInfo.followings.length
     ) {
-      getFollowingsInfinite(
-        profileOwnerInfo.followings,
-        followingsKey.current
-      ).then((res) => {
+      try {
+        const res = await getFollowingsInfinite(
+          profileOwnerInfo.followings,
+          followingsKey.current
+        );
         let tmp = res.docs.map((doc: any) => ({
           ...doc.data(),
           docID: doc.id,
@@ -83,7 +86,9 @@ const useGetFollowers = (
           return [...origin, ...tmp];
         });
         followingsKey.current += tmp.length;
-      });
+      } catch (error) {
+        console.log(error);
+      }
     }
   }, [profileOwnerInfo.followings]);
 

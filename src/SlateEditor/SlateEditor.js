@@ -19,7 +19,7 @@ import {
   MarkButton,
 } from "./utils";
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 import { Tooltip } from "@mui/material";
 import "../style/Slate.css";
 import ResizeObserver from "rc-resize-observer";
@@ -48,7 +48,7 @@ const SlateEditor = ({
 }) => {
   const [percentage, setPercentage] = useState(0);
   const [tempSaveModal, setTempSaveModal] = useState(false);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const isInitialMount = useRef(0);
   // Writing Info loading state
   const [loading, setLoading] = useState(false);
@@ -124,7 +124,6 @@ const SlateEditor = ({
   const setAlarm = (alarm) => {
     dispatch(alarmAction.setAlarm({ alarm }));
   };
-  // https://ollim.herokuapp.com
   // Handle Save fuctions
   const handleRequestTempSave = () => {
     const date = new Date().getTime();
@@ -298,7 +297,7 @@ const SlateEditor = ({
     },
   };
 
-  const isFullScreen = useSelector(
+  const isFullScreen = useAppSelector(
     (state) => state.setIsFullScreen.isFullScreen
   );
   const setIsFullScreen = useCallback(

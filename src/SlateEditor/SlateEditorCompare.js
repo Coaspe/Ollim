@@ -6,14 +6,14 @@ import { cx, css } from "@emotion/css";
 import { Leaf } from "./utils";
 import { motion } from "framer-motion";
 import ParagraphWithoutNum from "./paragraphWithoutNum";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "../hooks/useRedux";
 const SlateEditorCompare = ({ valueProps }) => {
   const [value, setValue] = useState([]);
   const [loading, setLoading] = useState(true);
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
 
-  const isFullScreen = useSelector(
+  const isFullScreen = useAppSelector(
     (state) => state.setIsFullScreen.isFullScreen
   );
 

@@ -9,7 +9,7 @@ import { Leaf } from "./utils";
 import ParagraphWithoutNum from "./paragraphWithoutNum";
 import { Tooltip } from "@mui/material";
 import { isFullScreenAction } from "../redux";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 
 const SlateEditorContest = ({ writingDocID, widthSize }) => {
   // SlateEditor value state
@@ -54,10 +54,10 @@ const SlateEditorContest = ({ writingDocID, widthSize }) => {
       />
     );
   };
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   // FullScreen redux state
-  const isFullScreen = useSelector(
+  const isFullScreen = useAppSelector(
     (state) => state.setIsFullScreen.isFullScreen
   );
   const setIsFullScreen = useCallback(

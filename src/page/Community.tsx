@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import Header from "../components/Header";
 import UserContext from "../context/user";
 import { userInfoAction } from "../redux";
@@ -19,15 +18,16 @@ import BestWritings from "../writingComponents/BestWritings";
 import SearchAutoComplete from "../SearchAutoComplete/SearchAutoComplete";
 import FormatResultWriting from "../SearchAutoComplete/FormatResultWriting";
 import FormatResultUser from "../SearchAutoComplete/FormatResultUser";
+import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 
 const Community = () => {
   const { user: contextUser } = useContext(UserContext);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   // Header context userInfo
   const setUserInfo = (userInfo: getFirestoreUser) => {
     dispatch(userInfoAction.setUserInfo({ userInfo }));
   };
-  const userInfo = useSelector(
+  const userInfo = useAppSelector(
     (state: RootState) => state.setUserInfo.userInfo
   );
 
@@ -49,11 +49,17 @@ const Community = () => {
   };
 
   useEffect(() => {
-    contextUser.uid &&
-      getUserByUID(contextUser.uid).then((res: any) => {
-        const data = res.docs[0].data();
-        setUserInfo(data);
-      });
+    const userInfo = async () => {
+      const user = await getUserByUID(contextUser.uid);
+      setUserInfo(user as getFirestoreUser);
+    };
+    if (contextUser.uid) {
+      try {
+        userInfo();
+      } catch (error) {
+        console.log(error);
+      }
+    }
     getAllWritings();
   }, [contextUser.uid]);
 

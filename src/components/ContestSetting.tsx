@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useContext, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "../hooks/useRedux";
 import { useNavigate } from "react-router-dom";
 import { alarmAction } from "../redux";
 import { alarmType, getFirestoreContest } from "../type";
@@ -33,7 +33,7 @@ const ContestSetting: React.FC<props> = ({
   deadline,
   setDeadline,
 }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { user: countextUser } = useContext(UserContext);
   // Delete modal variables
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);

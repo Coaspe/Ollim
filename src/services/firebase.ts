@@ -12,7 +12,12 @@ import {
   increment,
   writeBatch,
 } from "firebase/firestore";
-import { contestWriting, getFirestoreWriting, toObjectElements } from "../type";
+import {
+  contestWriting,
+  getFirestoreWriting,
+  toObjectElements,
+  getFirestoreUser,
+} from "../type";
 import { ref, remove } from "firebase/database";
 
 export const signInWithGoogleInfo = (info: any) => {
@@ -48,8 +53,13 @@ export async function doesEmailExist(userEmail: string) {
 }
 
 export const getUserByUID = async (uid: string) => {
-  const q = query(collection(firestore, "users"), where("uid", "==", uid));
-  return getDocs(q);
+  try {
+    const q = query(collection(firestore, "users"), where("uid", "==", uid));
+    return (await getDocs(q)).docs[0].data() as getFirestoreUser;
+  } catch (error) {
+    console.log(error);
+    return {} as getFirestoreUser;
+  }
 };
 export const getUserByEmail = async (email: string) => {
   return getDoc(doc(firestore, "users", email));
@@ -133,14 +143,19 @@ export const getBestWritings = async () => {
 };
 
 export const getAllWritings = async () => {
-  const docs = await getDocs(collection(firestore, "allWritings"));
-  let returnValue: any = [];
+  try {
+    const docs = await getDocs(collection(firestore, "allWritings"));
+    let returnValue: any = [];
 
-  docs.forEach((data) => {
-    returnValue.push({ ...data.data(), writingUID: data.id });
-  });
+    docs.forEach((data) => {
+      returnValue.push({ ...data.data(), writingUID: data.id });
+    });
 
-  return returnValue;
+    return returnValue;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
 };
 
 export const getAllUsers = async () => {

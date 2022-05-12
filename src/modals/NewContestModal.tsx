@@ -3,7 +3,7 @@ import axios from "axios";
 import "../style/NewContestModal.css";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 import { alarmAction } from "../redux";
 import { RootState } from "../redux/store";
 import { genre, alarmType, addContestArg } from "../type";
@@ -23,9 +23,9 @@ const NewContestModal: React.FC<NewContestProps> = ({
   const [description, setDescription] = useState("");
   const [limitNumOfPeople, setLimitNumOfPeople] = useState<number | "">(5);
   const [deadline, setDeadline] = useState<string>(new Date().toString());
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  const userInfo = useSelector(
+  const userInfo = useAppSelector(
     (state: RootState) => state.setUserInfo.userInfo
   );
 
