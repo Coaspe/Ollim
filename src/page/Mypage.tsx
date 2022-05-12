@@ -30,6 +30,7 @@ import ContestRow from "../components/ContestRow";
 import useGetFollowers from "../hooks/useGetFollowers";
 import useImageCompress from "../hooks/useImageCompress";
 import useGetWritings from "../hooks/useGetWritings";
+import MypageSkeleton from "../skeletons/MypageSkeleton";
 
 const Mypage = () => {
   // Profile owner's uid
@@ -117,8 +118,15 @@ const Mypage = () => {
     followingsLength.current = 0;
     followersLength.current = 0;
   }, [uid]);
-  const { poems, novels, scenarioes, totalWritings, userWritings } =
-    useGetWritings(uid);
+
+  const {
+    poems,
+    novels,
+    scenarioes,
+    totalWritings,
+    userWritings,
+    writingsLoading,
+  } = useGetWritings(uid);
 
   // Get profileOwner's user information and user's writings information
   useEffect(() => {
@@ -344,7 +352,7 @@ const Mypage = () => {
       {newContestModalOpen && (
         <NewContestModal setNewContestModalOpen={setNewContestModalOpen} />
       )}
-      {profileOwnerInfo && profileImage ? (
+      {profileOwnerInfo && profileImage && !writingsLoading ? (
         <div className="relative w-full h-full font-noto bg-opacity-30">
           {/* Header */}
           <Header userInfo={userInfo} />
@@ -691,14 +699,15 @@ const Mypage = () => {
           </div>
         </div>
       ) : (
-        // Loading Page
-        <div className="w-screen h-screen flex items-center justify-center bg-opacity-30">
-          <img
-            src="/logo/Ollim-logos_black.png"
-            className="w-32 opacity-50"
-            alt="loading"
-          />
-        </div>
+        <MypageSkeleton widthSize={widthSize} />
+        // // Loading Page
+        // <div className="w-screen h-screen flex items-center justify-center bg-opacity-30">
+        //   <img
+        //     src="/logo/Ollim-logos_black.png"
+        //     className="w-32 opacity-50"
+        //     alt="loading"
+        //   />
+        // </div>
       )}
     </>
   );

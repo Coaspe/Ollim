@@ -16,10 +16,12 @@ const useGetWritings = (uid: string | undefined) => {
   const [userWritings, setUserWritings] = useState(
     {} as getFirestoreUserWritings
   );
+  const [writingsLoading, setWritingsLoading] = useState(false);
 
   // Get and Set profileOwner's writings information function
   const getWritings = async (uid: string) => {
     try {
+      setWritingsLoading(true);
       const userWritings = await getUserWritings(uid as string);
       if (userWritings) {
         setUserWritings(userWritings as getFirestoreUserWritings);
@@ -55,6 +57,8 @@ const useGetWritings = (uid: string | undefined) => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setWritingsLoading(false);
     }
   };
   useEffect(() => {
@@ -67,6 +71,7 @@ const useGetWritings = (uid: string | undefined) => {
     scenarioes,
     totalWritings,
     userWritings,
+    writingsLoading,
   };
 };
 
