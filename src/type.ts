@@ -103,6 +103,7 @@ export type toObjectElements = {
   changed?: boolean;
 };
 export type commitType = { [key: number]: { contents: string; memo: string } };
+
 export type collectionType = {
   [collectionNum: number]: {
     commits: [];
@@ -133,6 +134,7 @@ export interface addContestArg {
   writings: { [key: string]: contestWriting };
   dateCreated: number;
   whoVoted: { [key: string]: string };
+  prize: Array<contestWriting>;
 }
 export interface getFirestoreContest extends addContestArg {
   contestDocID: string;
@@ -163,6 +165,7 @@ export type getFirestoreWriting = {
   likes: string[];
   isCollection: boolean;
   bgm?: string;
+  duplicatedForContest?: boolean;
 };
 export type contentType = {
   type: string;
@@ -209,3 +212,4 @@ export const bgColor = {
   7: "rgb(157 23 77)",
   8: "rgb(131 24 67)",
 };
+export type leftPartType = "INTRO" | "LOGIN" | "SIGNUP";

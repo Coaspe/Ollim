@@ -4,7 +4,7 @@ import { useContext, useState } from "react";
 import SpinningSvg from "../components/SpinningSvg";
 import UserContext from "../context/user";
 import { getFirestoreAlarmType } from "../type";
-import AlarmRow from "../alarmrows/AlarmRow";
+import AlarmRow from "../components/alarmrows/AlarmRow";
 interface props {
   open: boolean;
   alarmMap: Map<string, getFirestoreAlarmType>;

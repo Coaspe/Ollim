@@ -1,7 +1,7 @@
 import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
 import { memo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { genre, genreMatching, getFirestoreWriting } from "../type";
+import { genre, genreMatching, getFirestoreWriting } from "../../type";
 interface props {
   data: getFirestoreWriting;
   medal?: string;
@@ -38,6 +38,7 @@ const MypageWriting: React.FC<props> = ({ data, widthSize }) => {
     >
       <AnimateSharedLayout>
         <motion.div
+          whileHover={{ y: "-10%" }}
           key="container-before"
           layoutId="container"
           className="w-full h-full relative flex flex-col text-noto border border-logoBrown border-opacity-50 rounded-xl shadow-lg cursor-pointer py-5 px-5 z-0"

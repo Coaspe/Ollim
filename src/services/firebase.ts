@@ -17,6 +17,7 @@ import {
   getFirestoreWriting,
   toObjectElements,
   getFirestoreUser,
+  getFirestoreContest,
 } from "../type";
 import { ref, remove } from "firebase/database";
 
@@ -45,7 +46,37 @@ export const signInWithGoogleInfo = (info: any) => {
   });
   return batch.commit();
 };
+export const signInWithEmail = (user: any) => {
+  console.log("dfsdfsdf", user);
 
+  const batch = writeBatch(firestore);
+  try {
+    batch.set(doc(firestore, "writings", user.uid), {
+      novelDocID: [],
+      poemDocID: [],
+      scenarioDocID: [],
+      totalCommits: {},
+    });
+
+    batch.set(doc(firestore, "users", user.email), {
+      likeWritings: [],
+      contests: { host: [], participation: [] },
+      userEmail: user.email.toLowerCase(),
+      uid: user.uid,
+      username: "none",
+      followings: [],
+      followers: [],
+      dateCreated: Date.now(),
+      profileImg: "",
+      profileCaption: "",
+      contestAuth: false,
+    });
+  } catch (error) {
+    console.log(error);
+  } finally {
+    return batch.commit();
+  }
+};
 export async function doesEmailExist(userEmail: string) {
   const q = doc(firestore, "users", userEmail);
   const result = await getDoc(q);
@@ -53,6 +84,8 @@ export async function doesEmailExist(userEmail: string) {
 }
 
 export const getUserByUID = async (uid: string) => {
+  console.log(uid);
+
   try {
     const q = query(collection(firestore, "users"), where("uid", "==", uid));
     return (await getDocs(q)).docs[0].data() as getFirestoreUser;
@@ -77,15 +110,22 @@ export const addElements = (elements: toObjectElements) => {
 };
 
 export const getWritingsArrayInfo = (docIDs: Array<string>) => {
-  return Promise.all(
-    docIDs.map(async (docID: string) => {
-      const tmp = await getDoc(doc(firestore, "allWritings", docID));
-      if (tmp.exists()) {
-        const data = tmp.data();
-        return { ...data, writingDocID: tmp.id };
-      }
-    })
-  );
+  let returnVal: any = [];
+  try {
+    returnVal = Promise.all(
+      docIDs.map(async (docID: string) => {
+        const tmp = await getDoc(doc(firestore, "allWritings", docID));
+        if (tmp.exists()) {
+          const data = tmp.data();
+          return { ...data, writingDocID: tmp.id };
+        }
+      })
+    );
+  } catch (error) {
+    console.log(error);
+  } finally {
+    return returnVal;
+  }
 };
 export const getDiagram = (writingDocID: string) => {
   return getDoc(doc(firestore, "diagram", writingDocID));
@@ -175,8 +215,16 @@ export const getContetsArrayInfo = (contestsDocID: string[]) => {
     })
   );
 };
-export const getContestInfo = (contestDocID: string) => {
-  return getDoc(doc(firestore, "contests", contestDocID));
+export const getContestInfo = async (contestDocID: string) => {
+  let data: getFirestoreContest | undefined;
+  try {
+    data = (
+      await getDoc(doc(firestore, "contests", contestDocID))
+    ).data() as getFirestoreContest;
+  } catch (error) {
+    console.log(error);
+  }
+  return data;
 };
 export const removeAlarm = (alarmID: string, userUID: string) => {
   return remove(ref(rtDBRef, `alarms/${userUID}/${alarmID}`));
@@ -192,6 +240,7 @@ export const participateContest = async (
     tmp.isCollection = false;
     tmp.collection = { 1: tmp.collection[collectionNum] };
   }
+  tmp.duplicatedForContest = true;
   try {
     const batch = writeBatch(firestore);
     const newDocID = (await addDoc(collection(firestore, "allWritings"), tmp))

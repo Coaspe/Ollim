@@ -1,7 +1,7 @@
 import { memo, useState } from "react";
 import { Handle } from "react-flow-renderer";
 import { motion, AnimatePresence } from "framer-motion";
-import "../style/test.css";
+import "../../style/test.css";
 
 export default memo(({ id, data, isConnectable }) => {
   const [click, setClick] = useState(false);

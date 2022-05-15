@@ -1,17 +1,27 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { Editable, withReact, Slate, ReactEditor } from "slate-react";
 import { createEditor } from "slate";
 import { withHistory } from "slate-history";
 import { cx, css } from "@emotion/css";
-import { getWritingInfo } from "../services/firebase";
+import { getCommentsInfinite, getWritingInfo } from "../../services/firebase";
 import { AnimatePresence, motion } from "framer-motion";
 import { Leaf } from "./utils";
 import ParagraphWithoutNum from "./paragraphWithoutNum";
+import CommentRow from "../CommentRow";
+import axios from "axios";
+import SpinningSvg from "../SpinningSvg";
 import { Tooltip } from "@mui/material";
-import { isFullScreenAction } from "../redux";
-import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
+import { isFullScreenAction } from "../../redux";
+import { useAppSelector, useAppDispatch } from "../../hooks/useRedux";
 
-const SlateEditorContest = ({ writingDocID, widthSize }) => {
+const SlateEditorRDOnly = ({
+  writingDocID,
+  widthSize,
+  contextUserInfo,
+  alarmCommentDocID,
+  test,
+}) => {
+  const [commentLoading, setCommentLoading] = useState(false);
   // SlateEditor value state
   const [value, setValue] = useState([]);
   // Selected commit key
@@ -27,6 +37,17 @@ const SlateEditorContest = ({ writingDocID, widthSize }) => {
 
   // Load commit modal open state
   const [openLoadCommitModal, setOpenLoadCommitModal] = useState(false);
+  // Comment modal open state
+  const [openCommentsModal, setOpenCommentsModal] = useState(false);
+
+  // Writing's comments state
+  const [comments, setComments] = useState([]);
+  // Writing's comments' DocID
+  const [commentsDocID, setCommentsDocID] = useState([]);
+  const [commentButtonDisabled, setCommentButtonDisabled] = useState(false);
+
+  // Comment Text state
+  const [commentText, setCommentText] = useState("");
 
   // Now selected collection num state
   const [nowCollectionNum, setNowCollectionNum] = useState(0);
@@ -66,13 +87,27 @@ const SlateEditorContest = ({ writingDocID, widthSize }) => {
     },
     [dispatch]
   );
+  const [bottomMenuOpen, setBottomMenuOpen] = useState(true);
 
   // useEffect to get writing's information
   useEffect(() => {
     getWritingInfo(writingDocID).then((res) => {
       setWritingInfo(res);
       nowCollectionNum === 0 && setNowCollectionNum(1);
+      setCommentsDocID(
+        res.comments
+          ? Object.values(
+              Object.keys(res.comments)
+                .sort()
+                .reduce((newObj, key) => {
+                  newObj[key] = res.comments[key];
+                  return newObj;
+                }, {})
+            )
+          : []
+      );
     });
+    test.current = false;
   }, [writingDocID]);
 
   // Get writing's collection's lastest value
@@ -111,9 +146,157 @@ const SlateEditorContest = ({ writingDocID, widthSize }) => {
     value.length > 0 && setLoading(true);
   }, [value]);
 
+  // Loaded Comments Count key
+  const commetsKey = useRef(0);
+  const commentLoadFirst = useRef(true);
+
+  const handleMoreComments = useCallback(() => {
+    if (commentLoadFirst.current) {
+      commentLoadFirst.current = false;
+    }
+    setCommentLoading(true);
+    if (commentsDocID.length > 0 && commetsKey.current < commentsDocID.length) {
+      getCommentsInfinite(commentsDocID, commetsKey.current).then((res) => {
+        let tmp = res.docs
+          .map((doc) => ({
+            ...doc.data(),
+            docID: doc.id,
+          }))
+          .sort((a, b) => b.dateCreated - a.dateCreated);
+        setComments((origin) => {
+          return [...origin, ...tmp];
+        });
+        commetsKey.current += tmp.length;
+      });
+    }
+  }, [commentsDocID]);
+  useEffect(() => {
+    if (openCommentsModal && commentLoadFirst.current) {
+      handleMoreComments();
+    }
+  }, [openCommentsModal]);
+
+  // Comment modal framer-motion variant
+  const commentsModalVariants = {
+    initial: {
+      x: "100%",
+    },
+    animate: {
+      x: "0%",
+    },
+    exit: {
+      x: "100%",
+    },
+  };
+  // Add comment function
+  const handleAddComment = () => {
+    setCommentText("");
+    setCommentButtonDisabled(true);
+    const dateCreated = new Date().getTime();
+    const commentInfo = {
+      replies: {},
+      content: commentText,
+      commentOwnerUID: contextUserInfo.uid,
+      likes: [],
+      dateCreated,
+    };
+    // https://ollim.herokuapp.com/addComment
+    axios
+      .post("https://ollim.herokuapp.com/addComment", {
+        writingDocID,
+        writingTitle: writingInfo.title,
+        writingOwnerUID: writingInfo.userUID,
+        commentInfo: JSON.stringify(commentInfo),
+        commentUserInfo: JSON.stringify(contextUserInfo),
+      })
+      .then((res) => {
+        if (res.data[1] === "success") {
+          commentInfo["docID"] = res.data[3];
+          setComments((origin) => [commentInfo, ...origin]);
+        }
+        setCommentButtonDisabled(false);
+      });
+  };
+  useEffect(() => {
+    comments.length > 0 && setCommentLoading(false);
+  }, [comments]);
   return (
     <>
       <AnimatePresence>
+        {openCommentsModal && (
+          <motion.div
+            variants={commentsModalVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{ zIndex: 51, top: "20%" }}
+            className="fixed right-0 w-1/3 h-2/3 bg-white flex flex-col items-center border border-opacity-20 border-black GalaxyS20Ultra:w-4/5 GalaxyS20Ultra:h-1/2"
+          >
+            <motion.div
+              layout
+              className="w-full h-full gap-5 overflow-y-scroll py-2 px-4 flex flex-col items-center"
+            >
+              {commentsDocID.length !== 0 ? (
+                <>
+                  {comments.map((comment, index) => (
+                    <CommentRow
+                      genre={writingInfo.genre}
+                      writingDocID={writingDocID}
+                      key={comment.dateCreated}
+                      replies={comment.replies}
+                      content={comment.content}
+                      commentOwnerUID={comment.commentOwnerUID}
+                      likes={comment.likes}
+                      dateCreated={comment.dateCreated}
+                      docID={comment.docID}
+                      index={index}
+                      setComments={setComments}
+                      isAlarmComment={comment.docID === alarmCommentDocID}
+                    />
+                  ))}
+                  {/* Load more followings button */}
+                  {commetsKey.current < commentsDocID.length && (
+                    <div
+                      onClick={handleMoreComments}
+                      className={`${
+                        commentLoading && "pointer-events-none"
+                      } font-semibold text-sm shadow-inner cursor-pointer w-1/2 bg-white h-10 flex items-center justify-center rounded-xl text-gray-500`}
+                    >
+                      {!commentLoading && "Load more..."}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <p className="text-2xl font-bold text-gray-400 font-Nanum_Gothic mt-5">
+                  댓글이 없습니다. ㅠㅠ
+                </p>
+              )}
+            </motion.div>
+            <div className="w-full shadow-inner h-1/5 border-opacity-50 flex items-center justify-between py-4 px-4">
+              <textarea
+                value={commentText}
+                onChange={(e) => {
+                  setCommentText(e.target.value);
+                }}
+                placeholder="댓글을 입력하세요"
+                rows={1}
+                className="w-full border mr-4 rounded-xl px-3 py-3 focus:outline-none max-h-full resize-none"
+              />
+              <motion.button
+                whileHover={{ y: "-10%" }}
+                onClick={handleAddComment}
+                disabled={commentButtonDisabled}
+                className="border rounded-full px-2 py-2 flex items-center justify-center"
+              >
+                {commentButtonDisabled ? (
+                  <SpinningSvg />
+                ) : (
+                  <span className="material-icons">maps_ugc</span>
+                )}
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
         {openLoadCommitModal && (
           <motion.div
             animate={{
@@ -306,62 +489,112 @@ const SlateEditorContest = ({ writingDocID, widthSize }) => {
               readOnly
             />
           </div>
-          <div
-            style={{ bottom: "5%", right: "5%", zIndex: 52 }}
-            className="fixed font-noto flex items-center space-x-5 > * + *"
-          >
-            {writingInfo.isCollection && isFullScreen && (
-              <Tooltip
-                arrow
-                placement="top"
-                title={`${nowCollectionNum}.${
-                  writingInfo.collection[nowCollectionNum.toString()].title
-                }`}
+          <AnimatePresence initial={false}>
+            {bottomMenuOpen ? (
+              <motion.div
+                key="Menu"
+                animate={{ y: ["100%", "0%"], opacity: [0, 1] }}
+                exit={{ y: ["0%", "100%"], opacity: [1, 0] }}
+                transition={{ duration: 0.1 }}
+                style={{ bottom: "5%", right: "5%", zIndex: 52 }}
+                className="fixed font-noto flex items-center space-x-5 > * + *"
               >
                 <motion.span
+                  whileHover={{ y: "-10%" }}
                   onClick={() => {
-                    setChangeCollectionElementModal(true);
+                    setBottomMenuOpen(false);
                   }}
                   style={{ fontSize: "2rem" }}
-                  whileHover={{ y: "-10%" }}
                   className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
                 >
-                  timeline
+                  expand_more
                 </motion.span>
-              </Tooltip>
+                {writingInfo.isCollection && isFullScreen && (
+                  <Tooltip
+                    arrow
+                    placement="top"
+                    title={`${nowCollectionNum}.${
+                      writingInfo.collection[nowCollectionNum.toString()].title
+                    }`}
+                  >
+                    <motion.span
+                      onClick={() => {
+                        setChangeCollectionElementModal(true);
+                      }}
+                      style={{ fontSize: "2rem" }}
+                      whileHover={{ y: "-10%" }}
+                      className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
+                    >
+                      timeline
+                    </motion.span>
+                  </Tooltip>
+                )}
+                <motion.span
+                  whileHover={{ y: "-10%" }}
+                  onClick={() => {
+                    const doc = document.querySelector(
+                      ".editor-container-browse"
+                    );
+                    if (doc) {
+                      document.fullscreenElement
+                        ? document.exitFullscreen()
+                        : doc.requestFullscreen({ navigationUI: "show" });
+                      setIsFullScreen(!document.fullscreenElement);
+                    }
+                  }}
+                  style={{ fontSize: "2rem" }}
+                  className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
+                >
+                  {isFullScreen ? "fullscreen_exit" : "fullscreen"}
+                </motion.span>
+                <motion.span
+                  whileHover={{ y: "-10%" }}
+                  onClick={() => {
+                    if (
+                      writingInfo.collection[nowCollectionNum.toString()]
+                        .commits.length !== 0
+                    ) {
+                      setOpenLoadCommitModal(true);
+                    }
+                  }}
+                  style={{ fontSize: "2rem" }}
+                  className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
+                >
+                  update
+                </motion.span>
+                <motion.span
+                  whileHover={{ y: "-10%" }}
+                  onClick={() => {
+                    setOpenCommentsModal((origin) => !origin);
+                  }}
+                  style={{ fontSize: "2rem" }}
+                  className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
+                >
+                  chat
+                </motion.span>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="key"
+                animate={{ y: ["100%", "0%"], opacity: [0, 1] }}
+                exit={{ y: ["0%", "100%"], opacity: [1, 0] }}
+                transition={{ duration: 0.1 }}
+                style={{ bottom: "0%", right: "50%", zIndex: 52 }}
+                className="fixed"
+              >
+                <span
+                  style={{ fontSize: "2rem" }}
+                  onClick={() => {
+                    setBottomMenuOpen(true);
+                  }}
+                  className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
+                >
+                  expand_less
+                </span>
+              </motion.div>
             )}
-            <motion.span
-              whileHover={{ y: "-10%" }}
-              onClick={() => {
-                const doc = document.querySelector(".editor-container-browse");
-                if (doc) {
-                  document.fullscreenElement
-                    ? document.exitFullscreen()
-                    : doc.requestFullscreen({ navigationUI: "show" });
-                  setIsFullScreen(!document.fullscreenElement);
-                }
-              }}
-              style={{ fontSize: "2rem" }}
-              className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
-            >
-              {isFullScreen ? "fullscreen_exit" : "fullscreen"}
-            </motion.span>
-            <motion.span
-              whileHover={{ y: "-10%" }}
-              onClick={() => {
-                if (
-                  writingInfo.collection[nowCollectionNum.toString()].commits
-                    .length !== 0
-                ) {
-                  setOpenLoadCommitModal(true);
-                }
-              }}
-              style={{ fontSize: "2rem" }}
-              className="material-icons shadow-md cursor-pointer text-gray-400 hover:text-slate-500 align-middle bg-white rounded-full inline-block px-2 py-2"
-            >
-              update
-            </motion.span>
-          </div>
+          </AnimatePresence>
+
           {writingInfo && writingInfo.bgm && (
             <div
               style={{ bottom: "5%", left: "1%", zIndex: 52 }}
@@ -386,4 +619,4 @@ const SlateEditorContest = ({ writingDocID, widthSize }) => {
   );
 };
 
-export default SlateEditorContest;
+export default SlateEditorRDOnly;

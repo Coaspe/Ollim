@@ -104,7 +104,7 @@ const Header: React.FC<props> = ({ userInfo }) => {
             onClick={() => {
               navigator(`/${userInfo.uid}`);
             }}
-            src={userInfo.profileImg}
+            src={userInfo.profileImg || "/svg/user-svgrepo-com.svg"}
             className="w-7 h-7 object-cover rounded-full"
             alt="user profile"
           />
@@ -148,7 +148,8 @@ const Header: React.FC<props> = ({ userInfo }) => {
         </div>
       ) : (
         <div>
-          <svg
+          <motion.svg
+            whileHover={{ y: "-10%" }}
             onClick={() => {
               navigator("/");
             }}
@@ -170,7 +171,7 @@ const Header: React.FC<props> = ({ userInfo }) => {
                 />
               </g>
             </g>
-          </svg>
+          </motion.svg>
         </div>
       )}
     </header>

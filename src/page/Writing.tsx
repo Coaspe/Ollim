@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import UserContext from "../context/user";
-import CustomNodeFlowRDOnly from "../diagram/RelationShipDiagramReadOnly";
+import CustomNodeFlowRDOnly from "../components/diagram/RelationShipDiagramReadOnly";
 import {
   getUserByEmail,
   getUserByUID,
@@ -19,7 +19,7 @@ import {
   genreMatching,
 } from "../type";
 import { cx, css } from "@emotion/css";
-import SlateEditorRDOnly from "../SlateEditor/SlateEditorRDOnly";
+import SlateEditorRDOnly from "../components/SlateEditor/SlateEditorRDOnly";
 import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 import {
   diagramAction,
@@ -30,7 +30,7 @@ import {
 import { RootState } from "../redux/store";
 import { Alert } from "@mui/material";
 import { Elements } from "react-flow-renderer";
-import { initialValue } from "../SlateEditor/utils";
+import { initialValue } from "../components/SlateEditor/utils";
 import WritingSetting from "../components/WritingSetting";
 import Header from "../components/Header";
 import axios from "axios";

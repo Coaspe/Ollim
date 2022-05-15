@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { memo } from "react";
 import { useNavigate } from "react-router-dom";
-import { genre, genreMatching, getFirestoreContest } from "../type";
+import { genre, genreMatching, getFirestoreContest } from "../../type";
 
 interface contestRowProps {
   data: getFirestoreContest;
@@ -13,6 +13,7 @@ const ContestRow: React.FC<contestRowProps> = ({ data, widthSize }) => {
 
   return (
     <motion.div
+      whileHover={{ y: "-10%" }}
       animate={{ opacity: [0, 1] }}
       onClick={() => {
         navigator(`/contest/${data.contestDocID}`);

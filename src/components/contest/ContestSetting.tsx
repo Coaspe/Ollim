@@ -1,12 +1,12 @@
 import axios from "axios";
 import { useContext, useState } from "react";
-import { useAppDispatch } from "../hooks/useRedux";
+import { useAppDispatch } from "../../hooks/useRedux";
 import { useNavigate } from "react-router-dom";
-import { alarmAction } from "../redux";
-import { alarmType, getFirestoreContest } from "../type";
+import { alarmAction } from "../../redux";
+import { alarmType, getFirestoreContest } from "../../type";
 import { motion } from "framer-motion";
-import SpinningSvg from "./SpinningSvg";
-import UserContext from "../context/user";
+import SpinningSvg from "../SpinningSvg";
+import UserContext from "../../context/user";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DesktopDateTimePicker from "@mui/lab/DesktopDateTimePicker";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
@@ -14,25 +14,17 @@ import { TextField } from "@mui/material";
 
 interface props {
   contestInfo: getFirestoreContest;
-  description: string;
-  setDescription: React.Dispatch<React.SetStateAction<string>>;
-  title: string;
-  setTitle: React.Dispatch<React.SetStateAction<string>>;
+  setContestInfo: React.Dispatch<React.SetStateAction<getFirestoreContest>>;
   contestDocID: string;
-  deadline: string;
-  setDeadline: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const ContestSetting: React.FC<props> = ({
+  setContestInfo,
   contestInfo,
-  title,
-  setTitle,
-  description,
-  setDescription,
   contestDocID,
-  deadline,
-  setDeadline,
 }) => {
+  type arg = "deadline" | "description" | "title";
+
   const dispatch = useAppDispatch();
   const { user: countextUser } = useContext(UserContext);
   // Delete modal variables
@@ -46,13 +38,48 @@ const ContestSetting: React.FC<props> = ({
 
   // To prohibit indiscriminate request, use disable state.
   const [titleSaveButtonDisabled, setTitleSaveButtonDisabled] = useState(false);
-  const [synopsisSaveButtonDisabled, setSynopsisSaveButtonDisabled] =
+  const [descrioptionSaveButtonDisabled, setDescriptionSaveButtonDisabled] =
     useState(false);
-  const [disclosureSaveButtonDisabled, setDisclosureSaveButtonDisabled] =
+  const [deadlineSaveButtonDisabled, setDeadlineSaveButtonDisabled] =
     useState(false);
   const handleDeadlineChange = (date: any) => {
     setDeadline(date);
   };
+  const btnDisabledMatching: {
+    [key: string]: React.Dispatch<React.SetStateAction<boolean>>;
+  } = {
+    title: setTitleSaveButtonDisabled,
+    description: setDescriptionSaveButtonDisabled,
+    deadline: setDeadlineSaveButtonDisabled,
+  };
+
+  // Title
+  const [title, setTitle] = useState(contestInfo.title);
+  // Synopsis State
+  const [description, setDescription] = useState("");
+  // Deadline
+  const [deadline, setDeadline] = useState("");
+  const handleOnClick = (arg: arg) => {
+    if (contestInfo[arg] !== arg) {
+      setTitleSaveButtonDisabled(true);
+      axios
+        .post(`https://ollim.herokuapp.com/updateContest${arg}`, {
+          contestDocID,
+          arg,
+        })
+        .then((res) => {
+          let tmp = Object.assign({}, contestInfo);
+          tmp[arg] = arg;
+          setContestInfo(tmp);
+          setAlarm(res.data);
+          btnDisabledMatching[arg](false);
+          setTimeout(() => {
+            setAlarm(["", "success", false]);
+          }, 2000);
+        });
+    }
+  };
+
   return (
     <div className="w-full font-noto flex flex-col items-start px-20 my-20 space-y-20 GalaxyS20Ultra:px-10">
       {/* Title div */}
@@ -63,21 +90,7 @@ const ContestSetting: React.FC<props> = ({
             disabled={titleSaveButtonDisabled}
             style={{ fontSize: "0.75rem" }}
             onClick={() => {
-              if (contestInfo.title !== title) {
-                setTitleSaveButtonDisabled(true);
-                axios
-                  .post(`https://ollim.herokuapp.com/updateContestTitle`, {
-                    contestDocID,
-                    title,
-                  })
-                  .then((res) => {
-                    setAlarm(res.data);
-                    setTitleSaveButtonDisabled(false);
-                    setTimeout(() => {
-                      setAlarm(["", "success", false]);
-                    }, 2000);
-                  });
-              }
+              handleOnClick("title");
             }}
             className="flex items-center justify-center border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
           >
@@ -100,26 +113,9 @@ const ContestSetting: React.FC<props> = ({
           <span className="text-2xl font-bold mr-10">설명</span>
           <button
             style={{ fontSize: "0.75rem" }}
-            disabled={synopsisSaveButtonDisabled}
+            disabled={descrioptionSaveButtonDisabled}
             onClick={() => {
-              if (contestInfo.description !== description) {
-                setSynopsisSaveButtonDisabled(true);
-                axios
-                  .post(
-                    `https://ollim.herokuapp.com/updateContestDescription`,
-                    {
-                      contestDocID,
-                      description,
-                    }
-                  )
-                  .then((res) => {
-                    setAlarm(res.data);
-                    setSynopsisSaveButtonDisabled(false);
-                    setTimeout(() => {
-                      setAlarm(["", "success", false]);
-                    }, 2000);
-                  });
-              }
+              handleOnClick("description");
             }}
             className="border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
           >
@@ -143,24 +139,10 @@ const ContestSetting: React.FC<props> = ({
         <div className="flex items-center">
           <span className="text-2xl font-bold mr-10">마감</span>
           <button
-            disabled={disclosureSaveButtonDisabled}
+            disabled={deadlineSaveButtonDisabled}
             style={{ fontSize: "0.75rem" }}
             onClick={() => {
-              if (contestInfo.deadline !== deadline) {
-                setDisclosureSaveButtonDisabled(true);
-                axios
-                  .post(`https://ollim.herokuapp.com/updateDisclosure`, {
-                    contestDocID,
-                    deadline,
-                  })
-                  .then((res) => {
-                    setAlarm(res.data);
-                    setDisclosureSaveButtonDisabled(false);
-                    setTimeout(() => {
-                      setAlarm(["", "success", false]);
-                    }, 2000);
-                  });
-              }
+              handleOnClick("deadline");
             }}
             className="border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
           >

@@ -6,7 +6,7 @@ import { cx, css } from "@emotion/css";
 import { Leaf } from "./utils";
 import { motion } from "framer-motion";
 import ParagraphWithoutNum from "./paragraphWithoutNum";
-import { useAppSelector } from "../hooks/useRedux";
+import { useAppSelector } from "../../hooks/useRedux";
 const SlateEditorCompare = ({ valueProps }) => {
   const [value, setValue] = useState([]);
   const [loading, setLoading] = useState(true);

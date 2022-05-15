@@ -7,17 +7,17 @@ import ReactFlow, {
   Elements,
   Background,
 } from "react-flow-renderer";
-import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
+import { useAppDispatch, useAppSelector } from "../../hooks/useRedux";
 import ColorSelectorNode from "./RelationShipDiagramNode";
 import {
   alarmAction,
   alarmTimerAction,
   diagramAction,
   elementsAction,
-} from "../redux";
-import { RootState } from "../redux/store";
+} from "../../redux";
+import { RootState } from "../../redux/store";
 import ButtonEdge from "./ButtonEdge";
-import { toObjectElements, alarmType } from "../type";
+import { toObjectElements, alarmType } from "../../type";
 import axios from "axios";
 const initBgColor = "#faf6f5";
 const edgeTypes = {

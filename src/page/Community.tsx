@@ -14,7 +14,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
 import { AnimatePresence, motion } from "framer-motion";
 import WriterRecommandation from "../components/WriterRecommandation";
-import BestWritings from "../writingComponents/BestWritings";
+import BestWritings from "../components/writingComponents/BestWritings";
 import SearchAutoComplete from "../SearchAutoComplete/SearchAutoComplete";
 import FormatResultWriting from "../SearchAutoComplete/FormatResultWriting";
 import FormatResultUser from "../SearchAutoComplete/FormatResultUser";
@@ -64,19 +64,13 @@ const Community = () => {
   }, [contextUser.uid]);
 
   useEffect(() => {
-    const handleGetAllBestWritingInfo = async () => {
+    const getAllBestWritingInfo = async () => {
       setAllBestWritingInfo((await getBestWritings()) as any);
-    };
-    const handleRecommandedUsers = async () => {
       setRecommandedUsers(await getAllUsers());
-    };
-    const handleGetAllWritings = async () => {
       setAllWritings(await getAllWritings());
     };
 
-    handleGetAllBestWritingInfo();
-    handleRecommandedUsers();
-    handleGetAllWritings();
+    getAllBestWritingInfo();
   }, []);
 
   useEffect(() => {
@@ -87,7 +81,12 @@ const Community = () => {
   }, [allBestWritingInfo, recommandedUsers, allWritings]);
 
   return (
-    <div className="w-full font-noto flex flex-col items-center">
+    <div
+      onClick={() => {
+        open && setOpen(false);
+      }}
+      className="w-full font-noto flex flex-col items-center"
+    >
       <Header userInfo={userInfo} />
 
       {/* Search Div */}
@@ -97,12 +96,11 @@ const Community = () => {
             {recommandedUsers.length > 0 && (
               <div className="w-full flex items-center">
                 <div className="relative">
-                  <span
-                    onClick={handleClick}
-                    className="material-icons text-gray-500 px-1 py-1 rounded-full hover:bg-gray-300 cursor-pointer mr-2"
-                  >
-                    {searchNowText}
-                  </span>
+                  <div onClick={handleClick}>
+                    <span className="material-icons text-gray-500 px-1 py-1 rounded-full hover:bg-gray-300 cursor-pointer mr-2">
+                      {searchNowText}
+                    </span>
+                  </div>
                   <AnimatePresence>
                     {open && (
                       <motion.div

@@ -1,22 +1,57 @@
-import { memo } from "react";
+import { motion } from "framer-motion";
+import { memo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { genre, genreMatching, medal } from "../type";
+import { getUserByUID } from "../../services/firebase";
+import {
+  genre,
+  genreMatching,
+  getFirestoreUser,
+  getFirestoreWriting,
+  medal,
+} from "../../type";
 
 interface props {
-  data: any;
+  data: getFirestoreWriting;
   medal?: medal;
 }
 
 const BestWriting: React.FC<props> = ({ data, medal }) => {
+  const [writingOwnerInfo, setWritingOwnerInfo] = useState(
+    {} as getFirestoreUser
+  );
   const navigator = useNavigate();
-
+  useEffect(() => {
+    const effctGetUserByUID = async () => {
+      const userInfo = await getUserByUID(data.userUID);
+      setWritingOwnerInfo(userInfo);
+    };
+    data.userUID && effctGetUserByUID();
+  }, [data.userUID]);
   return (
-    <div
+    <motion.div
+      whileHover={{ y: "-10%" }}
       onClick={() => {
         navigator(`/writings/${data.userUID}/${data.writingDocID}`);
       }}
       className="relative w-full h-full"
     >
+      {writingOwnerInfo.profileImg && (
+        <motion.img
+          // style={{ filter: "grayscale(100%)" }}
+          // whileHover={{
+          // filter: "grayscale(0%)",
+          // transition: {
+          // duration: 0.3,
+          // },
+          // }}
+          onClick={() => {
+            navigator(`/${data.userUID}`);
+          }}
+          className="w-7 h-7 object-cover rounded-full absolute bottom-2 right-2 shadow-lg z-10"
+          src={writingOwnerInfo.profileImg}
+          alt="profile"
+        />
+      )}
       <div
         key="container-before"
         className="w-full h-full relative flex flex-col text-noto border border-logoBrown border-opacity-50 rounded-xl shadow-lg cursor-pointer py-5 px-3 z-0"
@@ -40,7 +75,7 @@ const BestWriting: React.FC<props> = ({ data, medal }) => {
           {data.synopsis}
         </textarea>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

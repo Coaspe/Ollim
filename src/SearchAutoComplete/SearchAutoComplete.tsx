@@ -26,9 +26,7 @@ const SearchAutoComplete: React.FC<props> = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (searchedItems) {
-      setOpen(true);
-    }
+    searchedItems.length > 0 && setOpen(true);
   }, [searchedItems]);
 
   useEffect(() => {

@@ -61,6 +61,7 @@ const NewContestModal: React.FC<NewContestProps> = ({
       dateCreated: new Date().getTime(),
       writings: {},
       whoVoted: {},
+      prize: [],
     };
     axios
       .post(`http://ollim.herokuapp.com/addContest`, {

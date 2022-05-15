@@ -1,11 +1,11 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useContext, useEffect, useRef, useState } from "react";
-import MypageWriting from "../writingComponents/MypageWriting";
+import MypageWriting from "../components/writingComponents/MypageWriting";
 import UserContext from "../context/user";
 import { getUserByUID, getContetsArrayInfo } from "../services/firebase";
 import { signOutAuth } from "../helpers/auth-OAuth2";
 import NewWritingModal from "../modals/NewWritingModal";
-import CustomNodeFlow from "../diagram/RelationShipDiagram";
+import CustomNodeFlow from "../components/diagram/RelationShipDiagram";
 import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 import { RootState } from "../redux/store";
 import {
@@ -17,20 +17,20 @@ import {
 import { alarmAction, userInfoAction, widthSizeAction } from "../redux";
 import { useNavigate, useParams } from "react-router-dom";
 
-import Calendar from "../components/Calendar";
+import Calendar from "../components/calendar/Calendar";
 import { Alert, Tooltip } from "@mui/material";
 import axios from "axios";
 import FollowingRow from "../components/FollowingRow";
 import FollowerRow from "../components/FollowerRow";
-import FollowersFollowingsSkeleton from "../components/FollowersFollowingsSkeleton";
+import FollowersFollowingsSkeleton from "../components/skeletons/FollowersFollowingsSkeleton";
 import Header from "../components/Header";
 import Select from "react-select";
 import NewContestModal from "../modals/NewContestModal";
-import ContestRow from "../components/ContestRow";
+import ContestRow from "../components/contest/ContestRow";
 import useGetFollowers from "../hooks/useGetFollowers";
 import useImageCompress from "../hooks/useImageCompress";
 import useGetWritings from "../hooks/useGetWritings";
-import MypageSkeleton from "../skeletons/MypageSkeleton";
+import MypageSkeleton from "../components/skeletons/MypageSkeleton";
 
 const Mypage = () => {
   // Profile owner's uid
@@ -353,8 +353,8 @@ const Mypage = () => {
         <NewContestModal setNewContestModalOpen={setNewContestModalOpen} />
       )}
       {/* Header */}
-      {userInfo.uid && <Header userInfo={userInfo} />}
-      {profileOwnerInfo && profileImage && !writingsLoading ? (
+      {<Header userInfo={userInfo} />}
+      {profileOwnerInfo && !writingsLoading ? (
         <div className="relative w-full h-full font-noto bg-opacity-30">
           <div className="w-full flex">
             {/* Profile div */}
@@ -368,7 +368,9 @@ const Mypage = () => {
                     animate={{ scale: [0, 1] }}
                     transition={{ type: "spring", duration: 0.3 }}
                     className="rounded-full w-64 h-64 shadow-xl object-cover"
-                    src={profileImage}
+                    src={
+                      profileOwnerInfo.profileImg || "/svg/user-svgrepo-com.svg"
+                    }
                     alt="profile"
                   />
                 </label>

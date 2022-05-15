@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import ReactFlow, { Background } from "react-flow-renderer";
 import ColorSelectorNode from "./RelationShipDiagramNodeReadOnly";
-import { toObjectElements } from "../type";
+import { toObjectElements } from "../../type";
 import ButtonEdgeReadOnly from "./ButtonEdgeReadOnly";
 
 const onElementClick = (event: any, element: any) =>

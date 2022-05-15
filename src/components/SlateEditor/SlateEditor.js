@@ -5,8 +5,8 @@ import { Editor, createEditor } from "slate";
 import { withHistory } from "slate-history";
 import { Toolbar } from "./components";
 import { cx, css } from "@emotion/css";
-import { alarmAction, isFullScreenAction } from "../redux";
-import { getWritingInfo } from "../services/firebase";
+import { alarmAction, isFullScreenAction } from "../../redux";
+import { getWritingInfo } from "../../services/firebase";
 import { motion, AnimatePresence } from "framer-motion";
 import DiagramWrite from "../diagram/RelationShipDiagram";
 import {
@@ -19,12 +19,12 @@ import {
   MarkButton,
 } from "./utils";
 import axios from "axios";
-import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
+import { useAppSelector, useAppDispatch } from "../../hooks/useRedux";
 import { Tooltip } from "@mui/material";
-import "../style/Slate.css";
+import "../../style/Slate.css";
 import ResizeObserver from "rc-resize-observer";
 import ParagraphWithoutNum from "./paragraphWithoutNum";
-import SpinningSvg from "../components/SpinningSvg";
+import SpinningSvg from "../SpinningSvg";
 
 const HOTKEYS = {
   "mod+b": "bold",

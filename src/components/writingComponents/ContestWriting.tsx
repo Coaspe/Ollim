@@ -1,9 +1,9 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { memo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import VoteComfirmModal from "../modals/VoteConfirmModal";
-import { getUserByUID } from "../services/firebase";
-import { contestWriting, getFirestoreUser } from "../type";
+import VoteComfirmModal from "../../modals/VoteConfirmModal";
+import { getUserByUID } from "../../services/firebase";
+import { contestWriting, getFirestoreUser } from "../../type";
 interface props {
   data: contestWriting;
   medal?: string;

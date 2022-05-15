@@ -6,10 +6,10 @@ import ReactFlow, {
   ControlButton,
   Background,
 } from "react-flow-renderer";
-import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
+import { useAppDispatch, useAppSelector } from "../../hooks/useRedux";
 import ColorSelectorNode from "./RelationShipDiagramNode";
-import { diagramAction, elementsAction } from "../redux";
-import { RootState } from "../redux/store";
+import { diagramAction, elementsAction } from "../../redux";
+import { RootState } from "../../redux/store";
 import ButtonEdge from "./ButtonEdge";
 
 const initBgColor = "#faf6f5";

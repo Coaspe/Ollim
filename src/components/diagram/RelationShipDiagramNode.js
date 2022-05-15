@@ -1,9 +1,9 @@
 import { memo, useState, useRef, useEffect, useCallback } from "react";
 import { Handle, removeElements, isEdge } from "react-flow-renderer";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
-import { elementsAction } from "../redux";
-import "../style/test.css";
+import { useAppDispatch, useAppSelector } from "../../hooks/useRedux";
+import { elementsAction } from "../../redux";
+import "../../style/test.css";
 
 export default memo(({ id, data, isConnectable }) => {
   const elements = useAppSelector((state) => state.setElements.elements);

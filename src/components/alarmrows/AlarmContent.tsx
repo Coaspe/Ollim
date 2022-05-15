@@ -6,7 +6,7 @@ import {
   alarmFollowingInfo,
   alarmAddWritingInfo,
   alarmRankInInfo,
-} from "../type";
+} from "../../type";
 
 interface props {
   info: totalAlarmType;

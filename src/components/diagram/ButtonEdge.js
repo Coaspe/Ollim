@@ -6,8 +6,8 @@ import {
 } from "react-flow-renderer";
 import { memo, useState, useCallback, useRef, useEffect } from "react";
 import { removeElements } from "react-flow-renderer";
-import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
-import { elementsAction } from "../redux";
+import { useAppDispatch, useAppSelector } from "../../hooks/useRedux";
+import { elementsAction } from "../../redux";
 
 export default memo(function CustomEdge({
   id,

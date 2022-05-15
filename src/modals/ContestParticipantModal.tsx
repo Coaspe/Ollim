@@ -1,31 +1,25 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import useGetGenreWritings from "../hooks/useGetGenreWritings";
-import { contestWriting, gerneType } from "../type";
-import ContestParticipantWritingRow from "../writingComponents/ContestParticipantWritingRow";
+import { getFirestoreContest } from "../type";
+import ContestParticipantWritingRow from "../components/writingComponents/ContestParticipantWritingRow";
 
 interface props {
   uid: string;
-  genre: gerneType;
   open: boolean;
+  contestInfo: getFirestoreContest;
+  setContestInfo: React.Dispatch<React.SetStateAction<getFirestoreContest>>;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  contestDocID: string;
-  setSubmittedWriting: React.Dispatch<React.SetStateAction<contestWriting>>;
-  deadline: string;
-  setNumOfEntry: React.Dispatch<React.SetStateAction<number>>;
 }
 const ContestParticipantModal: React.FC<props> = ({
   uid,
-  genre,
   open,
+  contestInfo,
+  setContestInfo,
   setOpen,
-  contestDocID,
-  setSubmittedWriting,
-  deadline,
-  setNumOfEntry,
 }) => {
   // Context User's writings lists that fits the genre
-  const writingsInfo = useGetGenreWritings(uid, genre);
+  const writingsInfo = useGetGenreWritings(uid, contestInfo.genre);
   // Search input Opened state and value and searched writings
   const [inputOpened, setInputOpened] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -130,12 +124,10 @@ const ContestParticipantModal: React.FC<props> = ({
               {writingsInfo.length ? (
                 searchedWritings.map((data) => (
                   <ContestParticipantWritingRow
-                    contestDocID={contestDocID as string}
                     key={data.writingDocID}
+                    contestInfo={contestInfo}
+                    setContestInfo={setContestInfo}
                     data={data}
-                    setNumOfEntry={setNumOfEntry}
-                    setSubmittedWriting={setSubmittedWriting}
-                    deadline={deadline}
                     setOpen={setOpen}
                   />
                 ))

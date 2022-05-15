@@ -1,10 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import UserContext from "../context/user";
 import {
@@ -18,7 +13,6 @@ import {
   getFirestoreContest,
   contestTableType,
   getFirestoreWriting,
-  contestWriting,
   genreMatching,
 } from "../type";
 import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
@@ -28,13 +22,15 @@ import { Alert } from "@mui/material";
 import Header from "../components/Header";
 import axios from "axios";
 import SpinningSvg from "../components/SpinningSvg";
-import ContestSetting from "../components/ContestSetting";
+import ContestSetting from "../components/contest/ContestSetting";
 import { css, cx } from "@emotion/css";
-import SlateEditorContest from "../SlateEditor/SlateEditorContest";
-import ContestWriting from "../writingComponents/ContestWriting";
+import SlateEditorContest from "../components/SlateEditor/SlateEditorContest";
+import ContestWriting from "../components/writingComponents/ContestWriting";
 import ContestParticipantModal from "../modals/ContestParticipantModal";
+import ContestPrize from "../components/contest/ContestPrize";
 
 const Contest = () => {
+  const navigator = useNavigate();
   // User Info Variables
   const { contestDocID } = useParams();
 
@@ -52,25 +48,10 @@ const Contest = () => {
     {} as getFirestoreContest
   );
   const [participateModalOpen, setParticipateModalOpen] = useState(false);
-  const [numOfEntry, setNumOfEntry] = useState(0);
   // Table State
   const [table, setTable] = useState<contestTableType>("OVERVIEW");
 
   const [userVote, setUserVote] = useState("");
-
-  // Synopsis State
-  const [description, setDescription] = useState("");
-  // Deadline
-  const [deadline, setDeadline] = useState("");
-  // Title
-  const [title, setTitle] = useState("");
-
-  // The work I submitted
-  const [submittedWriting, setSubmittedWriting] = useState(
-    {} as contestWriting
-  );
-  // Submitted writings contained others
-  const [writingDocInfo, setWritingDocInfo] = useState<contestWriting[]>([]);
 
   // Browse submitted writing
   const [selectedWritingDocID, setSelectedWritingDocID] = useState("");
@@ -78,8 +59,6 @@ const Contest = () => {
     useState<getFirestoreWriting>({} as getFirestoreWriting);
 
   const dispatch = useAppDispatch();
-
-  const navigator = useNavigate();
 
   const handleOnClick = (selectedWritingDocID: string) => {
     setSelectedWritingDocID(selectedWritingDocID);
@@ -170,7 +149,7 @@ const Contest = () => {
         setContextUserInfo(res.data() as getFirestoreUser);
       });
     }
-  }, [contextUser]);
+  }, [contextUser, contextUser.email]);
 
   // useEffect to get writing owner's information
   useEffect(() => {
@@ -181,24 +160,20 @@ const Contest = () => {
         }
       });
     }
-  }, [contestInfo]);
+  }, [contestInfo, contestInfo.hostUID]);
 
   // Get writing info and set relevant states
   useEffect(() => {
+    const effectGetContest = async (contestDocID: string) => {
+      const contestInfo = await getContestInfo(contestDocID);
+      if (contestInfo) {
+        Object.keys(contestInfo.whoVoted).includes(contextUser.uid) &&
+          setUserVote(contestInfo.whoVoted[contextUser.uid]);
+        setContestInfo(contestInfo);
+      }
+    };
     if (contestDocID) {
-      getContestInfo(contestDocID).then((res: any) => {
-        const data: getFirestoreContest = res.data();
-        setNumOfEntry(Object.keys(data.writings).length);
-        setWritingDocInfo(Object.values(data.writings));
-        setDeadline(data.deadline);
-        setDescription(data.description);
-        setTitle(data.title);
-        data.writings[contextUser.uid] &&
-          setSubmittedWriting(data.writings[contextUser.uid]);
-        Object.keys(data.whoVoted).includes(contextUser.uid) &&
-          setUserVote(data.whoVoted[contextUser.uid]);
-        setContestInfo(data);
-      });
+      effectGetContest(contestDocID);
     }
   }, [table, contestDocID]);
 
@@ -236,38 +211,34 @@ const Contest = () => {
       {contextUser.uid && contestInfo.genre && (
         <ContestParticipantModal
           uid={contextUser.uid}
-          genre={contestInfo.genre}
           open={participateModalOpen}
+          contestInfo={contestInfo}
+          setContestInfo={setContestInfo}
           setOpen={setParticipateModalOpen}
-          contestDocID={contestDocID as string}
-          setSubmittedWriting={setSubmittedWriting}
-          deadline={contestInfo.deadline}
-          setNumOfEntry={setNumOfEntry}
         />
       )}
-      {Object.keys(contestInfo).length > 0 &&
-        contestDocID &&
+      {/* Alarm */}
+      <AnimatePresence>
+        {alarm[2] && (
+          <motion.div
+            variants={alertVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{ zIndex: 2000 }}
+            className="fixed w-1/2 top-5 translate-x-1/2 left-1/4"
+          >
+            <Alert severity={alarm[1]}>{alarm[0]}</Alert>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* Header */}
+      <Header userInfo={contextUserInfo} />
+
+      {contestDocID &&
+        Object.keys(contestInfo).length > 0 &&
         Object.keys(contestHostInfo).length > 0 && (
           <div className="w-full bg-opacity-30 relative writing-container font-noto">
-            {/* Alarm */}
-            <AnimatePresence>
-              {alarm[2] && (
-                <motion.div
-                  variants={alertVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  style={{ zIndex: 2000 }}
-                  className="fixed w-1/2 top-5 translate-x-1/2 left-1/4"
-                >
-                  <Alert severity={alarm[1]}>{alarm[0]}</Alert>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Header */}
-            <Header userInfo={contextUserInfo} />
-
             {/* Contest title Navigation bar*/}
             <div className="flex flex-col items-start px-20 GalaxyS20Ultra:px-10">
               <div className="flex flex-col items-start justify-center font-bold mb-10">
@@ -369,6 +340,7 @@ const Contest = () => {
             {/* Table OVERVIEW */}
             {table === "OVERVIEW" && (
               <div className="w-full flex flex-col items-start px-20 mt-10 GalaxyS20Ultra:px-10">
+                {/* Host, Deadline, Limitation, Genre */}
                 <div className="mb-20 flex items-center w-2/3 justify-between">
                   <div className="flex flex-col GalaxyS20Ultra:w-full">
                     <span className="text-2xl font-bold mb-10">개최자</span>
@@ -404,7 +376,8 @@ const Contest = () => {
                   <div className="flex flex-col GalaxyS20Ultra:w-full">
                     <span className="text-2xl font-bold mb-10">제한 인원</span>
                     <span>
-                      {numOfEntry}/{contestInfo.limitNumOfPeople}
+                      {Object.keys(contestInfo.writings).length}/
+                      {contestInfo.limitNumOfPeople}
                     </span>
                   </div>
                   <div className="flex flex-col GalaxyS20Ultra:w-full">
@@ -413,7 +386,12 @@ const Contest = () => {
                   </div>
                 </div>
 
-                {/* Description div */}
+                {/* Prize */}
+                {contestInfo.prize.length > 0 && (
+                  <ContestPrize prize={contestInfo.prize} />
+                )}
+
+                {/* Contest description div */}
                 <div className="flex flex-col mb-20 w-2/3 GalaxyS20Ultra:w-full">
                   <span className="text-2xl font-bold mb-10">백일장 설명</span>
                   <textarea
@@ -425,14 +403,13 @@ const Contest = () => {
                     {contestInfo.description}
                   </textarea>
                 </div>
-
                 {/* Participate, Submission div */}
                 <div className="flex flex-col mb-20 w-2/3 GalaxyS20Ultra:w-full">
                   <span className="text-2xl font-bold mb-10 flex items-center">
                     {Object.keys(contestInfo.writings).includes(contextUser.uid)
                       ? "제출 목록"
                       : "참가하기"}
-                    {!Object.keys(submittedWriting).length && (
+                    {!contestInfo.writings[contextUser.uid] && (
                       <motion.span
                         whileHover={{ backgroundColor: "rgb(209 213 219)" }}
                         transition={{ ease: "linear" }}
@@ -445,14 +422,14 @@ const Contest = () => {
                       </motion.span>
                     )}
                   </span>
-                  {Object.keys(submittedWriting).length ? (
+                  {contestInfo.writings[contextUser.uid] ? (
                     <ContestWriting
-                      data={submittedWriting}
+                      data={contestInfo.writings[contextUser.uid]}
                       widthSize={widthSize}
                       handleOnClick={handleOnClick}
                       contestDocID={contestDocID}
                       contextUserUID={contextUser.uid}
-                      deadline={deadline}
+                      deadline={contestInfo.deadline}
                       userVote={userVote}
                       setUserVote={setUserVote}
                     />
@@ -497,15 +474,15 @@ const Contest = () => {
                     layout
                     className="grid grid-cols-3 items-center justify-between w-full gap-5 GalaxyS20Ultra:flex GalaxyS20Ultra:flex-col GalaxyS20Ultra:items-center GalaxyS20Ultra:overflow-y-scroll GalaxyS20Ultra:max-h-72 GalaxyS20Ultra:py-5 GalaxyS20Ultra:px-3"
                   >
-                    {writingDocInfo.length ? (
-                      writingDocInfo.map((val) => (
+                    {Object.keys(contestInfo.writings) ? (
+                      Object.values(contestInfo.writings).map((val) => (
                         <ContestWriting
                           data={val}
                           widthSize={widthSize}
                           handleOnClick={handleOnClick}
                           contestDocID={contestDocID}
                           contextUserUID={contextUser.uid}
-                          deadline={deadline}
+                          deadline={contestInfo.deadline}
                           userVote={userVote}
                           setUserVote={setUserVote}
                         />
@@ -523,14 +500,9 @@ const Contest = () => {
             {/* Table SETTING */}
             {table === "SETTING" && contestInfo.hostUID === contextUser.uid && (
               <ContestSetting
+                setContestInfo={setContestInfo}
                 contestInfo={contestInfo}
                 contestDocID={contestDocID as string}
-                title={title}
-                setTitle={setTitle}
-                description={description}
-                setDescription={setDescription}
-                deadline={deadline}
-                setDeadline={setDeadline}
               />
             )}
           </div>

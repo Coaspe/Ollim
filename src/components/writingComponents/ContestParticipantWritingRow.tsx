@@ -1,27 +1,24 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-import { participateContest } from "../services/firebase";
+import { participateContest } from "../../services/firebase";
 import {
   contestWriting,
   genre,
   genreMatching,
+  getFirestoreContest,
   getFirestoreWriting,
-} from "../type";
+} from "../../type";
 interface props {
   data: getFirestoreWriting;
-  contestDocID: string;
-  setSubmittedWriting: React.Dispatch<React.SetStateAction<contestWriting>>;
-  deadline: string;
+  contestInfo: getFirestoreContest;
+  setContestInfo: React.Dispatch<React.SetStateAction<getFirestoreContest>>;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setNumOfEntry: React.Dispatch<React.SetStateAction<number>>;
 }
 const ContestParticipantWritingRow: React.FC<props> = ({
   data,
-  contestDocID,
-  setSubmittedWriting,
-  deadline,
+  contestInfo,
+  setContestInfo,
   setOpen,
-  setNumOfEntry,
 }) => {
   const variants = {
     initial: {
@@ -58,10 +55,10 @@ const ContestParticipantWritingRow: React.FC<props> = ({
     idx: number = -1,
     collectionTitle: string = ""
   ) => {
-    if (new Date().getTime() <= new Date(deadline).getTime()) {
+    if (new Date().getTime() <= new Date(contestInfo.deadline).getTime()) {
       try {
         let newDocID: string = await participateContest(
-          contestDocID,
+          contestInfo.contestDocID,
           data,
           idx + 1
         );
@@ -74,8 +71,9 @@ const ContestParticipantWritingRow: React.FC<props> = ({
           vote: 0,
           userUID: data.userUID,
         };
-        setNumOfEntry((origin) => origin + 1);
-        setSubmittedWriting(update);
+        let tmp = Object.assign({}, contestInfo);
+        tmp.writings[data.userUID] = update;
+        setContestInfo(tmp);
         setOpen(false);
       } catch (error) {
         console.log(error);

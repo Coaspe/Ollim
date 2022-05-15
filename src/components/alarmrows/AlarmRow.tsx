@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import { memo, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import UserContext from "../context/user";
-import { removeAlarm } from "../services/firebase";
-import { getFirestoreAlarmType, totalAlarmType } from "../type";
+import UserContext from "../../context/user";
+import { removeAlarm } from "../../services/firebase";
+import { getFirestoreAlarmType, totalAlarmType } from "../../type";
 import axios from "axios";
-import { alarmNavigator } from "../helpers/alarm-navigator";
+import { alarmNavigator } from "../../helpers/alarm-navigator";
 import AlarmContent from "./AlarmContent";
 
 interface props {
