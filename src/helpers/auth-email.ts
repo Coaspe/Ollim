@@ -2,26 +2,50 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendSignInLinkToEmail,
 } from "firebase/auth";
 import { NavigateFunction } from "react-router-dom";
-import { signInWithEmail } from "../services/firebase";
+import { signupWithEmail } from "../services/firebase";
 
+export const verifyEmail = (email: string) => {
+  const auth = getAuth();
+  var actionCodeSettings = {
+    url: "http://localhost:3000/",
+    handleCodeInApp: true,
+  };
+  return sendSignInLinkToEmail(auth, email, actionCodeSettings);
+};
 export const createAccountWithEmailAndPassword = (
   email: string,
   password: string,
+  username: string,
   navi: NavigateFunction
 ) => {
   const auth = getAuth();
   createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       const user = userCredential.user;
-      signInWithEmail(user).then(() => {
-        navi(`/${user.uid}`);
-      });
-      console.log(user);
+      window.localStorage.removeItem("verificatedEmail");
+      signupWithEmail(user, username)
+        .then(() => {
+          navi(`/${user.uid}`);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     })
     .catch((error) => {
       console.log(error);
+
+      switch (error.code) {
+        case "EMAIL_EXISTS":
+          break;
+
+        default:
+          break;
+      }
+      if (error.code === "EMAIL_EXISTS") {
+      }
     });
 };
 

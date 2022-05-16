@@ -46,7 +46,7 @@ export const signInWithGoogleInfo = (info: any) => {
   });
   return batch.commit();
 };
-export const signInWithEmail = (user: any) => {
+export const signupWithEmail = (user: any, username: string) => {
   console.log("dfsdfsdf", user);
 
   const batch = writeBatch(firestore);
@@ -63,7 +63,7 @@ export const signInWithEmail = (user: any) => {
       contests: { host: [], participation: [] },
       userEmail: user.email.toLowerCase(),
       uid: user.uid,
-      username: "none",
+      username,
       followings: [],
       followers: [],
       dateCreated: Date.now(),

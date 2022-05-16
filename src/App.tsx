@@ -6,9 +6,9 @@ import IsUserLoggedIn from "./helpers/Is-user-logged-in";
 import Community from "./page/Community";
 import Writing from "./page/Writing";
 import Contest from "./page/Contest";
+import Mypage from "./page/Mypage";
 
 const Intro = lazy(() => import("./page/Intro"));
-const Mypage = lazy(() => import("./page/Mypage"));
 
 const App = () => {
   const { user } = useAuthListner();

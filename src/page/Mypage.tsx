@@ -113,12 +113,6 @@ const Mypage = () => {
     };
   }, []);
 
-  // Uid param change detection
-  useEffect(() => {
-    followingsLength.current = 0;
-    followersLength.current = 0;
-  }, [uid]);
-
   const {
     poems,
     novels,
@@ -145,16 +139,21 @@ const Mypage = () => {
           : [];
       setTotalContests(tmp);
     };
-    // Get user information
-    getUserByUID(uid as string).then((res: any) => {
-      if (res.username) {
-        setProfileOwnerInfo(res);
-        setProfileImage(res.profileImg);
-        getContests(res.contests);
-        followersLength.current = res.followers.length;
-        followingsLength.current = res.followings.length;
-      }
-    });
+    if (uid) {
+      // Get user information
+      getUserByUID(uid as string).then((res: any) => {
+        if (res.username) {
+          setProfileOwnerInfo(res);
+          setProfileImage(res.profileImg);
+          getContests(res.contests);
+          followersLength.current = res.followers.length;
+          followingsLength.current = res.followings.length;
+        }
+      });
+
+      followingsLength.current = 0;
+      followersLength.current = 0;
+    }
   }, [uid]);
 
   // Get context user's information
@@ -374,7 +373,7 @@ const Mypage = () => {
                     alt="profile"
                   />
                 </label>
-                {contextUser.uid && contextUser.uid === uid && (
+                {contextUser && contextUser.uid && contextUser.uid === uid && (
                   <input
                     onChange={handleProfileImgOnChange}
                     style={{ display: "none" }}
