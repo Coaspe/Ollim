@@ -10,6 +10,7 @@ import {
 } from "../components/constants/variants";
 import {
   createAccountWithEmailAndPassword,
+  loginWithEmailAndPassword,
   verifyEmail,
 } from "../helpers/auth-email";
 import { signInWithGoogle } from "../helpers/auth-OAuth2";
@@ -144,7 +145,7 @@ const Intro = () => {
                 </motion.p>
                 <motion.div className="flex flex-col">
                   <input
-                    className="border border-logoBrown rounded-2xl bg-transparent px-3 py-3 text-md mb-3 shadow-md"
+                    className="focus:outline-none border border-logoBrown rounded-2xl bg-transparent px-3 py-3 text-md mb-3 shadow-md"
                     type="email"
                     value={loginEmail}
                     onChange={(e) => {
@@ -153,7 +154,7 @@ const Intro = () => {
                     placeholder="이메일"
                   />
                   <input
-                    className="border border-logoBrown rounded-2xl bg-transparent px-3 py-3 text-md shadow-md"
+                    className="focus:outline-none border border-logoBrown rounded-2xl bg-transparent px-3 py-3 text-md shadow-md"
                     type="password"
                     value={loginPassword}
                     onChange={(e) => {
@@ -203,6 +204,43 @@ const Intro = () => {
                   >
                     home
                   </motion.span>
+                  <motion.span
+                    onClick={() => {
+                      try {
+                        loginWithEmailAndPassword(loginEmail, loginPassword);
+                      } catch (error: any) {
+                        switch (error.code) {
+                          case "auth/invalid-email":
+                            setAlarm([
+                              "유효하지 않는 이메일 입니다.",
+                              "error",
+                              true,
+                            ]);
+                            break;
+
+                          case "auth/wrong-password":
+                            setAlarm(["틀린 비밀번호 입니다.", "error", true]);
+                            break;
+
+                          default:
+                            setAlarm([
+                              "로그인에 실패하였습니다.",
+                              "error",
+                              true,
+                            ]);
+                            break;
+                        }
+                        setTimeout(() => {
+                          setAlarm(["", "success", false]);
+                        }, 2000);
+                      }
+                    }}
+                    whileHover={{ y: "-10%" }}
+                    style={{ fontSize: "1.2rem", backgroundColor: "#eee" }}
+                    className="px-3 py-3 rounded-full shadow-md font-semibold cursor-pointer material-symbols-outlined"
+                  >
+                    check
+                  </motion.span>
                 </motion.div>
               </motion.div>
             ) : (
@@ -219,7 +257,7 @@ const Intro = () => {
                 <motion.div className="flex flex-col">
                   <div className="relative mb-3">
                     <input
-                      className="border border-logoBrown rounded-2xl bg-transparent px-3 py-3 text-md shadow-md"
+                      className="focus:outline-none border border-logoBrown rounded-2xl bg-transparent px-3 py-3 text-md shadow-md"
                       type="email"
                       readOnly={verificatedEmail !== ""}
                       value={signupEmail}
@@ -320,7 +358,7 @@ const Intro = () => {
                             handleInputChanged(e, setSignupName);
                           }}
                           value={signupName}
-                          className="border border-logoBrown rounded-2xl bg-transparent px-3 py-3 mb-3 text-md shadow-md"
+                          className="focus:outline-none border border-logoBrown rounded-2xl bg-transparent px-3 py-3 mb-3 text-md shadow-md"
                           type="text"
                           placeholder="닉네임"
                           minLength={2}
@@ -336,7 +374,7 @@ const Intro = () => {
                               handleInputChanged(e, setSignupPassword);
                             }}
                             value={signupPassword}
-                            className="border border-logoBrown rounded-2xl bg-transparent px-3 py-3 text-md mb-3 shadow-md"
+                            className="focus:outline-none border border-logoBrown rounded-2xl bg-transparent px-3 py-3 text-md mb-3 shadow-md"
                             required
                             type="password"
                             minLength={5}
@@ -371,7 +409,7 @@ const Intro = () => {
                                 handleInputChanged(e, setSignupConfirmPassword);
                               }}
                               value={signupConfirmPassword}
-                              className="border border-logoBrown rounded-2xl bg-transparent px-3 py-3 text-md shadow-md"
+                              className="focus:outline-none border border-logoBrown rounded-2xl bg-transparent px-3 py-3 text-md shadow-md"
                               type="password"
                               minLength={5}
                               placeholder="비밀번호 확인"

@@ -47,8 +47,6 @@ export const signInWithGoogleInfo = (info: any) => {
   return batch.commit();
 };
 export const signupWithEmail = (user: any, username: string) => {
-  console.log("dfsdfsdf", user);
-
   const batch = writeBatch(firestore);
   try {
     batch.set(doc(firestore, "writings", user.uid), {

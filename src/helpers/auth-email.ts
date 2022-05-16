@@ -51,15 +51,5 @@ export const createAccountWithEmailAndPassword = (
 
 export const loginWithEmailAndPassword = (email: string, password: string) => {
   const auth = getAuth();
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed in
-      const user = userCredential.user;
-      console.log(user);
-
-      // ...
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  return signInWithEmailAndPassword(auth, email, password);
 };
