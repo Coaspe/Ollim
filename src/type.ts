@@ -213,3 +213,9 @@ export const bgColor = {
   8: "rgb(131 24 67)",
 };
 export type leftPartType = "INTRO" | "LOGIN" | "SIGNUP";
+
+export const options: Array<{ value: contestType; label: string }> = [
+  { value: "PARTICIPATION", label: "참가" },
+  { value: "HOST", label: "개최" },
+  { value: "TOTAL", label: "전체" },
+];

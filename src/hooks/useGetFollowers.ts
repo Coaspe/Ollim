@@ -11,7 +11,6 @@ const useGetFollowers = (
   // Load 5 followers, followings every "Load More" request.
   // Below two variables indicate how many followers, followings loaded now
   const followersKey = useRef(0);
-
   const [followers, setFollowers] = useState<getFirestoreUser[]>([]);
   const handleMoreFollowers = useCallback(async () => {
     setLoading(true);

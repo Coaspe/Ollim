@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState, lazy } from "react";
 import MypageWriting from "../components/writingComponents/MypageWriting";
 import UserContext from "../context/user";
 import { getUserByUID, getContetsArrayInfo } from "../services/firebase";
@@ -13,6 +13,7 @@ import {
   getFirestoreUser,
   getFirestoreContest,
   contestType,
+  options,
 } from "../type";
 import { alarmAction, userInfoAction, widthSizeAction } from "../redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -30,8 +31,9 @@ import useImageCompress from "../hooks/useImageCompress";
 import useGetWritings from "../hooks/useGetWritings";
 import MypageSkeleton from "../components/skeletons/MypageSkeleton";
 
-import FollowingsModal from "../modals/FollowingsModal";
+import { alertVariants } from "../components/constants/variants";
 import FollowersModal from "../modals/FollowersModal";
+import FollowingsModal from "../modals/FollowingsModal";
 
 const Mypage = () => {
   // Profile owner's uid
@@ -40,8 +42,6 @@ const Mypage = () => {
   const [profileOwnerInfo, setProfileOwnerInfo] = useState<getFirestoreUser>(
     {} as getFirestoreUser
   );
-
-  const [loading, setLoading] = useState(false);
 
   // For more natural UI of the number of followers of followings, followers
   const followingsLength = useRef(0);
@@ -87,7 +87,7 @@ const Mypage = () => {
   const widthSize = useAppSelector(
     (state: RootState) => state.setWidthSize.widthSize
   );
-
+  const alarm = useAppSelector((state: RootState) => state.setAlarm.alarm);
   const setAlarm = (alarm: [string, alarmType, boolean]) => {
     dispatch(alarmAction.setAlarm({ alarm }));
   };
@@ -162,40 +162,24 @@ const Mypage = () => {
     navigator("/community");
   };
 
-  const alarm = useAppSelector((state: RootState) => state.setAlarm.alarm);
-  const alertVariants = {
-    initial: {
-      opacity: 0,
-      y: -10,
-    },
-    animate: {
-      opacity: 1,
-      y: 0,
-    },
-    exit: {
-      opacity: 0,
-      y: -10,
-    },
-  };
-  const options: Array<{ value: contestType; label: string }> = [
-    { value: "PARTICIPATION", label: "참가" },
-    { value: "HOST", label: "개최" },
-    { value: "TOTAL", label: "전체" },
-  ];
   return (
     <>
-      <FollowersModal
-        followersModalOpen={followersModalOpen}
-        setFollowersModalOpen={setFollowersModalOpen}
-        profileOwnerInfo={profileOwnerInfo}
-        followersLength={followersLength}
-      />
-      <FollowingsModal
-        followingsModalOpen={followingsModalOpen}
-        setFollowingsModalOpen={setFollowingsModalOpen}
-        profileOwnerInfo={profileOwnerInfo}
-        followingsLength={followingsLength}
-      />
+      {followersModalOpen && profileOwnerInfo && (
+        <FollowersModal
+          followersModalOpen={followersModalOpen}
+          setFollowersModalOpen={setFollowersModalOpen}
+          profileOwnerInfo={profileOwnerInfo}
+          followersLength={followersLength}
+        />
+      )}
+      {followingsModalOpen && profileOwnerInfo && (
+        <FollowingsModal
+          followingsModalOpen={followingsModalOpen}
+          setFollowingsModalOpen={setFollowingsModalOpen}
+          profileOwnerInfo={profileOwnerInfo}
+          followingsLength={followingsLength}
+        />
+      )}
 
       {/* Alarm */}
       <AnimatePresence>
