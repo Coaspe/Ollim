@@ -61,6 +61,7 @@ const useGetFollowers = (
         setFollowers((origin: any) => {
           return [...origin, ...tmp];
         });
+        followersKey.current += tmp.length;
       } catch (error) {
         console.log(error);
       }
