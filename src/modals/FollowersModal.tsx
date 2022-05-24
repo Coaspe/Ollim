@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import {  motion } from "framer-motion";
+import {  useState } from "react";
 import FollowerRow from "../components/FollowerRow";
 import FollowersFollowingsSkeleton from "../components/skeletons/FollowersFollowingsSkeleton";
 import useGetFollowers from "../hooks/useGetFollowers";

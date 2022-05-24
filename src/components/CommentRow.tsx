@@ -8,22 +8,18 @@ import { getUserByUID } from "../services/firebase";
 import { alarmType, commentType, getFirestoreUser } from "../type";
 import SpinningSvg from "./SpinningSvg";
 
-interface props extends commentType {
+interface props {
   writingDocID: string;
   index: number;
   genre: string;
   setComments: React.Dispatch<React.SetStateAction<any[]>>;
   isAlarmComment?: boolean;
+  commentData: commentType
 }
 
 const CommentRow: React.FC<props> = ({
+  commentData,
   index,
-  content,
-  replies,
-  likes,
-  commentOwnerUID,
-  docID,
-  dateCreated,
   setComments,
   writingDocID,
   genre,
@@ -45,14 +41,14 @@ const CommentRow: React.FC<props> = ({
     dispatch(alarmAction.setAlarm({ alarm }));
   };
   useEffect(() => {
-    getUserByUID(commentOwnerUID).then((res: any) => {
+    getUserByUID(commentData.commentOwnerUID).then((res: any) => {
       setCommentOwnerInfo(res);
     });
-  }, [commentOwnerUID]);
+  }, [commentData.commentOwnerUID]);
 
   useEffect(() => {
-    setLikesState(likes);
-    setDoesUserLike(likes.includes(user.uid));
+    setLikesState(commentData.likes);
+    setDoesUserLike(commentData.likes.includes(user.uid));
   }, []);
 
   const handleCommentLike = () => {
@@ -60,7 +56,7 @@ const CommentRow: React.FC<props> = ({
       let likesTmp = origin.slice();
       axios.post("https://ollim.herokuapp.com/updateCommentLike", {
         like: doesUserLike,
-        commentDocID: docID,
+        commentDocID: commentData.docID,
         userUID: user.uid,
       });
 
@@ -99,10 +95,10 @@ const CommentRow: React.FC<props> = ({
     setDeleteBtnDisable(true);
     axios
       .post("https://ollim.herokuapp.com/deleteComment", {
-        commentDocID: docID,
+        commentDocID: commentData.docID,
         writingDocID,
         genre,
-        dateCreated,
+        dateCreated: commentData.dateCreated,
       })
       .then(() => {
         setComments((origin) => {
@@ -118,8 +114,8 @@ const CommentRow: React.FC<props> = ({
     axios
       .post("https://ollim.herokuapp.com/reportComment", {
         reportUID: user.uid,
-        reportedUID: commentOwnerUID,
-        commentDocID: docID,
+        reportedUID: commentData.commentOwnerUID,
+        commentDocID: commentData.docID,
         reasonForReport,
       })
       .then((res) => {
@@ -168,7 +164,7 @@ const CommentRow: React.FC<props> = ({
                       exit={{ opacity: "0%" }}
                       className="flex items-center"
                     >
-                      {user.uid === commentOwnerUID && (
+                      {user.uid === commentData.commentOwnerUID && (
                         <button
                           onClick={handleCommentDelete}
                           disabled={deleteBtnDisable}
@@ -208,7 +204,7 @@ const CommentRow: React.FC<props> = ({
               </div>
             </div>
             <textarea
-              value={content}
+              value={commentData.content}
               readOnly
               style={{ maxHeight: "100px" }}
               className="w-full focus:outline-none"

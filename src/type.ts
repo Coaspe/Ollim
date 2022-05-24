@@ -219,3 +219,14 @@ export const options: Array<{ value: contestType; label: string }> = [
   { value: "HOST", label: "개최" },
   { value: "TOTAL", label: "전체" },
 ];
+export const commentsModalVariants = {
+  initial: {
+    x: "100%",
+  },
+  animate: {
+    x: "0%",
+  },
+  exit: {
+    x: "100%",
+  },
+};

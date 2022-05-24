@@ -7,12 +7,11 @@ import { getCommentsInfinite, getWritingInfo } from "../../services/firebase";
 import { AnimatePresence, motion } from "framer-motion";
 import { Leaf } from "./utils";
 import ParagraphWithoutNum from "./paragraphWithoutNum";
-import CommentRow from "../CommentRow";
-import axios from "axios";
-import SpinningSvg from "../SpinningSvg";
 import { Tooltip } from "@mui/material";
 import { isFullScreenAction } from "../../redux";
 import { useAppSelector, useAppDispatch } from "../../hooks/useRedux";
+import useGetComments from "../../hooks/useGetComments";
+import CommentsModal from "../../modals/CommentsModal";
 
 const SlateEditorRDOnly = ({
   writingDocID,
@@ -21,7 +20,6 @@ const SlateEditorRDOnly = ({
   alarmCommentDocID,
   test,
 }) => {
-  const [commentLoading, setCommentLoading] = useState(false);
   // SlateEditor value state
   const [value, setValue] = useState([]);
   // Selected commit key
@@ -40,14 +38,8 @@ const SlateEditorRDOnly = ({
   // Comment modal open state
   const [openCommentsModal, setOpenCommentsModal] = useState(false);
 
-  // Writing's comments state
-  const [comments, setComments] = useState([]);
   // Writing's comments' DocID
   const [commentsDocID, setCommentsDocID] = useState([]);
-  const [commentButtonDisabled, setCommentButtonDisabled] = useState(false);
-
-  // Comment Text state
-  const [commentText, setCommentText] = useState("");
 
   // Now selected collection num state
   const [nowCollectionNum, setNowCollectionNum] = useState(0);
@@ -141,161 +133,16 @@ const SlateEditorRDOnly = ({
     }
   }, [writingInfo, nowCollectionNum]);
 
-  // When value changed, Set load state true
+  // When value changed, Set loading state true
   useEffect(() => {
     value.length > 0 && setLoading(true);
   }, [value]);
 
-  // Loaded Comments Count key
-  const commetsKey = useRef(0);
-  const commentLoadFirst = useRef(true);
-
-  const handleMoreComments = useCallback(() => {
-    if (commentLoadFirst.current) {
-      commentLoadFirst.current = false;
-    }
-    setCommentLoading(true);
-    if (commentsDocID.length > 0 && commetsKey.current < commentsDocID.length) {
-      getCommentsInfinite(commentsDocID, commetsKey.current).then((res) => {
-        let tmp = res.docs
-          .map((doc) => ({
-            ...doc.data(),
-            docID: doc.id,
-          }))
-          .sort((a, b) => b.dateCreated - a.dateCreated);
-        setComments((origin) => {
-          return [...origin, ...tmp];
-        });
-        commetsKey.current += tmp.length;
-      });
-    }
-  }, [commentsDocID]);
-  useEffect(() => {
-    if (openCommentsModal && commentLoadFirst.current) {
-      handleMoreComments();
-    }
-  }, [openCommentsModal]);
-
-  // Comment modal framer-motion variant
-  const commentsModalVariants = {
-    initial: {
-      x: "100%",
-    },
-    animate: {
-      x: "0%",
-    },
-    exit: {
-      x: "100%",
-    },
-  };
-  // Add comment function
-  const handleAddComment = () => {
-    setCommentText("");
-    setCommentButtonDisabled(true);
-    const dateCreated = new Date().getTime();
-    const commentInfo = {
-      replies: {},
-      content: commentText,
-      commentOwnerUID: contextUserInfo.uid,
-      likes: [],
-      dateCreated,
-    };
-    // https://ollim.herokuapp.com/addComment
-    axios
-      .post("https://ollim.herokuapp.com/addComment", {
-        writingDocID,
-        writingTitle: writingInfo.title,
-        writingOwnerUID: writingInfo.userUID,
-        commentInfo: JSON.stringify(commentInfo),
-        commentUserInfo: JSON.stringify(contextUserInfo),
-      })
-      .then((res) => {
-        if (res.data[1] === "success") {
-          commentInfo["docID"] = res.data[3];
-          setComments((origin) => [commentInfo, ...origin]);
-        }
-        setCommentButtonDisabled(false);
-      });
-  };
-  useEffect(() => {
-    comments.length > 0 && setCommentLoading(false);
-  }, [comments]);
   return (
     <>
       <AnimatePresence>
         {openCommentsModal && (
-          <motion.div
-            variants={commentsModalVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            style={{ zIndex: 51, top: "20%" }}
-            className="fixed right-0 w-1/3 h-2/3 bg-white flex flex-col items-center border border-opacity-20 border-black GalaxyS20Ultra:w-4/5 GalaxyS20Ultra:h-1/2"
-          >
-            <motion.div
-              layout
-              className="w-full h-full gap-5 overflow-y-scroll py-2 px-4 flex flex-col items-center"
-            >
-              {commentsDocID.length !== 0 ? (
-                <>
-                  {comments.map((comment, index) => (
-                    <CommentRow
-                      genre={writingInfo.genre}
-                      writingDocID={writingDocID}
-                      key={comment.dateCreated}
-                      replies={comment.replies}
-                      content={comment.content}
-                      commentOwnerUID={comment.commentOwnerUID}
-                      likes={comment.likes}
-                      dateCreated={comment.dateCreated}
-                      docID={comment.docID}
-                      index={index}
-                      setComments={setComments}
-                      isAlarmComment={comment.docID === alarmCommentDocID}
-                    />
-                  ))}
-                  {/* Load more followings button */}
-                  {commetsKey.current < commentsDocID.length && (
-                    <div
-                      onClick={handleMoreComments}
-                      className={`${
-                        commentLoading && "pointer-events-none"
-                      } font-semibold text-sm shadow-inner cursor-pointer w-1/2 bg-white h-10 flex items-center justify-center rounded-xl text-gray-500`}
-                    >
-                      {!commentLoading && "Load more..."}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <p className="text-2xl font-bold text-gray-400 font-Nanum_Gothic mt-5">
-                  댓글이 없습니다. ㅠㅠ
-                </p>
-              )}
-            </motion.div>
-            <div className="w-full shadow-inner h-1/5 border-opacity-50 flex items-center justify-between py-4 px-4">
-              <textarea
-                value={commentText}
-                onChange={(e) => {
-                  setCommentText(e.target.value);
-                }}
-                placeholder="댓글을 입력하세요"
-                rows={1}
-                className="w-full border mr-4 rounded-xl px-3 py-3 focus:outline-none max-h-full resize-none"
-              />
-              <motion.button
-                whileHover={{ y: "-10%" }}
-                onClick={handleAddComment}
-                disabled={commentButtonDisabled}
-                className="border rounded-full px-2 py-2 flex items-center justify-center"
-              >
-                {commentButtonDisabled ? (
-                  <SpinningSvg />
-                ) : (
-                  <span className="material-icons">maps_ugc</span>
-                )}
-              </motion.button>
-            </div>
-          </motion.div>
+          <CommentsModal writingDocID={writingDocID} commentModalOpen={openCommentsModal} commentsDocId={commentsDocID} writingInfo={writingInfo} contextUserInfo={contextUserInfo} alarmCommentDocID={alarmCommentDocID} />
         )}
         {openLoadCommitModal && (
           <motion.div
