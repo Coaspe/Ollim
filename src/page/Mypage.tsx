@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useContext, useEffect, useRef, useState, lazy } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import MypageWriting from "../components/writingComponents/MypageWriting";
 import UserContext from "../context/user";
 import { getUserByUID, getContetsArrayInfo } from "../services/firebase";
@@ -109,6 +109,7 @@ const Mypage = () => {
     userWritings,
     writingsLoading,
   } = useGetWritings(uid);
+  console.log(poems);
 
   // Get profileOwner's user information and user's writings information
   useEffect(() => {
@@ -156,12 +157,10 @@ const Mypage = () => {
         }
       });
   }, [profileOwnerInfo, contextUser]);
-
   // Navigate to community
   const handleGoToCommunity = () => {
     navigator("/community");
   };
-
   return (
     <>
       {followersModalOpen && profileOwnerInfo && (

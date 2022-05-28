@@ -292,7 +292,7 @@ const Writing = () => {
                 className="flex items-center justify-between mb-5 cursor-pointer"
               >
                 <img
-                  className="w-7 rounded-full mr-2"
+                  className="w-7 h-7 rounded-full mr-2 object-cover"
                   src={writingOwnerInfo.profileImg}
                   alt="writing owner"
                 />

@@ -131,6 +131,24 @@ const Intro = () => {
                     다른 작가들의 글
                   </motion.button>
                 </motion.div>
+                <motion.div
+                  initial="initial"
+                  animate="animate"
+                  variants={divVariants}
+                >
+                  <motion.button
+                    whileHover={{ y: "-10%" }}
+                    className="px-4 py-3 rounded-2xl bg-white shadow-md font-semibold mt-5"
+                    onClick={() => {
+                      loginWithEmailAndPassword(
+                        "achoe628@naver.com",
+                        "test111"
+                      );
+                    }}
+                  >
+                    테스트 계정으로 로그인
+                  </motion.button>
+                </motion.div>
               </motion.div>
             ) : leftPart === "LOGIN" ? (
               <motion.div

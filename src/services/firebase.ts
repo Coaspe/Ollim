@@ -11,6 +11,7 @@ import {
   arrayUnion,
   increment,
   writeBatch,
+  setDoc,
 } from "firebase/firestore";
 import {
   contestWriting,
@@ -19,7 +20,7 @@ import {
   getFirestoreUser,
   getFirestoreContest,
 } from "../type";
-import { ref, remove } from "firebase/database";
+import { ref, remove, update } from "firebase/database";
 
 export const signInWithGoogleInfo = (info: any) => {
   const batch = writeBatch(firestore);
