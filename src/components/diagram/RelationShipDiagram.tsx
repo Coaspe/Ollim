@@ -114,12 +114,13 @@ const DiagramWrite: React.FC<props> = ({
     setElements(elementsTmp);
   };
   const onElementClick = (event: any, element: any) =>
-    // Fit view on mounted
-    useEffect(() => {
-      if (reactflowInstance && elements && elements.length > 0) {
-        reactflowInstance.fitView();
-      }
-    }, [reactflowInstance]);
+    console.log("click", element);
+  // Fit view on mounted
+  useEffect(() => {
+    if (reactflowInstance && elements && elements.length > 0) {
+      reactflowInstance.fitView();
+    }
+  }, [reactflowInstance]);
 
   useEffect(() => {
     if (reactflowInstance) {
