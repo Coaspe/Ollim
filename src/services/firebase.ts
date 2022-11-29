@@ -83,7 +83,6 @@ export async function doesEmailExist(userEmail: string) {
 }
 
 export const getUserByUID = async (uid: string) => {
-  console.log(uid);
 
   try {
     const q = query(collection(firestore, "users"), where("uid", "==", uid));

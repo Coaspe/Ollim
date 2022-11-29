@@ -17,6 +17,7 @@ const CalendarElement: React.FC<props> = ({
 
   useEffect(() => {
     if (yearMonth && keys && totalCommits) {
+
       const tmp: { [key: number]: string[] } = {};
 
       Array.from(

@@ -97,7 +97,6 @@ const DiagramWrite: React.FC<props> = ({
     pos.current[0] += 10;
     pos.current[1] += 10;
     setElements([...elements, addedNode]);
-    console.log(elements);
   };
   const onConnect = (params: any) => {
     setElements([
@@ -115,13 +114,12 @@ const DiagramWrite: React.FC<props> = ({
     setElements(elementsTmp);
   };
   const onElementClick = (event: any, element: any) =>
-    console.log("click", element);
-  // Fit view on mounted
-  useEffect(() => {
-    if (reactflowInstance && elements && elements.length > 0) {
-      reactflowInstance.fitView();
-    }
-  }, [reactflowInstance]);
+    // Fit view on mounted
+    useEffect(() => {
+      if (reactflowInstance && elements && elements.length > 0) {
+        reactflowInstance.fitView();
+      }
+    }, [reactflowInstance]);
 
   useEffect(() => {
     if (reactflowInstance) {

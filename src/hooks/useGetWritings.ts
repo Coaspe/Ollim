@@ -27,24 +27,24 @@ const useGetWritings = (uid: string | undefined) => {
         setUserWritings(userWritings as getFirestoreUserWritings);
         const poem = userWritings.poemDocID
           ? (
-              (await getWritingsArrayInfo(
-                userWritings.poemDocID
-              )) as Array<getFirestoreWriting>
-            ).sort((a, b) => b.dateCreated - a.dateCreated)
+            (await getWritingsArrayInfo(
+              userWritings.poemDocID
+            )) as Array<getFirestoreWriting>
+          ).sort((a, b) => b.dateCreated - a.dateCreated)
           : [];
         const novel = userWritings.novelDocID
           ? (
-              (await getWritingsArrayInfo(
-                userWritings.novelDocID
-              )) as Array<getFirestoreWriting>
-            ).sort((a, b) => b.dateCreated - a.dateCreated)
+            (await getWritingsArrayInfo(
+              userWritings.novelDocID
+            )) as Array<getFirestoreWriting>
+          ).sort((a, b) => b.dateCreated - a.dateCreated)
           : [];
         const scenario = userWritings.scenarioDocID
           ? (
-              (await getWritingsArrayInfo(
-                userWritings.scenarioDocID
-              )) as Array<getFirestoreWriting>
-            ).sort((a, b) => b.dateCreated - a.dateCreated)
+            (await getWritingsArrayInfo(
+              userWritings.scenarioDocID
+            )) as Array<getFirestoreWriting>
+          ).sort((a, b) => b.dateCreated - a.dateCreated)
           : [];
         setPoems(poem);
         setNovels(novel);
@@ -64,7 +64,6 @@ const useGetWritings = (uid: string | undefined) => {
   useEffect(() => {
     uid && getWritings(uid);
   }, [uid]);
-
   return {
     poems,
     novels,

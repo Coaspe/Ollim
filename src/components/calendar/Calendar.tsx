@@ -19,23 +19,22 @@ const Calendar: React.FC<props> = ({ totalCommits, widthSize }) => {
         `${twoMonthsBeforeYear}-${twoMonthsBeforeMonth}-1`
       ).valueOf();
 
-      const current = [];
+      const currentMonth = [];
       const oneMonthBefore = [];
       const twoMonthBefore = [];
 
       const oneMonthsBeforeUnix = moment(
-        `${moment().subtract(1, "months").year()}-${
-          moment().subtract(1, "months").month() + 1
+        `${moment().subtract(1, "months").year()}-${moment().subtract(1, "months").month() + 1
         }-1`
       ).valueOf();
       const currentMonthLastDayUnix = moment(
-        `${moment().year()}-${moment().month() + 1}-${moment().daysInMonth()}`
-      ).valueOf();
+        `${moment().year()}-${moment().month() + 1 + 1}-1`
+      ).valueOf() - 1;
       const currentMonthFirstDayUnix = moment(
         `${moment().year()}-${moment().month() + 1}-1`
       ).valueOf();
 
-      const tmp = Object.keys(totalCommits).reverse();
+      const tmp = Object.keys(totalCommits);
 
       for (let i = 0; i < tmp.length; i++) {
         let tmpInt = parseInt(tmp[i]);
@@ -43,7 +42,7 @@ const Calendar: React.FC<props> = ({ totalCommits, widthSize }) => {
           currentMonthLastDayUnix >= tmpInt &&
           tmpInt >= currentMonthFirstDayUnix
         ) {
-          current.push(tmpInt);
+          currentMonth.push(tmpInt);
         } else if (
           currentMonthFirstDayUnix > tmpInt &&
           tmpInt >= oneMonthsBeforeUnix
@@ -55,20 +54,20 @@ const Calendar: React.FC<props> = ({ totalCommits, widthSize }) => {
         ) {
           twoMonthBefore.push(tmpInt);
         } else if (twoMonthsBeforeUnix > tmpInt) {
-          break;
+          continue;
         }
       }
 
       const tmp2: any = {};
       tmp2[`${twoMonthsBeforeYear}-${twoMonthsBeforeMonth}`] = twoMonthBefore;
       tmp2[
-        `${moment().subtract(1, "months").year()}-${
-          moment().subtract(1, "months").month() + 1
+        `${moment().subtract(1, "months").year()}-${moment().subtract(1, "months").month() + 1
         }`
       ] = oneMonthBefore;
-      tmp2[`${moment().format("YYYY-MM")}`] = current;
+      tmp2[`${moment().format("YYYY-MM")}`] = currentMonth;
 
       setRecent3MonthsCommits(tmp2);
+
     };
 
     if (totalCommits) {
@@ -96,19 +95,19 @@ const Calendar: React.FC<props> = ({ totalCommits, widthSize }) => {
             <CalendarElement
               key={
                 Object.keys(recent3MonthsCommits)[
-                  Object.keys(recent3MonthsCommits).length - 1
+                Object.keys(recent3MonthsCommits).length - 1
                 ]
               }
               yearMonth={
                 Object.keys(recent3MonthsCommits)[
-                  Object.keys(recent3MonthsCommits).length - 1
+                Object.keys(recent3MonthsCommits).length - 1
                 ]
               }
               keys={
                 recent3MonthsCommits[
-                  Object.keys(recent3MonthsCommits)[
-                    Object.keys(recent3MonthsCommits).length - 1
-                  ]
+                Object.keys(recent3MonthsCommits)[
+                Object.keys(recent3MonthsCommits).length - 1
+                ]
                 ]
               }
               totalCommits={totalCommits}

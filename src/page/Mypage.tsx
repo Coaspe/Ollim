@@ -109,7 +109,6 @@ const Mypage = () => {
     userWritings,
     writingsLoading,
   } = useGetWritings(uid);
-  console.log(poems);
 
   // Get profileOwner's user information and user's writings information
   useEffect(() => {
@@ -123,8 +122,8 @@ const Mypage = () => {
       const tmp: Array<any> =
         host || participation
           ? await getContetsArrayInfo(
-              Array.prototype.concat(host, participation)
-            )
+            Array.prototype.concat(host, participation)
+          )
           : [];
       setTotalContests(tmp);
     };
@@ -263,9 +262,8 @@ const Mypage = () => {
                         return !origin;
                       });
                     }}
-                    className={`${
-                      !doseUserFollow ? "bg-blue-400" : "bg-gray-300"
-                    } px-2 py-1 rounded-xl text-xs font-Nanum_Gothic font-bold text-gray-700`}
+                    className={`${!doseUserFollow ? "bg-blue-400" : "bg-gray-300"
+                      } px-2 py-1 rounded-xl text-xs font-Nanum_Gothic font-bold text-gray-700`}
                   >
                     {doseUserFollow ? "팔로우 취소" : "팔로우"}
                   </button>
@@ -393,11 +391,10 @@ const Mypage = () => {
                           setOnWritingCategory("NOVEL");
                         }}
                         style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
-                        className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${
-                          onWritingCategory === "NOVEL"
+                        className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${onWritingCategory === "NOVEL"
                             ? "text-slate-700 bg-genreSelectedBG"
                             : "text-slate-400"
-                        }`}
+                          }`}
                       >
                         menu_book
                       </motion.span>
