@@ -15,24 +15,17 @@ const Calendar: React.FC<props> = ({ totalCommits, widthSize }) => {
     const initial = () => {
       const twoMonthsBeforeMonth = moment().subtract(2, "months").month() + 1;
       const twoMonthsBeforeYear = moment().subtract(2, "months").year();
-      const twoMonthsBeforeUnix = moment(
-        `${twoMonthsBeforeYear}-${twoMonthsBeforeMonth}-1`
-      ).valueOf();
+
+      const twoMonthsBeforeStartDayUnix = moment().subtract(2, "months").startOf("month").valueOf()
 
       const currentMonth = [];
       const oneMonthBefore = [];
       const twoMonthBefore = [];
 
-      const oneMonthsBeforeUnix = moment(
-        `${moment().subtract(1, "months").year()}-${moment().subtract(1, "months").month() + 1
-        }-1`
-      ).valueOf();
-      const currentMonthLastDayUnix = moment(
-        `${moment().year()}-${moment().month() + 1 + 1}-1`
-      ).valueOf() - 1;
-      const currentMonthFirstDayUnix = moment(
-        `${moment().year()}-${moment().month() + 1}-1`
-      ).valueOf();
+      const oneMonthsBeforeStartDayUnix = moment().subtract(1, "months").startOf("month").valueOf()
+
+      const currentMonthFirstDayUnix = moment().startOf("month").valueOf()
+      const currentMonthLastDayUnix = moment().endOf("month").valueOf()
 
       const tmp = Object.keys(totalCommits);
 
@@ -45,15 +38,15 @@ const Calendar: React.FC<props> = ({ totalCommits, widthSize }) => {
           currentMonth.push(tmpInt);
         } else if (
           currentMonthFirstDayUnix > tmpInt &&
-          tmpInt >= oneMonthsBeforeUnix
+          tmpInt >= oneMonthsBeforeStartDayUnix
         ) {
           oneMonthBefore.push(tmpInt);
         } else if (
-          oneMonthsBeforeUnix > tmpInt &&
-          tmpInt >= twoMonthsBeforeUnix
+          oneMonthsBeforeStartDayUnix > tmpInt &&
+          tmpInt >= twoMonthsBeforeStartDayUnix
         ) {
           twoMonthBefore.push(tmpInt);
-        } else if (twoMonthsBeforeUnix > tmpInt) {
+        } else if (twoMonthsBeforeStartDayUnix > tmpInt) {
           continue;
         }
       }
