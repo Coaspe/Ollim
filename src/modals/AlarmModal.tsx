@@ -32,7 +32,7 @@ const AlarmModal: React.FC<props> = ({
     e.stopPropagation();
     if (setUnConfirmedAlarms.length !== 0) {
       axios
-        .post("https://ollim.herokuapp.com/makeAllAlarmsSeen", {
+        .post("https://ollim.onrender.com/makeAllAlarmsSeen", {
           alarmKeys: JSON.stringify(Array.from(alarmMap.keys())),
           userUID: user.uid,
         })
@@ -58,7 +58,7 @@ const AlarmModal: React.FC<props> = ({
     setRemoveAllBtnDisable(true);
     e.stopPropagation();
     if (alarmMap.size > 0) {
-      axios.post("https://ollim.herokuapp.com/removeAllAlarms", {
+      axios.post("https://ollim.onrender.com/removeAllAlarms", {
         alarmKeys: JSON.stringify(Array.from(alarmMap.keys())),
         userUID: user.uid,
       });

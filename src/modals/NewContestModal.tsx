@@ -48,7 +48,7 @@ const NewContestModal: React.FC<NewContestProps> = ({
   const setAlarm = (alarm: [string, alarmType, boolean]) => {
     dispatch(alarmAction.setAlarm({ alarm }));
   };
-  // https://ollim.herokuapp.com
+  // https://ollim.onrender.com
   const handleAddContest = () => {
     const data: addContestArg = {
       limitNumOfPeople: limitNumOfPeople as number,
@@ -165,11 +165,10 @@ const NewContestModal: React.FC<NewContestProps> = ({
                         setGenrn("NOVEL");
                       }}
                       style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
-                      className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${
-                        genrnState === "NOVEL"
+                      className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${genrnState === "NOVEL"
                           ? "text-slate-700 bg-genreSelectedBG"
                           : "text-slate-400"
-                      }`}
+                        }`}
                     >
                       menu_book
                     </span>
@@ -180,11 +179,10 @@ const NewContestModal: React.FC<NewContestProps> = ({
                         setGenrn("POEM");
                       }}
                       style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
-                      className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${
-                        genrnState === "POEM"
+                      className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${genrnState === "POEM"
                           ? "text-slate-700 bg-genreSelectedBG"
                           : "text-slate-400"
-                      }`}
+                        }`}
                     >
                       history_edu
                     </span>
@@ -195,11 +193,10 @@ const NewContestModal: React.FC<NewContestProps> = ({
                         setGenrn("SCENARIO");
                       }}
                       style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
-                      className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${
-                        genrnState === "SCENARIO"
+                      className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${genrnState === "SCENARIO"
                           ? "text-slate-700 bg-genreSelectedBG"
                           : "text-slate-400"
-                      }`}
+                        }`}
                     >
                       adf_scanner
                     </span>

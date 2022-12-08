@@ -54,7 +54,7 @@ const CommentRow: React.FC<props> = ({
   const handleCommentLike = () => {
     setLikesState((origin) => {
       let likesTmp = origin.slice();
-      axios.post("https://ollim.herokuapp.com/updateCommentLike", {
+      axios.post("https://ollim.onrender.com/updateCommentLike", {
         like: doesUserLike,
         commentDocID: commentData.docID,
         userUID: user.uid,
@@ -94,7 +94,7 @@ const CommentRow: React.FC<props> = ({
   const handleCommentDelete = () => {
     setDeleteBtnDisable(true);
     axios
-      .post("https://ollim.herokuapp.com/deleteComment", {
+      .post("https://ollim.onrender.com/deleteComment", {
         commentDocID: commentData.docID,
         writingDocID,
         genre,
@@ -112,7 +112,7 @@ const CommentRow: React.FC<props> = ({
   const handleCommentReport = () => {
     setReportBtnDisable(true);
     axios
-      .post("https://ollim.herokuapp.com/reportComment", {
+      .post("https://ollim.onrender.com/reportComment", {
         reportUID: user.uid,
         reportedUID: commentData.commentOwnerUID,
         commentDocID: commentData.docID,
@@ -192,9 +192,8 @@ const CommentRow: React.FC<props> = ({
               <div className="flex items-center">
                 <span
                   onClick={handleCommentLike}
-                  className={`material-icons mr-2 cursor-pointer ${
-                    doesUserLike ? "text-red-400" : "text-gray-400"
-                  }`}
+                  className={`material-icons mr-2 cursor-pointer ${doesUserLike ? "text-red-400" : "text-gray-400"
+                    }`}
                 >
                   favorite
                 </span>

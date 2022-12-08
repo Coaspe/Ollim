@@ -101,7 +101,7 @@ const Contest = () => {
   const isOpened = () => {
     setIsServerClosedDisable(true);
     axios
-      .get("https://ollim.herokuapp.com/isOpened")
+      .get("https://ollim.onrender.com/isOpened")
       .then(() => {
         setIsServerClosedComment("서버 열림");
         setIsServerClosedDisable(false);
@@ -253,10 +253,9 @@ const Contest = () => {
                 className="flex items-center space-x-5"
               >
                 <span
-                  className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${
-                    table === "OVERVIEW" &&
+                  className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${table === "OVERVIEW" &&
                     "text-hoverSpanMenu shadow-hoverSpanMenu"
-                  }`}
+                    }`}
                   onClick={() => {
                     setTable("OVERVIEW");
                   }}
@@ -267,10 +266,9 @@ const Contest = () => {
                   {Object.keys(selectedWritingInfo).length > 0 && (
                     <motion.span
                       animate={{ y: ["0%", "-20%", "0%", "-20%", "0%"] }}
-                      className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${
-                        table === "BROWSE" &&
+                      className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${table === "BROWSE" &&
                         "text-hoverSpanMenu shadow-hoverSpanMenu"
-                      }`}
+                        }`}
                       onClick={() => {
                         setTable("BROWSE");
                       }}
@@ -283,10 +281,9 @@ const Contest = () => {
                   onClick={() => {
                     setTable("VOTE");
                   }}
-                  className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${
-                    table === "VOTE" &&
+                  className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${table === "VOTE" &&
                     "text-hoverSpanMenu shadow-hoverSpanMenu"
-                  }`}
+                    }`}
                 >
                   how_to_vote
                 </span>
@@ -297,10 +294,9 @@ const Contest = () => {
                         onClick={() => {
                           setTable("SETTING");
                         }}
-                        className={`material-icons shadow cursor-pointer px-1 py-1 rounded-full ${
-                          table === "SETTING" &&
+                        className={`material-icons shadow cursor-pointer px-1 py-1 rounded-full ${table === "SETTING" &&
                           "text-hoverSpanMenu shadow-hoverSpanMenu"
-                        } hover:text-hoverSpanMenu`}
+                          } hover:text-hoverSpanMenu`}
                       >
                         settings
                       </span>
@@ -312,18 +308,15 @@ const Contest = () => {
                         }
                         onClick={isOpened}
                         className={`text-white flex flex-col items-center justify-center cursor-pointer ml-5 h-8 rounded-2xl px-2
-                            ${
-                              isServerClosedComment === "서버 닫힘" &&
-                              "bg-red-400"
-                            }
-                            ${
-                              isServerClosedComment === "서버 열림" &&
-                              "bg-green-400"
-                            }
-                            ${
-                              isServerClosedComment === "서버 확인" &&
-                              "bg-gray-400"
-                            }
+                            ${isServerClosedComment === "서버 닫힘" &&
+                          "bg-red-400"
+                          }
+                            ${isServerClosedComment === "서버 열림" &&
+                          "bg-green-400"
+                          }
+                            ${isServerClosedComment === "서버 확인" &&
+                          "bg-gray-400"
+                          }
                         `}
                       >
                         {isServerClosedBtnDisable ? (
@@ -362,7 +355,7 @@ const Contest = () => {
                     <div className="flex items-center mb-10">
                       <span className="text-2xl font-bold mr-3">마감 일자</span>
                       {new Date(contestInfo.deadline).getTime() >=
-                      new Date().getTime() ? (
+                        new Date().getTime() ? (
                         <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                       ) : (
                         <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />

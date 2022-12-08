@@ -249,7 +249,7 @@ const Mypage = () => {
                           ? (followersLength.current -= 1)
                           : (followersLength.current += 1);
                         axios.post(
-                          `https://ollim.herokuapp.com/updateFollowing`,
+                          `https://ollim.onrender.com/updateFollowing`,
                           {
                             followingUserEmail: userInfo.userEmail,
                             followedUserEmail: profileOwnerInfo.userEmail,
@@ -392,8 +392,8 @@ const Mypage = () => {
                         }}
                         style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
                         className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${onWritingCategory === "NOVEL"
-                            ? "text-slate-700 bg-genreSelectedBG"
-                            : "text-slate-400"
+                          ? "text-slate-700 bg-genreSelectedBG"
+                          : "text-slate-400"
                           }`}
                       >
                         menu_book

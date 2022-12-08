@@ -45,7 +45,7 @@ const AlarmRow: React.FC<props> = ({
           return tmp;
         });
         axios
-          .post("https://ollim.herokuapp.com/makeAlarmSeen", {
+          .post("https://ollim.onrender.com/makeAlarmSeen", {
             alarmKey: identity,
             userUID: user.uid,
           })
@@ -55,9 +55,8 @@ const AlarmRow: React.FC<props> = ({
       }}
     >
       <div
-        className={`absolute top-1 left-1 w-1.5 h-1.5 rounded-full ${
-          data.seen ? "bg-gray-500" : "bg-red-500"
-        }`}
+        className={`absolute top-1 left-1 w-1.5 h-1.5 rounded-full ${data.seen ? "bg-gray-500" : "bg-red-500"
+          }`}
       />
       <span
         onClick={(e) => {

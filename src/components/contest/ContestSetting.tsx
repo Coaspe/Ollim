@@ -63,7 +63,7 @@ const ContestSetting: React.FC<props> = ({
     if (contestInfo[arg] !== arg) {
       setTitleSaveButtonDisabled(true);
       axios
-        .post(`https://ollim.herokuapp.com/updateContest${arg}`, {
+        .post(`https://ollim.onrender.com/updateContest${arg}`, {
           contestDocID,
           arg,
         })
@@ -202,7 +202,7 @@ const ContestSetting: React.FC<props> = ({
                 <button
                   onClick={() => {
                     axios
-                      .post(`https://ollim.herokuapp.com/deleteWriting`, {
+                      .post(`https://ollim.onrender.com/deleteWriting`, {
                         contestDocID,
                       })
                       .then((res) => {
@@ -216,9 +216,8 @@ const ContestSetting: React.FC<props> = ({
                       });
                   }}
                   disabled={deleteInput !== contestInfo.title}
-                  className={`border px-2 py-2 text-center rounded-full text-sm ${
-                    deleteInput === contestInfo.title && "text-red-500"
-                  } `}
+                  className={`border px-2 py-2 text-center rounded-full text-sm ${deleteInput === contestInfo.title && "text-red-500"
+                    } `}
                 >
                   삭제
                 </button>

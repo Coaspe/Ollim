@@ -63,9 +63,9 @@ const WritingSetting: React.FC<props> = ({
       formData.append("userUID", writingInfo.userUID);
       formData.append("writingDocID", writingDocID);
       formData.append("file", mp4File);
-      // https://ollim.herokuapp.com
+      // https://ollim.onrender.com
       axios
-        .post(`https://ollim.herokuapp.com/updateBGM`, formData)
+        .post(`https://ollim.onrender.com/updateBGM`, formData)
         .then((res) => {
           setAlarm(res.data);
           setTimeout(() => {
@@ -101,7 +101,7 @@ const WritingSetting: React.FC<props> = ({
               if (writingInfo.title !== title) {
                 setTitleSaveButtonDisabled(true);
                 axios
-                  .post(`https://ollim.herokuapp.com/updateTitle`, {
+                  .post(`https://ollim.onrender.com/updateTitle`, {
                     genre: writingInfo.genre,
                     writingDocID,
                     title,
@@ -143,7 +143,7 @@ const WritingSetting: React.FC<props> = ({
               if (writingInfo.synopsis !== synopsis) {
                 setSynopsisSaveButtonDisabled(true);
                 axios
-                  .post(`https://ollim.herokuapp.com/updateSynopsis`, {
+                  .post(`https://ollim.onrender.com/updateSynopsis`, {
                     genre: writingInfo.genre,
                     writingDocID,
                     synopsis,
@@ -220,7 +220,7 @@ const WritingSetting: React.FC<props> = ({
               if (writingInfo.disclosure !== disclosure) {
                 setDisclosureSaveButtonDisabled(true);
                 axios
-                  .post(`https://ollim.herokuapp.com/updateDisclosure`, {
+                  .post(`https://ollim.onrender.com/updateDisclosure`, {
                     genre: writingInfo.genre,
                     writingDocID,
                     disclosure,
@@ -243,10 +243,9 @@ const WritingSetting: React.FC<props> = ({
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${
-              disclosure === "PUBLIC" &&
+            className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "PUBLIC" &&
               "bg-genreSelectedBG shadow-genreSelectedBG shadow-md"
-            }`}
+              }`}
             onClick={() => {
               setDisclosure("PUBLIC");
             }}
@@ -256,10 +255,9 @@ const WritingSetting: React.FC<props> = ({
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${
-              disclosure === "FOLLOWERS" &&
+            className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "FOLLOWERS" &&
               "bg-genreSelectedBG shadow-genreSelectedBG shadow-md"
-            }`}
+              }`}
             onClick={() => {
               setDisclosure("FOLLOWERS");
             }}
@@ -269,10 +267,9 @@ const WritingSetting: React.FC<props> = ({
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${
-              disclosure === "PRIVATE" &&
+            className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "PRIVATE" &&
               "bg-genreSelectedBG shadow-genreSelectedBG shadow-md"
-            }`}
+              }`}
             onClick={() => {
               setDisclosure("PRIVATE");
             }}
@@ -324,7 +321,7 @@ const WritingSetting: React.FC<props> = ({
                 <button
                   onClick={() => {
                     axios
-                      .post(`https://ollim.herokuapp.com/deleteWriting`, {
+                      .post(`https://ollim.onrender.com/deleteWriting`, {
                         writingDocID,
                         genre: writingInfo.genre,
                       })
@@ -339,9 +336,8 @@ const WritingSetting: React.FC<props> = ({
                       });
                   }}
                   disabled={deleteInput !== writingInfo.title}
-                  className={`border px-2 py-2 text-center rounded-full text-sm ${
-                    deleteInput === writingInfo.title && "text-red-500"
-                  } `}
+                  className={`border px-2 py-2 text-center rounded-full text-sm ${deleteInput === writingInfo.title && "text-red-500"
+                    } `}
                 >
                   삭제
                 </button>
@@ -355,9 +351,8 @@ const WritingSetting: React.FC<props> = ({
         <div className="flex flex-col">
           <span className="text-2xl font-bold mb-10">글 삭제</span>
           <button
-            className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${
-              disclosure === "PUBLIC" && "bg-genreSelectedBG"
-            }`}
+            className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "PUBLIC" && "bg-genreSelectedBG"
+              }`}
             onClick={() => {
               setDeleteModalOpen(true);
             }}

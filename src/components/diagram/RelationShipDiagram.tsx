@@ -173,7 +173,7 @@ const DiagramWrite: React.FC<props> = ({
             if (isInitialMount && isInitialMount.current === 2) {
               // Edit firestore diagram info
               axios
-                .post(`https://ollim.herokuapp.com/editDiagram`, {
+                .post(`https://ollim.onrender.com/editDiagram`, {
                   diagram: JSON.stringify(diagram),
                   genre,
                   writingDocID,

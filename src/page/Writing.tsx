@@ -178,7 +178,7 @@ const Writing = () => {
   // Handle like writing function
   const handleLikeWriting = () => {
     setLikeWritingState((origin) => {
-      axios.post("https://ollim.herokuapp.com/updateLikeWriting", {
+      axios.post("https://ollim.onrender.com/updateLikeWriting", {
         likeUserEmail: contextUserInfo.userEmail,
         likedWritingDocID: writingDocID,
         likeWritingState: origin,
@@ -212,7 +212,7 @@ const Writing = () => {
   const isOpened = () => {
     setIsServerClosedDisable(true);
     axios
-      .get("https://ollim.herokuapp.com/isOpened")
+      .get("https://ollim.onrender.com/isOpened")
       .then(() => {
         setIsServerClosedComment("서버 열림");
         setIsServerClosedDisable(false);
@@ -309,9 +309,8 @@ const Writing = () => {
                     <span className="text-lg">·</span>
                     <span
                       onClick={handleLikeWriting}
-                      className={`cursor-pointer material-icons ${
-                        likeWritingState ? "text-red-500" : "text-gray-500"
-                      }`}
+                      className={`cursor-pointer material-icons ${likeWritingState ? "text-red-500" : "text-gray-500"
+                        }`}
                     >
                       favorite
                     </span>
@@ -324,10 +323,9 @@ const Writing = () => {
               className="flex items-center space-x-5"
             >
               <span
-                className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${
-                  table === "OVERVIEW" &&
+                className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${table === "OVERVIEW" &&
                   "text-hoverSpanMenu shadow-hoverSpanMenu"
-                }`}
+                  }`}
                 onClick={() => {
                   setTable("OVERVIEW");
                 }}
@@ -338,10 +336,9 @@ const Writing = () => {
                 onClick={() => {
                   setTable("BROWSE");
                 }}
-                className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${
-                  table === "BROWSE" &&
+                className={`shadow material-icons cursor-pointer px-1 py-1 rounded-full hover:text-hoverSpanMenu ${table === "BROWSE" &&
                   "text-hoverSpanMenu shadow-hoverSpanMenu"
-                }`}
+                  }`}
               >
                 play_circle
               </span>
@@ -352,10 +349,9 @@ const Writing = () => {
                       onClick={() => {
                         setTable("WRITE");
                       }}
-                      className={`material-icons shadow cursor-pointer px-1 py-1 rounded-full ${
-                        table === "WRITE" &&
+                      className={`material-icons shadow cursor-pointer px-1 py-1 rounded-full ${table === "WRITE" &&
                         "text-hoverSpanMenu shadow-hoverSpanMenu"
-                      } hover:text-hoverSpanMenu`}
+                        } hover:text-hoverSpanMenu`}
                     >
                       drive_file_rename_outline
                     </span>
@@ -364,10 +360,9 @@ const Writing = () => {
                     onClick={() => {
                       setTable("SETTING");
                     }}
-                    className={`material-icons shadow cursor-pointer px-1 py-1 rounded-full ${
-                      table === "SETTING" &&
+                    className={`material-icons shadow cursor-pointer px-1 py-1 rounded-full ${table === "SETTING" &&
                       "text-hoverSpanMenu shadow-hoverSpanMenu"
-                    } hover:text-hoverSpanMenu`}
+                      } hover:text-hoverSpanMenu`}
                   >
                     settings
                   </span>
@@ -379,18 +374,15 @@ const Writing = () => {
                     }
                     onClick={isOpened}
                     className={`text-white flex flex-col items-center justify-center cursor-pointer ml-5 h-8 rounded-2xl px-2 
-                            ${
-                              isServerClosedComment === "서버 닫힘" &&
-                              "bg-red-400"
-                            }
-                            ${
-                              isServerClosedComment === "서버 열림" &&
-                              "bg-green-400"
-                            }
-                            ${
-                              isServerClosedComment === "서버 확인" &&
-                              "bg-gray-400"
-                            }
+                            ${isServerClosedComment === "서버 닫힘" &&
+                      "bg-red-400"
+                      }
+                            ${isServerClosedComment === "서버 열림" &&
+                      "bg-green-400"
+                      }
+                            ${isServerClosedComment === "서버 확인" &&
+                      "bg-gray-400"
+                      }
                         `}
                   >
                     {isServerClosedBtnDisable ? (
