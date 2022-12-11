@@ -89,205 +89,15 @@ const WritingSetting: React.FC<props> = ({
     }
   }, [bgm]);
   return (
-    <div className="w-full font-noto flex flex-col items-start px-20 my-20 space-y-20 GalaxyS20Ultra:px-10">
-      {/* Title div */}
-      <div className="flex flex-col w-2/3 GalaxyS20Ultra:w-full">
-        <div className="flex items-center mb-10">
-          <span className="text-2xl font-bold mr-10">제목</span>
-          <button
-            disabled={titleSaveButtonDisabled}
-            style={{ fontSize: "0.75rem" }}
-            onClick={() => {
-              if (writingInfo.title !== title) {
-                setTitleSaveButtonDisabled(true);
-                axios
-                  .post(`https://ollim.onrender.com/updateTitle`, {
-                    genre: writingInfo.genre,
-                    writingDocID,
-                    title,
-                  })
-                  .then((res) => {
-                    setAlarm(res.data);
-                    setTitleSaveButtonDisabled(false);
-                    setTimeout(() => {
-                      setAlarm(["", "success", false]);
-                    }, 2000);
-                  });
-              }
-            }}
-            className="flex items-center justify-center border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
-          >
-            {titleSaveButtonDisabled ? <SpinningSvg /> : "저장"}
-          </button>
-        </div>
-        <input
-          style={{ backgroundColor: "#FAF6F5" }}
-          value={title}
-          onChange={(e) => {
-            setTitle(e.target.value);
-          }}
-          className="border-opacity-5 shadow-lg px-3 py-2 border border-black w-fit overflow-x-scroll focus:outline-none"
-        />
-      </div>
-
-      {/* Synopsis div */}
-      <div className="flex flex-col w-2/3 GalaxyS20Ultra:w-full">
-        <div className="flex items-center mb-10">
-          <span className="text-2xl font-bold mr-10">
-            {writingInfo.genre !== "POEM" ? "시놉시스" : "여는 말"}
-          </span>
-          <button
-            style={{ fontSize: "0.75rem" }}
-            disabled={synopsisSaveButtonDisabled}
-            onClick={() => {
-              if (writingInfo.synopsis !== synopsis) {
-                setSynopsisSaveButtonDisabled(true);
-                axios
-                  .post(`https://ollim.onrender.com/updateSynopsis`, {
-                    genre: writingInfo.genre,
-                    writingDocID,
-                    synopsis,
-                  })
-                  .then((res) => {
-                    setAlarm(res.data);
-                    setSynopsisSaveButtonDisabled(false);
-                    setTimeout(() => {
-                      setAlarm(["", "success", false]);
-                    }, 2000);
-                  });
-              }
-            }}
-            className="border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
-          >
-            저장
-          </button>
-        </div>
-        <textarea
-          style={{ backgroundColor: "#FAF6F5" }}
-          value={synopsis}
-          onChange={(e) => {
-            setSynopsis(e.target.value);
-          }}
-          className="border-opacity-5 shadow-lg resize-none px-3 py-3 border border-black w-full h-72 overflow-y-scroll bg-transparent focus:outline-none"
-        >
-          {synopsis}
-        </textarea>
-      </div>
-
-      {/* BGM div */}
-      {writingInfo.genre === "POEM" && (
-        <div className="flex flex-col w-2/3 GalaxyS20Ultra:w-full">
-          <div className="flex items-center mb-10">
-            <span className="text-2xl font-bold mr-10">배경 음악</span>
-            <button
-              style={{ fontSize: "0.75rem" }}
-              disabled={synopsisSaveButtonDisabled}
-              onClick={handleBGMChange}
-              className="border border-blue-400 px-3 mr-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
-            >
-              저장
-            </button>
-            <label htmlFor="bgm">
-              <span
-                style={{ fontSize: "0.75rem" }}
-                className="cursor-pointer border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
-              >
-                찾기
-              </span>
-            </label>
-            <input
-              style={{ display: "none" }}
-              id="bgm"
-              onChange={handleWebBGM}
-              type="file"
-              accept="audio/*"
-            />
-          </div>
-          <audio controls ref={audioRef}>
-            <source src={bgm} type="audio/mpeg" />
-          </audio>
-        </div>
-      )}
-
-      {/* Disclosure div */}
-      <div className="flex flex-col items-start w-1/3 GalaxyS20Ultra:w-full">
-        <div className="flex items-center">
-          <span className="text-2xl font-bold mr-10">공개 범위</span>
-          <button
-            disabled={disclosureSaveButtonDisabled}
-            style={{ fontSize: "0.75rem" }}
-            onClick={() => {
-              if (writingInfo.disclosure !== disclosure) {
-                setDisclosureSaveButtonDisabled(true);
-                axios
-                  .post(`https://ollim.onrender.com/updateDisclosure`, {
-                    genre: writingInfo.genre,
-                    writingDocID,
-                    disclosure,
-                  })
-                  .then((res) => {
-                    setAlarm(res.data);
-                    setDisclosureSaveButtonDisabled(false);
-                    setTimeout(() => {
-                      setAlarm(["", "success", false]);
-                    }, 2000);
-                  });
-              }
-            }}
-            className="border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
-          >
-            저장
-          </button>
-        </div>
-        <div className="w-full flex items-center justify-between mt-5 py-2 px-3">
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "PUBLIC" &&
-              "bg-genreSelectedBG shadow-genreSelectedBG shadow-md"
-              }`}
-            onClick={() => {
-              setDisclosure("PUBLIC");
-            }}
-          >
-            모두
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "FOLLOWERS" &&
-              "bg-genreSelectedBG shadow-genreSelectedBG shadow-md"
-              }`}
-            onClick={() => {
-              setDisclosure("FOLLOWERS");
-            }}
-          >
-            팔로워
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "PRIVATE" &&
-              "bg-genreSelectedBG shadow-genreSelectedBG shadow-md"
-              }`}
-            onClick={() => {
-              setDisclosure("PRIVATE");
-            }}
-          >
-            비공개
-          </motion.button>
-        </div>
-      </div>
-
+    <>
       {/* Delete modal*/}
       {deleteModalOpen && (
         <motion.div
-          style={{ zIndex: 10000 }}
           animate={{
             backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],
           }}
           transition={{ duration: 0.2 }}
-          className="fixed w-full h-full items-center justify-center top-0 left-0 flex"
+          className="fixed w-full h-full items-center justify-center top-0 left-0 flex z-50"
           onClick={(e) => {
             e.stopPropagation();
             setDeleteModalOpen(false);
@@ -346,22 +156,212 @@ const WritingSetting: React.FC<props> = ({
           </div>
         </motion.div>
       )}
-      {/* Delete div */}
-      <div className="flex flex-col items-start w-1/3 GalaxyS20Ultra:w-full">
-        <div className="flex flex-col">
-          <span className="text-2xl font-bold mb-10">글 삭제</span>
-          <button
-            className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "PUBLIC" && "bg-genreSelectedBG"
-              }`}
-            onClick={() => {
-              setDeleteModalOpen(true);
+      <div className="w-full font-noto flex flex-col items-start px-20 my-20 space-y-20 GalaxyS20Ultra:px-10">
+        {/* Title div */}
+        <div className="flex flex-col w-2/3 GalaxyS20Ultra:w-full">
+          <div className="flex items-center mb-10">
+            <span className="text-2xl font-bold mr-10">제목</span>
+            <button
+              disabled={titleSaveButtonDisabled}
+              style={{ fontSize: "0.75rem" }}
+              onClick={() => {
+                if (writingInfo.title !== title) {
+                  setTitleSaveButtonDisabled(true);
+                  axios
+                    .post(`https://ollim.onrender.com/updateTitle`, {
+                      genre: writingInfo.genre,
+                      writingDocID,
+                      title,
+                    })
+                    .then((res) => {
+                      setAlarm(res.data);
+                      setTitleSaveButtonDisabled(false);
+                      setTimeout(() => {
+                        setAlarm(["", "success", false]);
+                      }, 2000);
+                    });
+                }
+              }}
+              className="flex items-center justify-center border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
+            >
+              {titleSaveButtonDisabled ? <SpinningSvg /> : "저장"}
+            </button>
+          </div>
+          <input
+            style={{ backgroundColor: "#FAF6F5" }}
+            value={title}
+            onChange={(e) => {
+              setTitle(e.target.value);
             }}
+            className="border-opacity-5 shadow-lg px-3 py-2 border border-black w-fit overflow-x-scroll focus:outline-none"
+          />
+        </div>
+
+        {/* Synopsis div */}
+        <div className="flex flex-col w-2/3 GalaxyS20Ultra:w-full">
+          <div className="flex items-center mb-10">
+            <span className="text-2xl font-bold mr-10">
+              {writingInfo.genre !== "POEM" ? "시놉시스" : "여는 말"}
+            </span>
+            <button
+              style={{ fontSize: "0.75rem" }}
+              disabled={synopsisSaveButtonDisabled}
+              onClick={() => {
+                if (writingInfo.synopsis !== synopsis) {
+                  setSynopsisSaveButtonDisabled(true);
+                  axios
+                    .post(`https://ollim.onrender.com/updateSynopsis`, {
+                      genre: writingInfo.genre,
+                      writingDocID,
+                      synopsis,
+                    })
+                    .then((res) => {
+                      setAlarm(res.data);
+                      setSynopsisSaveButtonDisabled(false);
+                      setTimeout(() => {
+                        setAlarm(["", "success", false]);
+                      }, 2000);
+                    });
+                }
+              }}
+              className="border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
+            >
+              저장
+            </button>
+          </div>
+          <textarea
+            style={{ backgroundColor: "#FAF6F5" }}
+            value={synopsis}
+            onChange={(e) => {
+              setSynopsis(e.target.value);
+            }}
+            className="border-opacity-5 shadow-lg resize-none px-3 py-3 border border-black w-full h-72 overflow-y-scroll bg-transparent focus:outline-none"
           >
-            삭제 하기
-          </button>
+            {synopsis}
+          </textarea>
+        </div>
+
+        {/* BGM div */}
+        {writingInfo.genre === "POEM" && (
+          <div className="flex flex-col w-2/3 GalaxyS20Ultra:w-full">
+            <div className="flex items-center mb-10">
+              <span className="text-2xl font-bold mr-10">배경 음악</span>
+              <button
+                style={{ fontSize: "0.75rem" }}
+                disabled={synopsisSaveButtonDisabled}
+                onClick={handleBGMChange}
+                className="border border-blue-400 px-3 mr-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
+              >
+                저장
+              </button>
+              <label htmlFor="bgm">
+                <span
+                  style={{ fontSize: "0.75rem" }}
+                  className="cursor-pointer border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
+                >
+                  찾기
+                </span>
+              </label>
+              <input
+                style={{ display: "none" }}
+                id="bgm"
+                onChange={handleWebBGM}
+                type="file"
+                accept="audio/*"
+              />
+            </div>
+            <audio controls ref={audioRef}>
+              <source src={bgm} type="audio/mpeg" />
+            </audio>
+          </div>
+        )}
+
+        {/* Disclosure div */}
+        <div className="flex flex-col items-start w-1/3 GalaxyS20Ultra:w-full">
+          <div className="flex items-center">
+            <span className="text-2xl font-bold mr-10">공개 범위</span>
+            <button
+              disabled={disclosureSaveButtonDisabled}
+              style={{ fontSize: "0.75rem" }}
+              onClick={() => {
+                if (writingInfo.disclosure !== disclosure) {
+                  setDisclosureSaveButtonDisabled(true);
+                  axios
+                    .post(`https://ollim.onrender.com/updateDisclosure`, {
+                      genre: writingInfo.genre,
+                      writingDocID,
+                      disclosure,
+                    })
+                    .then((res) => {
+                      setAlarm(res.data);
+                      setDisclosureSaveButtonDisabled(false);
+                      setTimeout(() => {
+                        setAlarm(["", "success", false]);
+                      }, 2000);
+                    });
+                }
+              }}
+              className="border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
+            >
+              저장
+            </button>
+          </div>
+          <div className="w-full flex items-center justify-between mt-5 py-2 px-3">
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "PUBLIC" &&
+                "bg-genreSelectedBG shadow-genreSelectedBG shadow-md"
+                }`}
+              onClick={() => {
+                setDisclosure("PUBLIC");
+              }}
+            >
+              모두
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "FOLLOWERS" &&
+                "bg-genreSelectedBG shadow-genreSelectedBG shadow-md"
+                }`}
+              onClick={() => {
+                setDisclosure("FOLLOWERS");
+              }}
+            >
+              팔로워
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "PRIVATE" &&
+                "bg-genreSelectedBG shadow-genreSelectedBG shadow-md"
+                }`}
+              onClick={() => {
+                setDisclosure("PRIVATE");
+              }}
+            >
+              비공개
+            </motion.button>
+          </div>
+        </div>
+        {/* Delete div */}
+        <div className="flex flex-col items-start w-1/3 GalaxyS20Ultra:w-full">
+          <div className="flex flex-col">
+            <span className="text-2xl font-bold mb-10">글 삭제</span>
+            <button
+              className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "PUBLIC" && "bg-genreSelectedBG"
+                }`}
+              onClick={() => {
+                setDeleteModalOpen(true);
+              }}
+            >
+              삭제 하기
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
