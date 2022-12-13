@@ -75,14 +75,14 @@ const Intro = () => {
             />
           </div>
         </div>
-        <div className="w-1/2 h-full flex z-10 items-center justify-center GalaxyS20Ultra:w-full GalaxyS20Ultra:px-10">
+        <div className="w-1/2 h-full flex z-10 items-center justify-end GalaxyS20Ultra:w-full GalaxyS20Ultra:px-10">
           <AnimatePresence exitBeforeEnter>
             {leftPart === "INTRO" ? (
               <motion.div
                 key="Greeting"
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="w-full flex flex-col z-10 items-center GalaxyS20Ultra:h-full GalaxyS20Ultra:space-y-10 GalaxyS20Ultra:justify-center"
+                className="w-1/3 h-full justify-center flex flex-col z-10 items-center GalaxyS20Ultra:h-full GalaxyS20Ultra:space-y-10 GalaxyS20Ultra:justify-center"
               >
                 <motion.p
                   variants={pVariants}
@@ -105,50 +105,51 @@ const Intro = () => {
                 >
                   작가님의 포트폴리오를 관리하고, 다른 작가들의 글을 열람하세요!
                 </motion.p>
+
                 <motion.div
                   variants={divVariants}
                   initial="initial"
                   animate="animate"
-                  className="w-1/2 flex items-center justify-center mt-7 text-sm GalaxyS20Ultra:w-full"
+                  className="flex w-1/2 mt-7 text-sm GalaxyS20Ultra:w-full"
                 >
-                  <motion.button
+                  <motion.img
                     whileHover={{ y: "-10%" }}
-                    className="px-4 py-3 rounded-2xl bg-white shadow-md font-semibold mr-5"
+                    className="px-2 py-2 w-12 rounded-full bg-white shadow-md font-semibold"
                     onClick={() => {
                       setLeftPart("LOGIN");
                     }}
-                  >
-                    로그인
-                  </motion.button>
-                  <motion.button
+                    src="/icon/login.png"
+                  />
+                  <motion.img
                     style={{ backgroundColor: "#c69e92" }}
                     onClick={() => {
                       navigator("/community");
                     }}
                     whileHover={{ y: "-10%" }}
-                    className="px-5 py-3 rounded-2xl shadow-md font-semibold"
+                    className="px-2 py-2 w-12 rounded-full shadow-md font-semibold mx-5"
+                    src="/icon/browse.png"
+
+                  />
+                  <motion.div
+                    initial="initial"
+                    animate="animate"
+                    variants={divVariants}
                   >
-                    다른 작가들의 글
-                  </motion.button>
+                    <motion.button
+                      whileHover={{ y: "-10%" }}
+                      className="px-4 py-3 rounded-2xl bg-white shadow-md font-semibold"
+                      onClick={() => {
+                        loginWithEmailAndPassword(
+                          "achoe628@naver.com",
+                          "test111"
+                        );
+                      }}
+                    >
+                      테스트 계정
+                    </motion.button>
+                  </motion.div>
                 </motion.div>
-                <motion.div
-                  initial="initial"
-                  animate="animate"
-                  variants={divVariants}
-                >
-                  <motion.button
-                    whileHover={{ y: "-10%" }}
-                    className="px-4 py-3 rounded-2xl bg-white shadow-md font-semibold mt-5"
-                    onClick={() => {
-                      loginWithEmailAndPassword(
-                        "achoe628@naver.com",
-                        "test111"
-                      );
-                    }}
-                  >
-                    테스트 계정으로 로그인
-                  </motion.button>
-                </motion.div>
+
               </motion.div>
             ) : leftPart === "LOGIN" ? (
               <motion.div
@@ -156,14 +157,14 @@ const Intro = () => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 key="Login"
-                className="w-full flex flex-col z-10 items-center"
+                className="w-1/3 flex flex-col z-10 items-center"
               >
-                <motion.p className="w-1/2 text-3xl whitespace-pre-line mb-10 font-bold text-center ">
+                <motion.p className="w-1/2 text-3xl whitespace-pre-line mb-10 font-bold text-center text-slate-300">
                   로그인
                 </motion.p>
                 <motion.div className="flex flex-col">
                   <input
-                    className="focus:outline-none border border-logoBrown rounded-2xl bg-transparent px-3 py-3 text-md mb-3 shadow-md"
+                    className="focus:outline-none placeholder:text-sm placeholder:text-slate-300 border-2 border-hoverSpanMenu rounded-2xl bg-transparent px-3 py-3 text-md mb-3 shadow-md"
                     type="email"
                     value={loginEmail}
                     onChange={(e) => {
@@ -172,7 +173,7 @@ const Intro = () => {
                     placeholder="이메일"
                   />
                   <input
-                    className="focus:outline-none border border-logoBrown rounded-2xl bg-transparent px-3 py-3 text-md shadow-md"
+                    className="focus:outline-none placeholder:text-sm  placeholder:text-slate-300 border-2 border-hoverSpanMenu rounded-2xl bg-transparent px-3 py-3 text-md shadow-md"
                     type="password"
                     value={loginPassword}
                     onChange={(e) => {
@@ -182,9 +183,9 @@ const Intro = () => {
                   />
                 </motion.div>
                 <div className="flex w-1/2 items-center justify-center mt-10 mb-3">
-                  <hr className="w-1/4 border-gray-400" />
-                  <span className="text-sm text-gray-400 mx-2">또는</span>
-                  <hr className="w-1/4 border-gray-400" />
+                  <hr className="w-1/4 border-slate-300" />
+                  <span className="text-sm text-slate-300 mx-2">또는</span>
+                  <hr className="w-1/4 border-slate-300" />
                 </div>
                 <div className="flex w-1/2 items-center justify-center mb-10 space-x-2">
                   <Tooltip placement="top" title="구글 아이디로 로그인" arrow>
@@ -505,7 +506,7 @@ const Intro = () => {
 
         <div className="-z-0 absolute top-0 left-0 w-full h-full opacity-80 GalaxyS20Ultra:invisible">
           <img
-            className="w-full h-full"
+            className="w-full h-full fit-cover"
             src="backgroundImage/main.jpg"
             alt="background"
           />
