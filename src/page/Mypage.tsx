@@ -241,7 +241,7 @@ const Mypage = () => {
                 <span className="text-2xl font-bold my-7 mr-3">
                   {profileOwnerInfo.username}
                 </span>
-                {uid && contextUser && contextUser.uid !== uid && (
+                {uid && contextUser && contextUser.uid && contextUser.uid !== uid && (
                   <button
                     onClick={() => {
                       setDoseUserFollow((origin) => {
