@@ -75,14 +75,14 @@ const Intro = () => {
             />
           </div>
         </div>
-        <div className="w-1/2 h-full flex z-10 items-center justify-end GalaxyS20Ultra:w-full GalaxyS20Ultra:px-10">
+        <div className="w-4/5 h-full flex z-10 items-center justify-center GalaxyS20Ultra:w-full GalaxyS20Ultra:px-10">
           <AnimatePresence exitBeforeEnter>
             {leftPart === "INTRO" ? (
               <motion.div
                 key="Greeting"
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="w-1/3 h-full justify-center flex flex-col z-10 items-center GalaxyS20Ultra:h-full GalaxyS20Ultra:space-y-10 GalaxyS20Ultra:justify-center"
+                className="w-1/2 h-full justify-center flex flex-col z-10 items-center GalaxyS20Ultra:h-full GalaxyS20Ultra:space-y-10 GalaxyS20Ultra:justify-center"
               >
                 <motion.p
                   variants={pVariants}
@@ -128,7 +128,6 @@ const Intro = () => {
                     whileHover={{ y: "-10%" }}
                     className="px-2 py-2 w-12 rounded-full shadow-md font-semibold mx-5"
                     src="/icon/browse.png"
-
                   />
                   <motion.div
                     initial="initial"
@@ -149,7 +148,6 @@ const Intro = () => {
                     </motion.button>
                   </motion.div>
                 </motion.div>
-
               </motion.div>
             ) : leftPart === "LOGIN" ? (
               <motion.div
@@ -400,7 +398,7 @@ const Intro = () => {
                             placeholder="비밀번호"
                           />{" "}
                           {signupPassword.length > 0 &&
-                            signupPassword.length <= 5 ? (
+                          signupPassword.length <= 5 ? (
                             <span
                               style={{ fontSize: "0.7rem" }}
                               className="absolute right-2 text-red-500"
@@ -515,7 +513,14 @@ const Intro = () => {
         <div className="GalaxyS20Ultra:visible GalaxyS20Ultra:w-full GalaxyS20Ultra:h-full GalaxyS20Ultra:absolute GalaxyS20Ultra:bg-genreSelectedBG"></div>
         <div className="absolute right-3 bottom-3">
           <span className="text-slate-300 text-sm">
-            Photo by <a href="https://unsplash.com/@patrickian4?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Patrick Fore</a> on <a href="https://unsplash.com/s/photos/writing?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+            Photo by{" "}
+            <a href="https://unsplash.com/@patrickian4?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">
+              Patrick Fore
+            </a>{" "}
+            on{" "}
+            <a href="https://unsplash.com/s/photos/writing?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">
+              Unsplash
+            </a>
           </span>
         </div>
       </motion.div>

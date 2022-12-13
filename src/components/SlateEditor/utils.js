@@ -302,22 +302,26 @@ export const DictButton = ({ selectedProp, setIsFullScreen }) => {
         onClick={() => {
           setIsFullScreen(false);
           // Seleted text
-          const seleted = editor.selection
+          const seleted = editor.selection;
           seleted
             ? window.open(
-              `https://opendict.korean.go.kr/small/searchResult?query=${Editor.string(editor, seleted).toString()}`,
-              "_blank",
-              "width=450,height=600"
-            )
+                `https://opendict.korean.go.kr/small/searchResult?query=${Editor.string(
+                  editor,
+                  seleted
+                ).toString()}`,
+                "_blank",
+                "width=450,height=600"
+              )
             : window.open(
-              "https://opendict.korean.go.kr/small/main",
-              "_blank",
-              "width=450,height=600"
-            );
+                "https://opendict.korean.go.kr/small/main",
+                "_blank",
+                "width=450,height=600"
+              );
         }}
         style={{ width: "18px", fill: "#ccc" }}
-        className={`cursor-pointer ${selectedProp && "fill-slate-400"
-          } hover:fill-slate-400`}
+        className={`cursor-pointer ${
+          selectedProp && "fill-slate-400"
+        } hover:fill-slate-400`}
         viewBox="0 0 24 24"
       >
         <path
