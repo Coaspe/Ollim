@@ -88,10 +88,10 @@ const Intro = () => {
                   variants={pVariants}
                   initial="initial"
                   animate="animate"
-                  className="w-1/2 text-3xl whitespace-pre-line mb-10 GalaxyS20Ultra:w-full GalaxyS20Ultra:mb-0"
+                  className="text-slate-200 w-1/2 text-3xl whitespace-pre-line mb-10 GalaxyS20Ultra:w-full GalaxyS20Ultra:mb-0"
                 >
                   안녕하세요! {`\n`} 우리는{" "}
-                  <span className="text-4xl text-logoBrown font-extrabold">
+                  <span className="text-4xl text-hoverSpanMenu font-extrabold">
                     올림
                   </span>{" "}
                   입니다
@@ -101,7 +101,7 @@ const Intro = () => {
                   variants={pVariants2}
                   initial="initial"
                   animate="animate"
-                  className="w-1/2 text-lg  GalaxyS20Ultra:w-full"
+                  className="w-1/2 text-lg GalaxyS20Ultra:w-full text-slate-200"
                 >
                   작가님의 포트폴리오를 관리하고, 다른 작가들의 글을 열람하세요!
                 </motion.p>
@@ -109,7 +109,7 @@ const Intro = () => {
                   variants={divVariants}
                   initial="initial"
                   animate="animate"
-                  className="w-1/2 flex items-center justify-center mt-7 text-sm  GalaxyS20Ultra:w-full"
+                  className="w-1/2 flex items-center justify-center mt-7 text-sm GalaxyS20Ultra:w-full"
                 >
                   <motion.button
                     whileHover={{ y: "-10%" }}
@@ -399,7 +399,7 @@ const Intro = () => {
                             placeholder="비밀번호"
                           />{" "}
                           {signupPassword.length > 0 &&
-                          signupPassword.length <= 5 ? (
+                            signupPassword.length <= 5 ? (
                             <span
                               style={{ fontSize: "0.7rem" }}
                               className="absolute right-2 text-red-500"
@@ -512,6 +512,11 @@ const Intro = () => {
         </div>
 
         <div className="GalaxyS20Ultra:visible GalaxyS20Ultra:w-full GalaxyS20Ultra:h-full GalaxyS20Ultra:absolute GalaxyS20Ultra:bg-genreSelectedBG"></div>
+        <div className="absolute right-3 bottom-3">
+          <span className="text-slate-300 text-sm">
+            Photo by <a href="https://unsplash.com/@patrickian4?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Patrick Fore</a> on <a href="https://unsplash.com/s/photos/writing?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+          </span>
+        </div>
       </motion.div>
     </>
   );
