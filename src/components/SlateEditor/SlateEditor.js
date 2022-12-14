@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import isHotkey from "is-hotkey";
 import { Editable, withReact, Slate, ReactEditor } from "slate-react";
 import { Editor, createEditor } from "slate";
@@ -98,6 +98,10 @@ const SlateEditor = ({
   const [changeCollectionElementModal, setChangeCollectionElementModal] =
     useState(false);
   const loadTemp = useRef(true);
+
+  const [oneLineLeftTextLength, setOneLineLeftTextLength] = useState(0)
+  const [nowLineTextLength, setNowLineTextLength] = useState(0)
+  const [lineNumber, setLineNumber] = useState(1)
 
   // Render Slate element
   const renderElement = ({ element, attributes, children }) => {
@@ -267,7 +271,6 @@ const SlateEditor = ({
   const convertPXtoPercent = (px) => {
     const numberPX = parseInt(px.split("px")[0]) - 20;
     const pixel = 0.2645833333 * numberPX;
-
     return (pixel / 297) * 100;
   };
 
@@ -564,6 +567,17 @@ const SlateEditor = ({
             value={value}
             onChange={(value) => {
               setValue(value);
+
+              // Total text length update
+              const changedLineLength = value[value.length - 1].children[0].text?.length
+              if (value.length > lineNumber) {
+                setOneLineLeftTextLength(oneLineLeftTextLength + nowLineTextLength)
+                setLineNumber(value.length)
+              } else if (value.length < lineNumber) {
+                setOneLineLeftTextLength(oneLineLeftTextLength - changedLineLength)
+                setLineNumber(value.length)
+              }
+              setNowLineTextLength(changedLineLength)
             }}
           >
             {/* Toolbar Div */}
@@ -649,7 +663,7 @@ const SlateEditor = ({
                 {/* percentage */}
                 <Tooltip
                   placement="top"
-                  title={`${Math.round(percentage % 100)}% - A4`}
+                  title={`A4 ${parseInt(percentage / 100)} 매`}
                   arrow
                 >
                   <div className="">
@@ -664,12 +678,35 @@ const SlateEditor = ({
                         style={{ fontSize: "0.8rem" }}
                         className="ml-2 font-bold text-gray-500"
                       >
-                        {parseInt(percentage / 100)} 매
+                        {/* {parseInt(percentage / 100)} A4 */}
                       </span>
                     </div>
                   </div>
                 </Tooltip>
 
+                {/* 원고지 */}
+                <Tooltip
+                  placement="top"
+                  title={`원고지 ${Math.round((oneLineLeftTextLength + nowLineTextLength) * 0.005)} 매`}
+                  arrow
+                >
+                  <div className="">
+                    <div className="flex items-center">
+                      <div className="h-3 w-10 rounded-2xl border flex items-center">
+                        <div
+                          className="h-full rounded-2xl bg-hoverSpanMenu bg-opacity-50"
+                          style={{ width: `${((oneLineLeftTextLength + nowLineTextLength) * 0.5) % 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </Tooltip>
+                <span
+                  style={{ fontSize: "0.8rem" }}
+                  className="ml-2 font-bold text-gray-500"
+                >
+                  {oneLineLeftTextLength + nowLineTextLength} 글자
+                </span>
                 {/* Chapter */}
                 {writingInfo && writingInfo.isCollection && (
                   <div className="ml-3">
