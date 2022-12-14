@@ -97,11 +97,11 @@ const SlateEditor = ({
     useState("");
   const [changeCollectionElementModal, setChangeCollectionElementModal] =
     useState(false);
+
+  const editorDiv = useRef(null)
   const loadTemp = useRef(true);
 
-  const [oneLineLeftTextLength, setOneLineLeftTextLength] = useState(0)
-  const [nowLineTextLength, setNowLineTextLength] = useState(0)
-  const [lineNumber, setLineNumber] = useState(1)
+  const [totalTextLength, setTotalTextLegnth] = useState(0)
 
   // Render Slate element
   const renderElement = ({ element, attributes, children }) => {
@@ -260,7 +260,6 @@ const SlateEditor = ({
   useEffect(() => {
     setLoading(false);
   }, [value]);
-
   // window.addEventListener("beforeunload", function (e) {
   //   var confirmationMessage = "o/";
 
@@ -349,7 +348,13 @@ const SlateEditor = ({
                           if (selectedKey !== key) {
                             setLoading(true);
                             setSelectedKey(key);
-                            setValue(data[key]);
+                            setValue(() => {
+                              const val = data[key]
+                              let x = 0
+                              val.forEach((ele) => x += ele.children[0].text?.length)
+                              setTotalTextLegnth(x)
+                              return val
+                            });
                             setOpenModal(false);
                           }
                         }}
@@ -567,17 +572,13 @@ const SlateEditor = ({
             value={value}
             onChange={(value) => {
               setValue(value);
-
-              // Total text length update
-              const changedLineLength = value[value.length - 1].children[0].text?.length
-              if (value.length > lineNumber) {
-                setOneLineLeftTextLength(oneLineLeftTextLength + nowLineTextLength)
-                setLineNumber(value.length)
-              } else if (value.length < lineNumber) {
-                setOneLineLeftTextLength(oneLineLeftTextLength - changedLineLength)
-                setLineNumber(value.length)
-              }
-              setNowLineTextLength(changedLineLength)
+              setTotalTextLegnth(() => {
+                if (value.length > 1) {
+                  return editorDiv.current?.innerText?.length
+                } else {
+                  return value[0].children[0].text?.length
+                }
+              })
             }}
           >
             {/* Toolbar Div */}
@@ -678,16 +679,16 @@ const SlateEditor = ({
                         style={{ fontSize: "0.8rem" }}
                         className="ml-2 font-bold text-gray-500"
                       >
-                        {/* {parseInt(percentage / 100)} A4 */}
+                        {parseInt(percentage / 100)} 매
                       </span>
                     </div>
                   </div>
                 </Tooltip>
 
                 {/* 원고지 */}
-                <Tooltip
+                {/* <Tooltip
                   placement="top"
-                  title={`원고지 ${Math.round((oneLineLeftTextLength + nowLineTextLength) * 0.005)} 매`}
+                  title={`원고지 ${Math.round((totalTextLength) * 0.005)} 매`}
                   arrow
                 >
                   <div className="">
@@ -695,7 +696,7 @@ const SlateEditor = ({
                       <div className="h-3 w-10 rounded-2xl border flex items-center">
                         <div
                           className="h-full rounded-2xl bg-hoverSpanMenu bg-opacity-50"
-                          style={{ width: `${((oneLineLeftTextLength + nowLineTextLength) * 0.5) % 100}%` }}
+                          style={{ width: `${((totalTextLength) * 0.5) % 100}%` }}
                         />
                       </div>
                     </div>
@@ -705,8 +706,8 @@ const SlateEditor = ({
                   style={{ fontSize: "0.8rem" }}
                   className="ml-2 font-bold text-gray-500"
                 >
-                  {oneLineLeftTextLength + nowLineTextLength} 글자
-                </span>
+                  {totalTextLength} 자
+                </span> */}
                 {/* Chapter */}
                 {writingInfo && writingInfo.isCollection && (
                   <div className="ml-3">
@@ -767,7 +768,7 @@ const SlateEditor = ({
                     );
                   }}
                 >
-                  <div className="editable-container">
+                  <div ref={editorDiv} className="editable-container">
                     <Editable
                       className={cx(
                         "whitespace-pre-wrap break-all",
