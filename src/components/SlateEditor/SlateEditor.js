@@ -105,21 +105,11 @@ const SlateEditor = ({
 
   // Render Slate element
   const renderElement = ({ element, attributes, children }) => {
-    const elementKey = ReactEditor.findKey(editor, element);
-    let target = 0;
-    for (let i = 0; i < value.length; i++) {
-      const element = ReactEditor.findKey(editor, value[i]);
-      if (elementKey === element) {
-        target = i;
-        break;
-      }
-    }
     return (
       <ParagraphWithoutNum
         element={element}
         attributes={attributes}
         children={children}
-        lineNum={target}
       />
     );
   };
@@ -572,13 +562,6 @@ const SlateEditor = ({
             value={value}
             onChange={(value) => {
               setValue(value);
-              setTotalTextLegnth(() => {
-                if (value.length > 1) {
-                  return editorDiv.current?.innerText?.length
-                } else {
-                  return value[0].children[0].text?.length
-                }
-              })
             }}
           >
             {/* Toolbar Div */}

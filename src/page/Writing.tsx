@@ -283,7 +283,7 @@ const Writing = () => {
           {table !== "WRITE" && <Header userInfo={contextUserInfo} />}
 
           {/* Writing title, genre, owner's name,  */}
-          <div className="flex flex-col items-start px-20 GalaxyS20Ultra:px-10">
+          <div className="flex pt-5 flex-col items-start px-20 GalaxyS20Ultra:px-10">
             <div className="flex flex-col items-start justify-center font-bold mb-10">
               <div
                 onClick={() => {
