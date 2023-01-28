@@ -14,6 +14,7 @@ interface props {
 }
 
 const AlarmContent: React.FC<props> = ({ info, category }) => {
+  // New comment
   if (category === "ADDCOMMENT") {
     return (
       <>
@@ -28,7 +29,9 @@ const AlarmContent: React.FC<props> = ({ info, category }) => {
         </span>
       </>
     );
-  } else if (category === "FOLLOWING") {
+  }
+  // New Follower
+  else if (category === "FOLLOWING") {
     return (
       <>
         <span className="text-sm font-bold">
@@ -40,7 +43,9 @@ const AlarmContent: React.FC<props> = ({ info, category }) => {
         </span>
       </>
     );
-  } else if (category === "NEWCOMMIT") {
+  }
+  // New commit
+  else if (category === "NEWCOMMIT") {
     return (
       <>
         <span className="font-bold">

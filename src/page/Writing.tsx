@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import UserContext from "../context/user";
-import CustomNodeFlowRDOnly from "../components/diagram/RelationShipDiagramReadOnly";
+import CustomNodeFlowRDOnly from "../components/Diagram/RelationShipDiagramReadOnly";
 import {
   getUserByEmail,
   getUserByUID,
@@ -31,17 +31,17 @@ import { RootState } from "../redux/store";
 import { Alert } from "@mui/material";
 import { Elements } from "react-flow-renderer";
 import { initialValue } from "../components/SlateEditor/utils";
-import WritingSetting from "../components/WritingSetting";
+import WritingSetting from "../components/Writing/WritingSetting";
 import Header from "../components/Header";
 import axios from "axios";
 import SpinningSvg from "../components/SpinningSvg";
-import WritingWrite from "../components/WritingWrite";
+import WritingWrite from "../components/Writing/WritingWrite";
 
 const Writing = () => {
-  // User Info Variables
+  // User Info variables
   const { uid, writingDocID, commentDocID } = useParams();
 
-  // ContextUser's information
+  // Contextal user's information
   const { user: contextUser } = useContext(UserContext);
   const [contextUserInfo, setContextUserInfo] = useState<getFirestoreUser>(
     {} as getFirestoreUser

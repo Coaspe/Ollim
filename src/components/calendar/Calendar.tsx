@@ -6,16 +6,19 @@ interface props {
   totalCommits: { [key: number]: string };
   widthSize: number;
 }
+
+// Display works that commited in recent 3 months.
 const Calendar: React.FC<props> = ({ totalCommits, widthSize }) => {
   const [recent3MonthsCommits, setRecent3MonthsCommits] = useState<{
     [key: string]: number[];
   }>({});
 
+  // Build calander
   useEffect(() => {
     const initial = () => {
+      // Caculate date ...
       const twoMonthsBeforeMonth = moment().subtract(2, "months").month() + 1;
       const twoMonthsBeforeYear = moment().subtract(2, "months").year();
-
       const twoMonthsBeforeStartDayUnix = moment().subtract(2, "months").startOf("month").valueOf()
 
       const currentMonth = [];
@@ -27,40 +30,39 @@ const Calendar: React.FC<props> = ({ totalCommits, widthSize }) => {
       const currentMonthFirstDayUnix = moment().startOf("month").valueOf()
       const currentMonthLastDayUnix = moment().endOf("month").valueOf()
 
-      const tmp = Object.keys(totalCommits);
+      const commits = Object.keys(totalCommits);
 
-      for (let i = 0; i < tmp.length; i++) {
-        let tmpInt = parseInt(tmp[i]);
+      for (let i = 0; i < commits.length; i++) {
+        let commitTimeInUnix = parseInt(commits[i]);
         if (
-          currentMonthLastDayUnix >= tmpInt &&
-          tmpInt >= currentMonthFirstDayUnix
+          currentMonthLastDayUnix >= commitTimeInUnix &&
+          commitTimeInUnix >= currentMonthFirstDayUnix
         ) {
-          currentMonth.push(tmpInt);
+          currentMonth.push(commitTimeInUnix);
         } else if (
-          currentMonthFirstDayUnix > tmpInt &&
-          tmpInt >= oneMonthsBeforeStartDayUnix
+          currentMonthFirstDayUnix > commitTimeInUnix &&
+          commitTimeInUnix >= oneMonthsBeforeStartDayUnix
         ) {
-          oneMonthBefore.push(tmpInt);
+          oneMonthBefore.push(commitTimeInUnix);
         } else if (
-          oneMonthsBeforeStartDayUnix > tmpInt &&
-          tmpInt >= twoMonthsBeforeStartDayUnix
+          oneMonthsBeforeStartDayUnix > commitTimeInUnix &&
+          commitTimeInUnix >= twoMonthsBeforeStartDayUnix
         ) {
-          twoMonthBefore.push(tmpInt);
-        } else if (twoMonthsBeforeStartDayUnix > tmpInt) {
+          twoMonthBefore.push(commitTimeInUnix);
+        } else if (twoMonthsBeforeStartDayUnix > commitTimeInUnix) {
           continue;
         }
       }
 
-      const tmp2: any = {};
-      tmp2[`${twoMonthsBeforeYear}-${twoMonthsBeforeMonth}`] = twoMonthBefore;
-      tmp2[
+      const tmp: any = {};
+      tmp[`${twoMonthsBeforeYear}-${twoMonthsBeforeMonth}`] = twoMonthBefore;
+      tmp[
         `${moment().subtract(1, "months").year()}-${moment().subtract(1, "months").month() + 1
         }`
       ] = oneMonthBefore;
-      tmp2[`${moment().format("YYYY-MM")}`] = currentMonth;
+      tmp[`${moment().format("YYYY-MM")}`] = currentMonth;
 
-      setRecent3MonthsCommits(tmp2);
-
+      setRecent3MonthsCommits(tmp);
     };
 
     if (totalCommits) {

@@ -25,7 +25,7 @@ import SpinningSvg from "../components/SpinningSvg";
 import ContestSetting from "../components/contest/ContestSetting";
 import { css, cx } from "@emotion/css";
 import SlateEditorContest from "../components/SlateEditor/SlateEditorContest";
-import ContestWriting from "../components/writingComponents/ContestWriting";
+import ContestWriting from "../components/Writing/ContestWriting";
 import ContestParticipantModal from "../modals/ContestParticipantModal";
 import ContestPrize from "../components/contest/ContestPrize";
 

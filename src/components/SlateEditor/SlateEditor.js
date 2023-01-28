@@ -8,7 +8,7 @@ import { cx, css } from "@emotion/css";
 import { alarmAction, isFullScreenAction } from "../../redux";
 import { getWritingInfo } from "../../services/firebase";
 import { motion, AnimatePresence } from "framer-motion";
-import DiagramWrite from "../diagram/RelationShipDiagram";
+import DiagramWrite from "../Diagram/RelationShipDiagram";
 import {
   Leaf,
   toggleMark,

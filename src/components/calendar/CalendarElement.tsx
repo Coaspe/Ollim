@@ -6,6 +6,8 @@ interface props {
   keys: number[];
   totalCommits: { [key: number]: string };
 }
+
+// Display 1 month calendar.
 const CalendarElement: React.FC<props> = ({
   yearMonth,
   keys,
@@ -18,20 +20,20 @@ const CalendarElement: React.FC<props> = ({
   useEffect(() => {
     if (yearMonth && keys && totalCommits) {
 
-      const tmp: { [key: number]: string[] } = {};
+      const commits: { [key: number]: string[] } = {};
 
       Array.from(
         Array(moment(yearMonth, "YYYY-MM").daysInMonth()).keys()
-      ).forEach((date) => (tmp[date + 1] = []));
+      ).forEach((date) => (commits[date + 1] = []));
 
       keys.forEach((date) => {
-        tmp[moment(date).date()] = [
-          ...tmp[moment(date).date()],
+        commits[moment(date).date()] = [
+          ...commits[moment(date).date()],
           totalCommits[date],
         ];
       });
 
-      setElementCommits(tmp);
+      setElementCommits(commits);
     }
   }, [keys]);
 

@@ -3,7 +3,7 @@ import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
-import DiagramNewWritings from "../components/diagram/RelationShipDiagramNewWritings";
+import DiagramNewWritings from "../components/Diagram/RelationShipDiagramNewWritings";
 import { alarmAction, elementsAction } from "../redux";
 import { RootState } from "../redux/store";
 import { addWritingArg, genre, page, disclosure, alarmType } from "../type";
@@ -216,8 +216,8 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
                       }}
                       style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
                       className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${genrn === "NOVEL"
-                          ? "text-slate-700 bg-genreSelectedBG"
-                          : "text-slate-400"
+                        ? "text-slate-700 bg-genreSelectedBG"
+                        : "text-slate-400"
                         }`}
                     >
                       menu_book
@@ -231,8 +231,8 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
                       }}
                       style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
                       className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${genrn === "POEM"
-                          ? "text-slate-700 bg-genreSelectedBG"
-                          : "text-slate-400"
+                        ? "text-slate-700 bg-genreSelectedBG"
+                        : "text-slate-400"
                         }`}
                     >
                       history_edu
@@ -246,8 +246,8 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
                       }}
                       style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
                       className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${genrn === "SCENARIO"
-                          ? "text-slate-700 bg-genreSelectedBG"
-                          : "text-slate-400"
+                        ? "text-slate-700 bg-genreSelectedBG"
+                        : "text-slate-400"
                         }`}
                     >
                       adf_scanner
@@ -270,8 +270,8 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
                     }}
                     style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
                     className={`border rounded-full block py-2 px-2 cursor-pointer font-bold material-icons hover:text-slate-500 ${isCollection === true
-                        ? "text-slate-700 bg-genreSelectedBG"
-                        : "text-slate-400"
+                      ? "text-slate-700 bg-genreSelectedBG"
+                      : "text-slate-400"
                       }`}
                   >
                     done
@@ -282,8 +282,8 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
                     }}
                     style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
                     className={`border rounded-full block py-2 px-2 cursor-pointer font-bold material-icons hover:text-slate-500 ${isCollection === false
-                        ? "text-slate-700 bg-genreSelectedBG"
-                        : "text-slate-400"
+                      ? "text-slate-700 bg-genreSelectedBG"
+                      : "text-slate-400"
                       }`}
                   >
                     close

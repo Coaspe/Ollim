@@ -7,6 +7,8 @@ interface props {
   date: string;
   elementCommits: { [key: number]: string[] };
 }
+
+// Display 1 day calendar node.
 const CalendarElementNode: React.FC<props> = ({ date, elementCommits }) => {
   return (
     <>
@@ -24,8 +26,8 @@ const CalendarElementNode: React.FC<props> = ({ date, elementCommits }) => {
               backgroundColor:
                 elementCommits[parseInt(date)].length <= 8
                   ? bgColor[
-                      elementCommits[parseInt(date)].length as bgColorType
-                    ]
+                  elementCommits[parseInt(date)].length as bgColorType
+                  ]
                   : bgColor[8],
               width: "80%",
               aspectRatio: "1/1",

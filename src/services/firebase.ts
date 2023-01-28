@@ -11,7 +11,6 @@ import {
   arrayUnion,
   increment,
   writeBatch,
-  setDoc,
 } from "firebase/firestore";
 import {
   contestWriting,
@@ -290,3 +289,9 @@ export const vote = (
     throw new Error("There is an error!");
   }
 };
+export const makeAlarmSeen = (alarmKey: string, userUID: string) => {
+  let tmp: any = {};
+  tmp["seen"] = true;
+  return update(ref(rtDBRef, `alarms/${userUID}/${alarmKey}`), tmp)
+};
+//  return remove(ref(rtDBRef, `alarms/${userUID}/${alarmID}`));

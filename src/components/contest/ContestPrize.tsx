@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { getWritingsArrayInfo } from "../../services/firebase";
 import { contestWriting, getFirestoreWriting } from "../../type";
-import BestWritings from "../writingComponents/BestWritings";
+import BestWritings from "../Writing/BestWritings";
 
 interface props {
   prize: Array<contestWriting>;

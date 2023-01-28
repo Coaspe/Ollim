@@ -37,13 +37,6 @@ const BestWriting: React.FC<props> = ({ data, medal }) => {
     >
       {writingOwnerInfo.profileImg && (
         <motion.img
-          // style={{ filter: "grayscale(100%)" }}
-          // whileHover={{
-          // filter: "grayscale(0%)",
-          // transition: {
-          // duration: 0.3,
-          // },
-          // }}
           onClick={() => {
             navigator(`/${data.userUID}`);
           }}

@@ -1,11 +1,11 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { alarmAction } from "../redux";
-import { alarmType, getFirestoreWriting, disclosure } from "../type";
+import { alarmAction } from "../../redux";
+import { alarmType, getFirestoreWriting, disclosure } from "../../type";
 import { motion } from "framer-motion";
-import SpinningSvg from "./SpinningSvg";
-import { useAppDispatch } from "../hooks/useRedux";
+import SpinningSvg from "../SpinningSvg";
+import { useAppDispatch } from "../../hooks/useRedux";
 
 interface props {
   writingInfo: getFirestoreWriting;

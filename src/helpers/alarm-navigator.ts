@@ -13,23 +13,24 @@ export const alarmNavigator = (
   navigator: NavigateFunction
 ) => {
   if (category === "ADDCOMMENT") {
+    info = info as alarmAddCommentInfo
     navigator(
-      `/writings/${(info as alarmAddCommentInfo).writingOwnerUID}/${
-        (info as alarmAddCommentInfo).writingDocID
-      }/${(info as alarmAddCommentInfo).commentDocID}`
+      `/writings/${info.writingOwnerUID}/${info.writingDocID
+      }/${info.commentDocID}`
     );
   } else if (category === "FOLLOWING") {
-    navigator(`/${(info as alarmFollowingInfo).followingUserUID}`);
+    info = info as alarmFollowingInfo
+    navigator(`/${info.followingUserUID}`);
   } else if (category === "NEWCOMMIT") {
+    info = info as alarmNewCommit
     navigator(
-      `/writings/${(info as alarmNewCommit).writingOwnerUID}/${
-        (info as alarmNewCommit).writingDocID
+      `/writings/${info.writingOwnerUID}/${info.writingDocID
       }`
     );
   } else if (category === "NEWWRITING") {
+    info = info as alarmAddWritingInfo
     navigator(
-      `/writings/${(info as alarmAddWritingInfo).writingOwnerUID}/${
-        (info as alarmAddWritingInfo).writingDocID
+      `/writings/${info.writingOwnerUID}/${info.writingDocID
       }`
     );
   } else if (category === "RANKIN") {

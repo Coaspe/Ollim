@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import FollowerRow from "../components/FollowerRow";
-import FollowersFollowingsSkeleton from "../components/skeletons/FollowersFollowingsSkeleton";
+import FollowersFollowingsSkeleton from "../components/Skeleton/FollowersFollowingsSkeleton";
 import useGetFollowings from "../hooks/useGetFollowings";
 import { getFirestoreUser } from "../type";
 
@@ -72,9 +72,8 @@ const FollowingsModal: React.FC<props> = ({
               {followingsKey.current < profileOwnerInfo.followers.length && (
                 <div
                   onClick={handleMoreFollowings}
-                  className={`${
-                    loading && "pointer-events-none"
-                  } font-semibold text-sm shadow-inner cursor-pointer w-1/2 bg-white h-10 flex items-center justify-center rounded-xl text-gray-500`}
+                  className={`${loading && "pointer-events-none"
+                    } font-semibold text-sm shadow-inner cursor-pointer w-1/2 bg-white h-10 flex items-center justify-center rounded-xl text-gray-500`}
                 >
                   {!loading && "더 불러오기"}
                 </div>

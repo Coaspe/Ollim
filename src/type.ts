@@ -82,11 +82,11 @@ export type getFirestoreAlarmType = {
   dateCreated: number;
   seen: boolean;
   key: string;
-  info?:
-    | alarmAddCommentInfo
-    | alarmFollowingInfo
-    | alarmAddWritingInfo
-    | alarmRankInInfo;
+  info:
+  | alarmAddCommentInfo
+  | alarmFollowingInfo
+  | alarmAddWritingInfo
+  | alarmRankInInfo;
 };
 
 export type getFirestoreUserWritings = {

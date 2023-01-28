@@ -48,7 +48,6 @@ const CommentsModal: React.FC<props> = ({
       likes: [],
       dateCreated,
     };
-    // https://ollim.onrender.com/addComment
     axios
       .post("https://ollim.onrender.com/addComment", {
         writingDocID,
@@ -116,7 +115,7 @@ const CommentsModal: React.FC<props> = ({
           </>
         ) : (
           <p className="text-2xl font-bold text-gray-400 font-Nanum_Gothic mt-5">
-            댓글이 없습니다. ㅠㅠ
+            댓글이 없습니다.
           </p>
         )}
       </motion.div>

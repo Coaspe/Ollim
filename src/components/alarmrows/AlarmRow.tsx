@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { memo, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../../context/user";
-import { removeAlarm } from "../../services/firebase";
+import { makeAlarmSeen, removeAlarm } from "../../services/firebase";
 import { getFirestoreAlarmType, totalAlarmType } from "../../type";
 import axios from "axios";
 import { alarmNavigator } from "../../helpers/alarm-navigator";
@@ -25,9 +25,40 @@ const AlarmRow: React.FC<props> = ({
   setUnConfirmedAlarms,
 }) => {
   const { user } = useContext(UserContext);
-  const [info, setInfo] = useState<totalAlarmType>(data.info as totalAlarmType);
+  const [alarmData, setAlarmData] = useState<getFirestoreAlarmType>(data)
   const navigator = useNavigate();
 
+  const handleClickAlarm = async (e: any) => {
+    e.stopPropagation();
+    setUnConfirmedAlarms((origin) => {
+      const copy = new Map(origin);
+      if (copy.has(identity)) copy.delete(identity);
+      return copy;
+    });
+    await makeAlarmSeen(identity, user.uid)
+    setAlarmData(() => {
+      data.seen = true
+      return data
+    })
+    // Move page with alarm info.
+    alarmNavigator(alarmData.info, data.category, navigator);
+  }
+  const handleRemoveAlarm = (e: any) => {
+    e.stopPropagation();
+    if (!data.seen) {
+      setUnConfirmedAlarms((origin) => {
+        const tmp = new Map(origin);
+        tmp.delete(identity);
+        return tmp;
+      });
+    }
+    setAlarmMap((origin) => {
+      const tmp = new Map(origin);
+      tmp.delete(identity);
+      return tmp;
+    });
+    removeAlarm(identity, user.uid);
+  }
   return (
     <motion.div
       layout
@@ -37,44 +68,15 @@ const AlarmRow: React.FC<props> = ({
       whileHover={{ backgroundColor: "#eee" }}
       transition={{ type: "ease" }}
       className="relative flex border rounded-md px-3 py-3 items-center w-full h-fit"
-      onClick={(e) => {
-        e.stopPropagation();
-        setUnConfirmedAlarms((origin) => {
-          const tmp = new Map(origin);
-          tmp.delete(identity);
-          return tmp;
-        });
-        axios
-          .post("https://ollim.onrender.com/makeAlarmSeen", {
-            alarmKey: identity,
-            userUID: user.uid,
-          })
-          .then(() => {
-            alarmNavigator(info, data.category, navigator);
-          });
-      }}
+      onClick={handleClickAlarm}
     >
       <div
-        className={`absolute top-1 left-1 w-1.5 h-1.5 rounded-full ${data.seen ? "bg-gray-500" : "bg-red-500"
+        className={`absolute top-1 left-1 w-1.5 h-1.5 rounded-full ${alarmData.seen ? "bg-gray-500" : "bg-red-500"
           }`}
       />
+      {/* Remove alarm botton */}
       <span
-        onClick={(e) => {
-          e.stopPropagation();
-          if (!data.seen) {
-            setUnConfirmedAlarms((origin) => {
-              const tmp = new Map(origin);
-              tmp.delete(identity);
-              return tmp;
-            });
-          }
-          setAlarmMap((origin) => {
-            const tmp = new Map(origin);
-            tmp.delete(identity);
-            return tmp;
-          });
-          removeAlarm(identity, user.uid);
-        }}
+        onClick={handleRemoveAlarm}
         className="material-icons absolute top-0.5 right-0.5 text-sm text-gray-500"
       >
         close
@@ -82,7 +84,7 @@ const AlarmRow: React.FC<props> = ({
       <span className="material-icons">chat</span>
       <div className="h-full border-l border-l-gray-300 mx-3" />
       <div className="flex flex-col text-sm h-full">
-        <AlarmContent info={info} category={data.category} />
+        <AlarmContent info={alarmData.info} category={data.category} />
       </div>
     </motion.div>
   );

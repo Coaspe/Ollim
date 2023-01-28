@@ -109,8 +109,6 @@ const DiagramWrite: React.FC<props> = ({
   const onNodeDragStop = (event: any, node: any) => {
     let elementsTmp = diagram.elements.slice();
     elementsTmp[parseInt(node.id) - 1] = node;
-    // let diagramTmp = Object.assign({}, diagram)
-    // diagramTmp["elements"] = elementsTmp
     setElements(elementsTmp);
   };
   const onElementClick = (event: any, element: any) =>

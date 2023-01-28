@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import useGetGenreWritings from "../hooks/useGetGenreWritings";
 import { getFirestoreContest } from "../type";
-import ContestParticipantWritingRow from "../components/writingComponents/ContestParticipantWritingRow";
+import ContestParticipantWritingRow from "../components/Writing/ContestParticipantWritingRow";
 
 interface props {
   uid: string;
@@ -107,9 +107,8 @@ const ContestParticipantModal: React.FC<props> = ({
                   }}
                   whileHover={{ backgroundColor: "rgb(209 213 219)" }}
                   transition={{ ease: "linear" }}
-                  className={`px-1 py-1 rounded-full cursor-pointer material-icons justify-self-end font-bold text-gray-500 ${
-                    inputOpened && "text-black"
-                  }`}
+                  className={`px-1 py-1 rounded-full cursor-pointer material-icons justify-self-end font-bold text-gray-500 ${inputOpened && "text-black"
+                    }`}
                 >
                   search
                 </motion.span>
