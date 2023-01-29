@@ -1,39 +1,41 @@
 import { Tooltip } from "@mui/material";
-import { get, limitToLast, onChildAdded, query, ref } from "firebase/database";
+import { limitToLast, onChildAdded, query, ref } from "firebase/database";
 import { motion, useAnimation } from "framer-motion";
 import React, { memo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { rtDBRef } from "../lib/firebase";
 import AlarmModal from "../modals/AlarmModal";
-import { getFirestoreAlarmType, getFirestoreUser } from "../type";
+import { getAlarms } from "../services/firebase";
+import { AlarmMap, getFirestoreAlarmType, getFirestoreUser } from "../type";
 
 interface props {
   userInfo: getFirestoreUser;
 }
 
+
+/// Header
+/// Header has logo, alarm component and user Id, image.
 const Header: React.FC<props> = ({ userInfo }) => {
   const controls = useAnimation();
   const navigator = useNavigate();
 
-  const [unConfirmedAlarms, setUnConfirmedAlarms] = useState<
-    Map<string, getFirestoreAlarmType>
-  >(new Map<string, getFirestoreAlarmType>());
-  const [alarmMap, setAlarmMap] = useState<Map<string, getFirestoreAlarmType>>(
-    new Map<string, getFirestoreAlarmType>()
-  );
+  const [unConfirmedAlarms, setUnConfirmedAlarms] = useState<AlarmMap>(new Map());
+  const [alarmMap, setAlarmMap] = useState<AlarmMap>(new Map());
   const [alarmModalOpen, setAlarmModalOpen] = useState(false);
 
+  // Get user alarm
   useEffect(() => {
-    if (userInfo.uid) {
-      get(ref(rtDBRef, "alarms/" + userInfo.uid)).then((snapshot) => {
-        if (snapshot.exists()) {
+    const initAlarms = async () => {
+      if (userInfo.uid) {
+        const snapshot = await getAlarms(userInfo.uid)
+        if (snapshot && snapshot.exists()) {
           const snap = snapshot.val() as {
             [key: string]: getFirestoreAlarmType;
           };
           // Init Alarm Map
           setAlarmMap(() => {
             let tmp = new Map();
-            const unConfirmedTmp = new Map<string, getFirestoreAlarmType>();
+            const unConfirmedTmp = new Map();
             Object.entries(snap).forEach(([key, value]) => {
               tmp.set(key, value);
               !value.seen && unConfirmedTmp.set(key, value);
@@ -42,10 +44,12 @@ const Header: React.FC<props> = ({ userInfo }) => {
             return tmp;
           });
         }
-      });
+      }
     }
+    initAlarms()
   }, [userInfo.uid]);
 
+  // Listen alarm add event.
   useEffect(() => {
     const q = query(ref(rtDBRef, "alarms/" + userInfo.uid), limitToLast(1));
     onChildAdded(q, (onChildAddedSnapshot) => {
@@ -98,6 +102,7 @@ const Header: React.FC<props> = ({ userInfo }) => {
         src="/logo/Ollim-logos_transparent.png"
         alt="header logo"
       />
+      {/* User Id, image, alarms */}
       {userInfo.uid ? (
         <div className="flex items-center cursor-pointer px-4 py-2 rounded-3xl space-x-2 GalaxyS20Ultra:p-0 GalaxyS20Ultra:h-0">
           <img
@@ -122,9 +127,8 @@ const Header: React.FC<props> = ({ userInfo }) => {
                 fill={unConfirmedAlarms.size === 0 ? "#555" : "#d84742"}
                 key={unConfirmedAlarms.size}
                 animate={controls}
-                className={`w-5 ${
-                  unConfirmedAlarms.size > 0 && "animate-pulse"
-                }`}
+                className={`w-5 ${unConfirmedAlarms.size > 0 && "animate-pulse"
+                  }`}
                 x="0px"
                 y="0px"
                 viewBox="0 0 320 320"

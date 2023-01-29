@@ -10,6 +10,7 @@ export type gerneDocIDType = "novelDocID" | "poemDocID" | "scenarioDocID";
 export type alarmType = "error" | "warning" | "info" | "success";
 export type contestType = "HOST" | "PARTICIPATION" | "TOTAL";
 export type medal = "GOLD" | "SILVER" | "BRONZE";
+export type AlarmMap = Map<string, getFirestoreAlarmType>
 export type alarmCategory =
   | "ADDCOMMENT"
   | "FOLLOWING"

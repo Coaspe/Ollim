@@ -19,7 +19,7 @@ import {
   getFirestoreUser,
   getFirestoreContest,
 } from "../type";
-import { ref, remove, update } from "firebase/database";
+import { get, ref, remove, update } from "firebase/database";
 
 export const signInWithGoogleInfo = (info: any) => {
   const batch = writeBatch(firestore);
@@ -290,8 +290,20 @@ export const vote = (
   }
 };
 export const makeAlarmSeen = (alarmKey: string, userUID: string) => {
-  let tmp: any = {};
-  tmp["seen"] = true;
-  return update(ref(rtDBRef, `alarms/${userUID}/${alarmKey}`), tmp)
+  try {
+    let tmp: any = {};
+    tmp["seen"] = true;
+    return update(ref(rtDBRef, `alarms/${userUID}/${alarmKey}`), tmp)
+  } catch (error) {
+
+  }
 };
-//  return remove(ref(rtDBRef, `alarms/${userUID}/${alarmID}`));
+
+export const getAlarms = async (userUID: string) => {
+  try {
+    const snapshot = (await get(ref(rtDBRef, "alarms/" + userUID)))
+    return snapshot;
+  } catch (error) {
+    return null
+  }
+}
