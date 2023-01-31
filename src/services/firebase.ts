@@ -314,6 +314,7 @@ export const getAlarms = async (userUID: string) => {
     const snapshot = (await get(ref(rtDBRef, "alarms/" + userUID)))
     return snapshot;
   } catch (error) {
+    console.log(`getAlarms error: ${error}`)
     return null
   }
 }
