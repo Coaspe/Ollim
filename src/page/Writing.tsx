@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import UserContext from "../context/user";
-import CustomNodeFlowRDOnly from "../components/Diagram/RelationShipDiagramReadOnly";
+import CustomNodeFlowRDOnly from "../components/diagram/RelationShipDiagramReadOnly";
 import {
   getUserByEmail,
   getUserByUID,
