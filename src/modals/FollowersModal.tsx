@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import FollowerRow from "../components/FollowerRow";
-import FollowersFollowingsSkeleton from "../components/Skeleton/FollowersFollowingsSkeleton";
+import FollowersFollowingsSkeleton from "../components/skeleton/FollowersFollowingsSkeleton";
 import useGetFollowers from "../hooks/useGetFollowers";
 import { getFirestoreUser } from "../type";
 

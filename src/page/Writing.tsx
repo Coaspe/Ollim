@@ -19,7 +19,7 @@ import {
   genreMatching,
 } from "../type";
 import { cx, css } from "@emotion/css";
-import SlateEditorRDOnly from "../components/SlateEditor/SlateEditorRDOnly";
+import SlateEditorRDOnly from "../components/slateEditor/SlateEditorRDOnly";
 import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 import {
   diagramAction,
@@ -30,12 +30,12 @@ import {
 import { RootState } from "../redux/store";
 import { Alert } from "@mui/material";
 import { Elements } from "react-flow-renderer";
-import { initialValue } from "../components/SlateEditor/utils";
-import WritingSetting from "../components/Writing/WritingSetting";
+import { initialValue } from "../components/slateEditor/utils";
+import WritingSetting from "../components/writing/WritingSetting";
 import Header from "../components/Header";
 import axios from "axios";
 import SpinningSvg from "../components/SpinningSvg";
-import WritingWrite from "../components/Writing/WritingWrite";
+import WritingWrite from "../components/writing/WritingWrite";
 
 const Writing = () => {
   // User Info variables

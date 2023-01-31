@@ -14,7 +14,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
 import { AnimatePresence, motion } from "framer-motion";
 import WriterRecommandation from "../components/WriterRecommandation";
-import BestWritings from "../components/Writing/BestWritings";
+import BestWritings from "../components/writing/BestWritings";
 import SearchAutoComplete from "../SearchAutoComplete/SearchAutoComplete";
 import FormatResultWriting from "../SearchAutoComplete/FormatResultWriting";
 import FormatResultUser from "../SearchAutoComplete/FormatResultUser";

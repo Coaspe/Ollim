@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useContext, useEffect, useRef, useState } from "react";
-import MypageWriting from "../components/Writing/MypageWriting";
+import MypageWriting from "../components/writing/MypageWriting";
 import UserContext from "../context/user";
 import { getUserByUID, getContetsArrayInfo } from "../services/firebase";
 import { signOutAuth } from "../helpers/auth-OAuth2";
@@ -29,7 +29,7 @@ import ContestRow from "../components/contest/ContestRow";
 
 import useImageCompress from "../hooks/useImageCompress";
 import useGetWritings from "../hooks/useGetWritings";
-import MypageSkeleton from "../components/Skeleton/MypageSkeleton";
+import MypageSkeleton from "../components/skeleton/MypageSkeleton";
 
 import { alertVariants } from "../components/constants/variants";
 import FollowersModal from "../modals/FollowersModal";

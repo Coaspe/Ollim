@@ -8,10 +8,10 @@ import {
 import { useAppSelector } from "../hooks/useRedux";
 import { RootState } from "../redux/store";
 import { leftPartType } from "../type";
-import BackgroundImage from "../components/Intro/BackgroundImage";
-import Greeting from "../components/Intro/Greeting";
-import Signup from "../components/Intro/Singup";
-import Login from "../components/Intro/Login";
+import BackgroundImage from "../components/intro/BackgroundImage";
+import Greeting from "../components/intro/Greeting";
+import Signup from "../components/intro/Singup";
+import Login from "../components/intro/Login";
 
 const Intro = () => {
 
