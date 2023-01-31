@@ -24,7 +24,7 @@ import axios from "axios";
 import SpinningSvg from "../components/SpinningSvg";
 import ContestSetting from "../components/contest/ContestSetting";
 import { css, cx } from "@emotion/css";
-import SlateEditorContest from "../components/slateEditor/SlateEditorContest";
+import SlateEditorContest from "../components/slateEditor/slateEditorContest";
 import ContestWriting from "../components/writing/ContestWriting";
 import ContestParticipantModal from "../modals/ContestParticipantModal";
 import ContestPrize from "../components/contest/ContestPrize";
