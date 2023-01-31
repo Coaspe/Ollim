@@ -1,8 +1,8 @@
 import { css, cx } from "@emotion/css";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import SlateEditor from "../slateEditor/SlateEditor";
-import SlateEditorCompare from "../slateEditor/SlateEditorCompare";
+import SlateEditor from "../slateEditor/slateEditor";
+import SlateEditorCompare from "../slateEditor/slateEditorCompare";
 import { editorValue } from "../../type";
 
 interface props {

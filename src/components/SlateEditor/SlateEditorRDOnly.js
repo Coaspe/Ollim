@@ -3,14 +3,13 @@ import { Editable, withReact, Slate, ReactEditor } from "slate-react";
 import { createEditor } from "slate";
 import { withHistory } from "slate-history";
 import { cx, css } from "@emotion/css";
-import { getCommentsInfinite, getWritingInfo } from "../../services/firebase";
+import { getWritingInfo } from "../../services/firebase";
 import { AnimatePresence, motion } from "framer-motion";
 import { Leaf } from "./utils";
 import ParagraphWithoutNum from "./paragraphWithoutNum";
 import { Tooltip } from "@mui/material";
 import { isFullScreenAction } from "../../redux";
 import { useAppSelector, useAppDispatch } from "../../hooks/useRedux";
-import useGetComments from "../../hooks/useGetComments";
 import CommentsModal from "../../modals/CommentsModal";
 
 const SlateEditorRDOnly = ({
@@ -89,13 +88,13 @@ const SlateEditorRDOnly = ({
       setCommentsDocID(
         res.comments
           ? Object.values(
-              Object.keys(res.comments)
-                .sort()
-                .reduce((newObj, key) => {
-                  newObj[key] = res.comments[key];
-                  return newObj;
-                }, {})
-            )
+            Object.keys(res.comments)
+              .sort()
+              .reduce((newObj, key) => {
+                newObj[key] = res.comments[key];
+                return newObj;
+              }, {})
+          )
           : []
       );
     });
@@ -192,9 +191,8 @@ const SlateEditorRDOnly = ({
                             }
                           }}
                           key={key}
-                          className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${
-                            selectedKey === key && "bg-genreSelectedBG"
-                          } hover:bg-wirtingButtonHover`}
+                          className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${selectedKey === key && "bg-genreSelectedBG"
+                            } hover:bg-wirtingButtonHover`}
                         >
                           <div className="flex items-center w-5/6 justify-between">
                             <div className="flex flex-col items-center text-sm">
@@ -258,10 +256,9 @@ const SlateEditorRDOnly = ({
                         }
                       }}
                       key={data}
-                      className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${
-                        nowCollectionNum === parseInt(data) &&
+                      className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${nowCollectionNum === parseInt(data) &&
                         "bg-genreSelectedBG"
-                      } hover:bg-wirtingButtonHover`}
+                        } hover:bg-wirtingButtonHover`}
                     >
                       <div className="flex items-center w-5/6 justify-between">
                         <span>
@@ -310,9 +307,8 @@ const SlateEditorRDOnly = ({
               boxShadow: "0px 0px 10px rgba(0,0,0,0.3)",
               backgroundColor: "#FAF6F5",
             }}
-            className={`z-50 editor-inner-browse overflow-y-scroll w-noneFullScreenMenu GalaxyS20Ultra:w-4/5 GalaxyS20Ultra:overflow-x-scroll h-a4Height overflow-x-hidden ${
-              isFullScreen && "my-5"
-            }`}
+            className={`z-50 editor-inner-browse overflow-y-scroll w-noneFullScreenMenu GalaxyS20Ultra:w-4/5 GalaxyS20Ultra:overflow-x-scroll h-a4Height overflow-x-hidden ${isFullScreen && "my-5"
+              }`}
           >
             <Editable
               className={cx(
@@ -360,9 +356,8 @@ const SlateEditorRDOnly = ({
                   <Tooltip
                     arrow
                     placement="top"
-                    title={`${nowCollectionNum}.${
-                      writingInfo.collection[nowCollectionNum.toString()].title
-                    }`}
+                    title={`${nowCollectionNum}.${writingInfo.collection[nowCollectionNum.toString()].title
+                      }`}
                   >
                     <motion.span
                       onClick={() => {
