@@ -30,7 +30,7 @@ import {
 import { RootState } from "../redux/store";
 import { Alert } from "@mui/material";
 import { Elements } from "react-flow-renderer";
-import { initialValue } from "../components/slateEditor/utils";
+import { initialValue } from "../components/slateEditor/utils"
 import WritingSetting from "../components/writing/WritingSetting";
 import Header from "../components/Header";
 import axios from "axios";
