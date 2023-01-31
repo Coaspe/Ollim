@@ -19,7 +19,7 @@ const Header: React.FC<props> = ({ userInfo }) => {
   const controls = useAnimation();
   const navigator = useNavigate();
 
-  const [unConfirmedAlarms, setUnConfirmedAlarms] = useState<AlarmMap>(new Map());
+  const [unConfirmedAlarms, setUnConfirmedAlarms] = useState(0);
   const [alarmMap, setAlarmMap] = useState<AlarmMap>(new Map());
   const [alarmModalOpen, setAlarmModalOpen] = useState(false);
 
@@ -34,14 +34,14 @@ const Header: React.FC<props> = ({ userInfo }) => {
           };
           // Init Alarm Map
           setAlarmMap(() => {
-            let tmp = new Map();
-            const unConfirmedTmp = new Map();
+            let alarms = new Map();
+            let unConfirmedAlarmsNum = 0;
             Object.entries(snap).forEach(([key, value]) => {
-              tmp.set(key, value);
-              !value.seen && unConfirmedTmp.set(key, value);
+              alarms.set(key, value);
+              if (!value.seen) unConfirmedAlarmsNum += 1
             });
-            setUnConfirmedAlarms(unConfirmedTmp);
-            return tmp;
+            setUnConfirmedAlarms(unConfirmedAlarmsNum);
+            return alarms;
           });
         }
       }
@@ -54,17 +54,7 @@ const Header: React.FC<props> = ({ userInfo }) => {
     const q = query(ref(rtDBRef, "alarms/" + userInfo.uid), limitToLast(1));
     onChildAdded(q, (onChildAddedSnapshot) => {
       if (onChildAddedSnapshot.exists()) {
-        setUnConfirmedAlarms((originComfirmed) => {
-          if (!originComfirmed.has(onChildAddedSnapshot.key as string)) {
-            let tmp = new Map(originComfirmed);
-            tmp.set(
-              onChildAddedSnapshot.key as string,
-              onChildAddedSnapshot.val()
-            );
-            return tmp;
-          }
-          return originComfirmed;
-        });
+        setUnConfirmedAlarms(origin => origin + 1);
         setAlarmMap((origin) => {
           if (!alarmMap.has(onChildAddedSnapshot.key as string)) {
             controls.start({
@@ -122,12 +112,12 @@ const Header: React.FC<props> = ({ userInfo }) => {
             {userInfo.username}
           </span>
           <div className="relative" style={{ zIndex: 1000 }}>
-            <Tooltip title={unConfirmedAlarms.size} placement="top" arrow>
+            <Tooltip title={unConfirmedAlarms} placement="top" arrow>
               <motion.svg
-                fill={unConfirmedAlarms.size === 0 ? "#555" : "#d84742"}
-                key={unConfirmedAlarms.size}
+                fill={unConfirmedAlarms === 0 ? "#555" : "#d84742"}
+                key={unConfirmedAlarms}
                 animate={controls}
-                className={`w-5 ${unConfirmedAlarms.size > 0 && "animate-pulse"
+                className={`w-5 ${unConfirmedAlarms > 0 && "animate-pulse"
                   }`}
                 x="0px"
                 y="0px"
