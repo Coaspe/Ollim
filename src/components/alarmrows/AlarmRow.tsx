@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import UserContext from "../../context/user";
 import { makeAlarmSeen, removeAlarm } from "../../services/firebase";
 import { getFirestoreAlarmType, totalAlarmType } from "../../type";
-import axios from "axios";
 import { alarmNavigator } from "../../helpers/alarm-navigator";
 import AlarmContent from "./AlarmContent";
 
@@ -15,7 +14,7 @@ interface props {
     React.SetStateAction<Map<string, getFirestoreAlarmType>>
   >;
   setUnConfirmedAlarms: React.Dispatch<
-    React.SetStateAction<Map<string, getFirestoreAlarmType>>
+    React.SetStateAction<number>
   >;
 }
 const AlarmRow: React.FC<props> = ({
@@ -31,9 +30,7 @@ const AlarmRow: React.FC<props> = ({
   const handleClickAlarm = async (e: any) => {
     e.stopPropagation();
     setUnConfirmedAlarms((origin) => {
-      const copy = new Map(origin);
-      if (copy.has(identity)) copy.delete(identity);
-      return copy;
+      return origin - 1 >= 0 ? origin - 1 : 0;
     });
     await makeAlarmSeen(identity, user.uid)
     setAlarmData(() => {
@@ -43,13 +40,12 @@ const AlarmRow: React.FC<props> = ({
     // Move page with alarm info.
     alarmNavigator(alarmData.info, data.category, navigator);
   }
+
   const handleRemoveAlarm = (e: any) => {
     e.stopPropagation();
     if (!data.seen) {
       setUnConfirmedAlarms((origin) => {
-        const tmp = new Map(origin);
-        tmp.delete(identity);
-        return tmp;
+        return origin - 1 >= 0 ? origin - 1 : 0;
       });
     }
     setAlarmMap((origin) => {

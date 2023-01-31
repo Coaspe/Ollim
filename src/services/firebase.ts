@@ -223,8 +223,12 @@ export const getContestInfo = async (contestDocID: string) => {
   }
   return data;
 };
-export const removeAlarm = (alarmID: string, userUID: string) => {
-  return remove(ref(rtDBRef, `alarms/${userUID}/${alarmID}`));
+export const removeAlarm = async (alarmID: string, userUID: string) => {
+  try {
+    await remove(ref(rtDBRef, `alarms/${userUID}/${alarmID}`));
+  } catch (error) {
+
+  }
 };
 
 export const participateContest = async (
@@ -298,12 +302,19 @@ export const makeAlarmSeen = (alarmKey: string, userUID: string) => {
 
   }
 };
-
+export const removeAllAlarms = (userUID: string) => {
+  try {
+    remove(ref(rtDBRef, `alarms/${userUID}`))
+  } catch (error) {
+    console.log(`removeAllAlarms error: ${error}`)
+  }
+}
 export const getAlarms = async (userUID: string) => {
   try {
     const snapshot = (await get(ref(rtDBRef, "alarms/" + userUID)))
     return snapshot;
   } catch (error) {
+    console.log(`getAlarms error: ${error}`)
     return null
   }
 }

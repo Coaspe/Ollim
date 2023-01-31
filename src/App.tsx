@@ -1,17 +1,22 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import useAuthListner from "./hooks/useAuth";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import UserContext from "./context/user";
 import IsUserLoggedIn from "./helpers/Is-user-logged-in";
 import Community from "./page/Community";
 import Writing from "./page/Writing";
 import Contest from "./page/Contest";
 import Mypage from "./page/Mypage";
+import axios from "axios";
 
 const Intro = lazy(() => import("./page/Intro"));
 
 const App = () => {
   const { user } = useAuthListner();
+  useEffect(() => {
+    axios
+      .get("https://ollim.onrender.com/isOpened")
+  }, [])
 
   return (
     <UserContext.Provider value={{ user }}>
