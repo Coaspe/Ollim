@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { commentsModalVariants, getFirestoreUser, getFirestoreWriting } from "../type";
+import { commentsModalVariants, commentType, getFirestoreUser, getFirestoreWriting } from "../type";
 import useGetComments from "../hooks/useGetComments";
 import axios from "axios";
 import CommentRow from "../components/CommentRow";
 import SpinningSvg from "../components/SpinningSvg";
+import { addComment } from "../services/firebase";
 
 interface props {
   commentModalOpen: boolean;
@@ -36,42 +37,25 @@ const CommentsModal: React.FC<props> = ({
     setComments
   } = useGetComments(commentsDocId, commentModalOpen, setLoading)
 
-  // Add comment function
-  const handleAddComment = () => {
+  // Add comment
+  const handleAddComment = async () => {
     setCommentText("");
     setCommentButtonDisabled(true);
-    const dateCreated = new Date().getTime();
-    let commentInfo = {
+    let commentInfo: commentType = {
       replies: {},
       content: commentText,
       commentOwnerUID: contextUserInfo.uid,
+      docID: "",
       likes: [],
-      dateCreated,
+      dateCreated: new Date().getTime(),
     };
-    axios
-      .post("https://ollim.onrender.com/addComment", {
-        writingDocID,
-        writingTitle: writingInfo.title,
-        writingOwnerUID: writingInfo.userUID,
-        commentInfo: JSON.stringify(commentInfo),
-        commentUserInfo: JSON.stringify(contextUserInfo),
-      })
-      .then((res) => {
-        if (res.data[1] === "success") {
-          let commentInfo2 = {
-            replies: {},
-            content: commentText,
-            commentOwnerUID: contextUserInfo.uid,
-            docID: "",
-            likes: [],
-            dateCreated,
-          };
-          commentInfo2["docID"] = res.data[3];
-          setComments((origin) => [commentInfo2, ...origin]);
-        }
-        setCommentButtonDisabled(false);
-      })
-  };
+    const id = await addComment(writingDocID, writingInfo.title, writingInfo.userUID, commentInfo, contextUserInfo,)
+    if (id) {
+      commentInfo["docID"] = id
+      setComments((origin) => [commentInfo, ...origin]);
+    }
+    setCommentButtonDisabled(false);
+  }
   useEffect(() => {
     comments.length > 0 && setLoading(false);
   }, [comments]);
@@ -89,11 +73,10 @@ const CommentsModal: React.FC<props> = ({
         layout
         className="w-full h-full gap-5 overflow-y-scroll py-2 px-4 flex flex-col items-center"
       >
-        {commentsDocId.length !== 0 ? (
+        {comments.length ? (
           <>
             {comments.map((comment, index) => (
               <CommentRow
-                genre={writingInfo.genre}
                 writingDocID={writingDocID}
                 key={comment.dateCreated}
                 commentData={comment}

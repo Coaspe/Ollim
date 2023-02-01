@@ -11,6 +11,9 @@ import {
   arrayUnion,
   increment,
   writeBatch,
+  deleteField,
+  serverTimestamp,
+  arrayRemove
 } from "firebase/firestore";
 import {
   contestWriting,
@@ -18,8 +21,9 @@ import {
   toObjectElements,
   getFirestoreUser,
   getFirestoreContest,
+  commentType,
 } from "../type";
-import { get, ref, remove, update } from "firebase/database";
+import { get, ref, remove, set, update } from "firebase/database";
 
 export const signInWithGoogleInfo = (info: any) => {
   const batch = writeBatch(firestore);
@@ -165,7 +169,85 @@ export const getComments = (commentsDocID: string[]) => {
     )
   );
 };
+export const addComment = async (
+  writingDocID: string,
+  writingTitle: string,
+  writingOwnerUID: string,
+  commentInfo: commentType,
+  commentUserInfo: getFirestoreUser
+) => {
+  try {
+    const batch = writeBatch(firestore);
+    const commentsDocID = await addDoc(collection(firestore, "comments"), {})
+    batch.set(doc(firestore, "comments", commentsDocID.id), commentInfo);
 
+    const tmp: any = {}
+    tmp[`comments.${`${commentInfo.dateCreated}_${commentsDocID.id}`}`] =
+      commentsDocID.id;
+    const writingDocCommentRef = doc(firestore, "allWritings", writingDocID)
+
+    batch.update(writingDocCommentRef, tmp);
+
+    batch.commit();
+
+    if (commentInfo.commentOwnerUID !== writingOwnerUID) {
+      const data = {
+        dateCreated: commentInfo.dateCreated,
+        category: "ADDCOMMENT",
+        seen: false,
+        info: {
+          writingDocID,
+          writingTitle,
+          writingOwnerUID,
+          commentDocID: commentsDocID.id,
+          commentUserUID: commentUserInfo.uid,
+          commentUsername: commentUserInfo.username,
+        },
+      };
+      set(
+        ref(rtDBRef,
+          `alarms/${writingOwnerUID}/${commentInfo.dateCreated}_ADDCOMMENT_${commentUserInfo.uid}`
+        ),
+        data
+      )
+    }
+    return commentsDocID.id;
+
+  } catch (error) {
+    return null
+  }
+
+}
+export const deleteComment = async (
+  commentDocID: string,
+  writingDocID: string,
+  dateCreated: number
+) => {
+  try {
+    const batch = writeBatch(firestore);
+    const updates: any = {};
+    updates[`comments.${dateCreated}_${commentDocID}`] = deleteField()
+    updates["updateAt"] = serverTimestamp()
+    batch.delete(doc(firestore, "comments", commentDocID))
+    batch.update(doc(firestore, "allWritings", writingDocID), updates)
+    await batch.commit()
+    return true
+  } catch (error) {
+    return false
+  }
+}
+export const updateCommentLikes = (like: boolean, commentDocID: string, userUID: string) => {
+  try {
+    updateDoc(doc(firestore, "comments", commentDocID), {
+      likes: like
+        ? arrayRemove(userUID)
+        : arrayUnion(userUID)
+    })
+    return true
+  } catch (error) {
+    return false
+  }
+};
 export const getBestWritings = async () => {
   const date = new Date();
   const year = date.getFullYear();

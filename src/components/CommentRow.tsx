@@ -4,14 +4,13 @@ import { memo, useContext, useEffect, useState } from "react";
 import UserContext from "../context/user";
 import { useAppDispatch } from "../hooks/useRedux";
 import { alarmAction } from "../redux";
-import { getUserByUID } from "../services/firebase";
+import { deleteComment, getUserByUID, updateCommentLikes } from "../services/firebase";
 import { alarmType, commentType, getFirestoreUser } from "../type";
 import SpinningSvg from "./SpinningSvg";
 
 interface props {
   writingDocID: string;
   index: number;
-  genre: string;
   setComments: React.Dispatch<React.SetStateAction<any[]>>;
   isAlarmComment?: boolean;
   commentData: commentType
@@ -22,7 +21,6 @@ const CommentRow: React.FC<props> = ({
   index,
   setComments,
   writingDocID,
-  genre,
   isAlarmComment,
 }) => {
   const [commentOwnerInfo, setCommentOwnerInfo] = useState(
@@ -54,60 +52,54 @@ const CommentRow: React.FC<props> = ({
   const handleCommentLike = () => {
     setLikesState((origin) => {
       let likesTmp = origin.slice();
-      axios.post("https://ollim.onrender.com/updateCommentLike", {
-        like: doesUserLike,
-        commentDocID: commentData.docID,
-        userUID: user.uid,
-      });
+      let result = updateCommentLikes(doesUserLike, commentData.docID, user.uid)
+      if (result) {
+        // Like
+        if (doesUserLike) {
+          const indexLocal = likesTmp.indexOf(user.uid);
+          setDoesUserLike((origin) => !origin);
+          likesTmp.splice(indexLocal, 1);
+          setComments((origin) => {
+            let tmp = origin.slice();
+            let tmpLikes = tmp[index].likes;
 
-      // Like
-      if (doesUserLike) {
-        const indexLocal = likesTmp.indexOf(user.uid);
-        setDoesUserLike((origin) => !origin);
-        likesTmp.splice(indexLocal, 1);
-        setComments((origin) => {
-          let tmp = origin.slice();
-          let tmpLikes = tmp[index].likes;
+            tmpLikes.push(user.uid);
+            tmp[index] = { ...origin[index], likes: tmpLikes };
 
-          tmpLikes.push(user.uid);
-          tmp[index] = { ...origin[index], likes: tmpLikes };
+            return tmp;
+          });
+        } else {
+          // Cancle Like
+          likesTmp.push(user.uid);
+          setDoesUserLike((origin) => !origin);
+          setComments((origin) => {
+            let tmp = origin.slice();
+            let tmpLikes = tmp[index].likes;
 
-          return tmp;
-        });
-      } else {
-        // Cancle Like
-        likesTmp.push(user.uid);
-        setDoesUserLike((origin) => !origin);
-        setComments((origin) => {
-          let tmp = origin.slice();
-          let tmpLikes = tmp[index].likes;
+            tmpLikes.splice(tmpLikes.indexOf(user.uid), 1);
+            tmp[index] = { ...origin[index], likes: tmpLikes };
 
-          tmpLikes.splice(tmpLikes.indexOf(user.uid), 1);
-          tmp[index] = { ...origin[index], likes: tmpLikes };
-
-          return tmp;
-        });
+            return tmp;
+          });
+        }
       }
       return likesTmp;
     });
   };
-  const handleCommentDelete = () => {
+  const handleCommentDelete = async () => {
     setDeleteBtnDisable(true);
-    axios
-      .post("https://ollim.onrender.com/deleteComment", {
-        commentDocID: commentData.docID,
-        writingDocID,
-        genre,
-        dateCreated: commentData.dateCreated,
-      })
-      .then(() => {
-        setComments((origin) => {
-          let tmp = origin.slice();
-          tmp.splice(index, 1);
-          setDeleteBtnDisable(false);
-          return tmp;
-        });
+    let x = await deleteComment(commentData.docID, writingDocID, commentData.dateCreated)
+    if (x) {
+      setComments((origin) => {
+        let tmp = origin.slice();
+        tmp.splice(index, 1);
+        setDeleteBtnDisable(false);
+        return tmp;
       });
+    } else {
+      setDeleteBtnDisable(false);
+    }
+
   };
   const handleCommentReport = () => {
     setReportBtnDisable(true);
@@ -128,7 +120,7 @@ const CommentRow: React.FC<props> = ({
   };
   return (
     <>
-      {Object.keys(commentOwnerInfo).length && (
+      {
         <AnimatePresence>
           <motion.div
             layout
@@ -210,7 +202,7 @@ const CommentRow: React.FC<props> = ({
             />
           </motion.div>
         </AnimatePresence>
-      )}
+      }
     </>
   );
 };

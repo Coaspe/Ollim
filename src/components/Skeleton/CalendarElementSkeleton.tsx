@@ -1,4 +1,4 @@
-import CalendarElementNode from "./CalendarElementNodeSkeleton";
+import CalendarElementNodeSkeleton from "./CalendarElementNodeSkeleton";
 const CalendarElementSkeleton = () => {
   const elementCommits = Array.from({ length: 30 }, () => 0);
 
@@ -11,7 +11,7 @@ const CalendarElementSkeleton = () => {
           className="w-3/4 px-2 py-2 border gap-3 grid grid-cols-7 place-items-center rounded-lg"
         >
           {elementCommits.map((date, idx) => (
-            <CalendarElementNode key={`${idx}-${date}`} />
+            <CalendarElementNodeSkeleton key={`${idx}-${date}`} />
           ))}
         </div>
       </div>
