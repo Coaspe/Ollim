@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://user-images.githubusercontent.com/76432686/215277696-24c2b949-0dfb-4b61-b7c8-a8f995ab700f.jpeg"  width="600" height="600"/>
+  <img src="https://user-images.githubusercontent.com/76432686/216037651-59f144e9-faad-498f-b7b9-32b97710eda4.png"/>
 </div>
 
 # 순수문학 작가들을 위한 작품관리, 작가 교류 웹사이트 - Ollim
