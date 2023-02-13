@@ -3,7 +3,7 @@ import isHotkey from "is-hotkey";
 import { Editable, withReact, Slate, ReactEditor } from "slate-react";
 import { Editor, createEditor } from "slate";
 import { withHistory } from "slate-history";
-import { Toolbar } from "./components";
+import { Toolbar } from "./Component";
 import { cx, css } from "@emotion/css";
 import { alarmAction, isFullScreenAction } from "../../redux";
 import { getWritingInfo } from "../../services/firebase";
@@ -23,7 +23,7 @@ import { useAppSelector, useAppDispatch } from "../../hooks/useRedux";
 import { Tooltip } from "@mui/material";
 import "../../style/Slate.css";
 import ResizeObserver from "rc-resize-observer";
-import ParagraphWithoutNum from "./paragraphWithoutNum";
+import ParagraphWithoutNum from "./ParagraphWithoutNum";
 import SpinningSvg from "../SpinningSvg";
 
 const HOTKEYS = {

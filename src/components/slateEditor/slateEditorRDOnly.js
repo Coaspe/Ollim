@@ -6,7 +6,7 @@ import { cx, css } from "@emotion/css";
 import { getWritingInfo } from "../../services/firebase";
 import { AnimatePresence, motion } from "framer-motion";
 import { Leaf } from "./utils";
-import ParagraphWithoutNum from "./paragraphWithoutNum";
+import ParagraphWithoutNum from "./ParagraphWithoutNum";
 import { Tooltip } from "@mui/material";
 import { isFullScreenAction } from "../../redux";
 import { useAppSelector, useAppDispatch } from "../../hooks/useRedux";

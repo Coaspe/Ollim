@@ -19,7 +19,7 @@ import {
   genreMatching,
 } from "../type";
 import { cx, css } from "@emotion/css";
-import SlateEditorRDOnly from "../components/slateEditor/slateEditorRDOnly";
+import SlateEditorRDOnly from "../components/slateEditor/SlateEditorRDOnly";
 import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 import {
   diagramAction,

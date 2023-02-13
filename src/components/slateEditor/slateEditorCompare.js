@@ -5,7 +5,7 @@ import { withHistory } from "slate-history";
 import { cx, css } from "@emotion/css";
 import { Leaf } from "./utils";
 import { motion } from "framer-motion";
-import ParagraphWithoutNum from "./paragraphWithoutNum";
+import ParagraphWithoutNum from "./ParagraphWithoutNum";
 import { useAppSelector } from "../../hooks/useRedux";
 const SlateEditorCompare = ({ valueProps }) => {
   const [value, setValue] = useState([]);
@@ -67,9 +67,8 @@ const SlateEditorCompare = ({ valueProps }) => {
                 boxShadow: "0px 0px 10px rgba(0,0,0,0.3)",
                 backgroundColor: "#FAF6F5",
               }}
-              className={`z-50 overflow-y-scroll w-noneFullScreenMenu h-a4Height overflow-x-hidden ${
-                isFullScreen && "my-5 h-a4FullScreenHeight"
-              }`}
+              className={`z-50 overflow-y-scroll w-noneFullScreenMenu h-a4Height overflow-x-hidden ${isFullScreen && "my-5 h-a4FullScreenHeight"
+                }`}
             >
               <Editable
                 className={cx(
