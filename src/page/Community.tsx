@@ -15,9 +15,9 @@ import Tooltip from "@mui/material/Tooltip";
 import { AnimatePresence, motion } from "framer-motion";
 import WriterRecommandation from "../components/WriterRecommandation";
 import BestWritings from "../components/writing/BestWritings";
-import SearchAutoComplete from "../SearchAutoComplete/SearchAutoComplete";
-import FormatResultWriting from "../SearchAutoComplete/FormatResultWriting";
-import FormatResultUser from "../SearchAutoComplete/FormatResultUser";
+import SearchAutoComplete from "../components/searchautocomplete/SearchAutoComplete";
+import FormatResultWriting from "../components/searchautocomplete/FormatResultWriting";
+import FormatResultUser from "../components/searchautocomplete/FormatResultUser";
 import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 
 const Community = () => {

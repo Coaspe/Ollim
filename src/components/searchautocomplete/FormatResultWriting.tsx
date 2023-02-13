@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { memo } from "react";
 import { useNavigate } from "react-router-dom";
-import { genreMatching, gerneType } from "../type";
+import { genreMatching, gerneType } from "../../type";
 interface props {
   item: any;
 }

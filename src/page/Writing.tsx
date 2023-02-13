@@ -19,7 +19,7 @@ import {
   genreMatching,
 } from "../type";
 import { cx, css } from "@emotion/css";
-import SlateEditorRDOnly from "../components/slateEditor/SlateEditorRDOnly";
+import SlateEditorRDOnly from "../components/slateeditor/SlateEditorRDOnly";
 import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 import {
   diagramAction,
@@ -30,7 +30,7 @@ import {
 import { RootState } from "../redux/store";
 import { Alert } from "@mui/material";
 import { Elements } from "react-flow-renderer";
-import { initialValue } from "../components/slateEditor/utils"
+import { initialValue } from "../components/slateeditor/utils"
 import WritingSetting from "../components/writing/WritingSetting";
 import Header from "../components/Header";
 import axios from "axios";

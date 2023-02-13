@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import isHotkey from "is-hotkey";
-import { Editable, withReact, Slate, ReactEditor } from "slate-react";
+import { Editable, withReact, Slate } from "slate-react";
 import { Editor, createEditor } from "slate";
 import { withHistory } from "slate-history";
 import { Toolbar } from "./Component";

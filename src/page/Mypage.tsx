@@ -5,7 +5,6 @@ import UserContext from "../context/user";
 import { getUserByUID, getContetsArrayInfo } from "../services/firebase";
 import { signOutAuth } from "../helpers/auth-OAuth2";
 import NewWritingModal from "../modals/NewWritingModal";
-import CustomNodeFlow from "../components/diagram/RelationShipDiagram";
 import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 import { RootState } from "../redux/store";
 import {
