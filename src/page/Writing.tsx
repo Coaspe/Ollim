@@ -261,7 +261,7 @@ const Writing = () => {
   }, []);
   return (
     <>
-      {Object.keys(writingInfo).length > 0 && uid && writingDocID && (
+      {Object.keys(writingInfo) && uid && writingDocID && (
         <div className="w-full bg-opacity-30 relative writing-container font-noto">
           {/* Alarm */}
           <AnimatePresence>

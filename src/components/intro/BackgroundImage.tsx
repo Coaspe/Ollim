@@ -1,7 +1,8 @@
+// import './BackgroundImage.css'
 const BackgroundImage = () => {
     return <>
         {/* Background image */}
-        <div className="z-0 absolute top-0 left-0 w-full h-full opacity-80 GalaxyS20Ultra:invisible">
+        <div className="bg-svg z-0 absolute top-0 left-0 w-full h-full opacity-80 GalaxyS20Ultra:invisible">
             <img
                 className="w-full h-full fit-cover"
                 src="backgroundImage/main.jpg"

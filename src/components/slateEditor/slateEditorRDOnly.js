@@ -79,12 +79,19 @@ const SlateEditorRDOnly = ({
     [dispatch]
   );
   const [bottomMenuOpen, setBottomMenuOpen] = useState(true);
-
+  const handleCommitChange = (selectedKey, data, key) => {
+    if (selectedKey !== key) {
+      setLoading(false);
+      setSelectedKey(key);
+      setValue(data[key]);
+      setOpenLoadCommitModal(false);
+    }
+  }
   // useEffect to get writing's information
   useEffect(() => {
     getWritingInfo(writingDocID).then((res) => {
       setWritingInfo(res);
-      nowCollectionNum === 0 && setNowCollectionNum(1);
+      setNowCollectionNum(Number(nowCollectionNum === 0))
       setCommentsDocID(
         res.comments
           ? Object.values(
@@ -103,7 +110,7 @@ const SlateEditorRDOnly = ({
 
   // Get writing's collection's lastest value
   useEffect(() => {
-    if (Object.keys(writingInfo).length !== 0 && nowCollectionNum) {
+    if (Object.keys(writingInfo).length && nowCollectionNum) {
       setLoading(false);
       const elementCommits =
         writingInfo.collection[nowCollectionNum.toString()].commits;
@@ -181,15 +188,7 @@ const SlateEditorRDOnly = ({
                       const DateNight = date.includes("오전") ? "오전" : "오후";
                       return (
                         <div
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (selectedKey !== key) {
-                              setLoading(false);
-                              setSelectedKey(key);
-                              setValue(data[key]);
-                              setOpenLoadCommitModal(false);
-                            }
-                          }}
+                          onClick={handleCommitChange}
                           key={key}
                           className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${selectedKey === key && "bg-genreSelectedBG"
                             } hover:bg-wirtingButtonHover`}
