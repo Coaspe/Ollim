@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { commentsModalVariants, commentType, getFirestoreUser, getFirestoreWriting } from "../type";
 import useGetComments from "../hooks/useGetComments";
+import axios from "axios";
 import CommentRow from "../components/CommentRow";
 import SpinningSvg from "../components/SpinningSvg";
 import { addComment } from "../services/firebase";
