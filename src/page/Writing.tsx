@@ -16,7 +16,6 @@ import {
   getFirestoreUser,
   toObjectElements,
   editorValue,
-  genreMatching,
 } from "../type";
 import { cx, css } from "@emotion/css";
 import SlateEditorRDOnly from "../components/slateEditor/SlateEditorRDOnly";
@@ -36,6 +35,7 @@ import Header from "../components/Header";
 import axios from "axios";
 import SpinningSvg from "../components/SpinningSvg";
 import WritingWrite from "../components/writing/WritingWrite";
+import { alertVariants, genreMatching } from "../constants";
 
 const Writing = () => {
   // User Info variables
@@ -185,22 +185,6 @@ const Writing = () => {
       });
       return !origin;
     });
-  };
-
-  // Alert modal framer-motion variant
-  const alertVariants = {
-    initial: {
-      opacity: 0,
-      y: -10,
-    },
-    animate: {
-      opacity: 1,
-      y: 0,
-    },
-    exit: {
-      opacity: 0,
-      y: -10,
-    },
   };
 
   // Server check state

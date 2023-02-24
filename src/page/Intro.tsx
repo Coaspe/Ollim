@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   alertVariants,
-} from "../components/constants/variants";
+} from "../constants";
 import { useAppSelector } from "../hooks/useRedux";
 import { RootState } from "../redux/store";
 import { leftPartType } from "../type";

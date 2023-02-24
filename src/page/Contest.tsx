@@ -13,7 +13,6 @@ import {
   getFirestoreContest,
   contestTableType,
   getFirestoreWriting,
-  genreMatching,
 } from "../type";
 import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 import { isFullScreenAction, widthSizeAction } from "../redux";
@@ -28,6 +27,7 @@ import SlateEditorContest from "../components/slateEditor/SlateEditorContest";
 import ContestWriting from "../components/writing/ContestWriting";
 import ContestParticipantModal from "../modals/ContestParticipantModal";
 import ContestPrize from "../components/contest/ContestPrize";
+import { alertVariants, genreMatching } from "../constants";
 
 const Contest = () => {
   const navigator = useNavigate();
@@ -75,22 +75,6 @@ const Contest = () => {
   // alarm state
   // alarm[0] : alarm message, alarm[1] : alarm type, alarm[2] : alarm on, off
   const alarm = useAppSelector((state: RootState) => state.setAlarm.alarm);
-
-  // Alert modal framer-motion variant
-  const alertVariants = {
-    initial: {
-      opacity: 0,
-      y: -10,
-    },
-    animate: {
-      opacity: 1,
-      y: 0,
-    },
-    exit: {
-      opacity: 0,
-      y: -10,
-    },
-  };
 
   // Server check state
   const [isServerClosedBtnDisable, setIsServerClosedDisable] = useState(false);
@@ -141,7 +125,6 @@ const Contest = () => {
     (state: RootState) => state.setWidthSize.widthSize
   );
 
-  ////////////////////////////////////////////////////// useEffects /////////////////////////////////////////
   // useEffect to get context user's information
   useEffect(() => {
     if (contextUser && contextUser.email) {

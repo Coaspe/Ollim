@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { memo } from "react";
 import { useNavigate } from "react-router-dom";
-import { genre, genreMatching, getFirestoreContest } from "../../type";
+import { genreMatching } from "../../constants";
+import { genre, getFirestoreContest } from "../../type";
 
 interface contestRowProps {
   data: getFirestoreContest;

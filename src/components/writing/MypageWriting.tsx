@@ -1,7 +1,8 @@
 import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
 import { memo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { genre, genreMatching, getFirestoreWriting } from "../../type";
+import { genreMatching } from "../../constants";
+import { genre, getFirestoreWriting } from "../../type";
 interface props {
   data: getFirestoreWriting;
   medal?: string;

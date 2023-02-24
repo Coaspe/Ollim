@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
 import { memo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { genreMatching } from "../../constants";
 import { getUserByUID } from "../../services/firebase";
 import {
   genre,
-  genreMatching,
   getFirestoreUser,
   getFirestoreWriting,
   medal,

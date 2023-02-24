@@ -13,7 +13,6 @@ import {
   getFirestoreUser,
   getFirestoreContest,
   contestType,
-  options,
 } from "../type";
 import { alarmAction, userInfoAction, widthSizeAction } from "../redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -31,7 +30,7 @@ import useImageCompress from "../hooks/useImageCompress";
 import useGetWritings from "../hooks/useGetWritings";
 import MypageSkeleton from "../components/skeleton/MypageSkeleton";
 
-import { alertVariants } from "../components/constants/variants";
+import { alertVariants, options } from "../constants";
 import FollowersModal from "../modals/FollowersModal";
 import FollowingsModal from "../modals/FollowingsModal";
 

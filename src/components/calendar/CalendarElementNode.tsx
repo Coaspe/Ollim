@@ -2,7 +2,8 @@ import { Tooltip } from "@mui/material";
 import Zoom from "@mui/material/Zoom";
 import { motion } from "framer-motion";
 import { memo } from "react";
-import { bgColor, bgColorType } from "../../type";
+import { bgColor } from "../../constants";
+import { bgColorType } from "../../type";
 interface props {
   date: string;
   elementCommits: { [key: number]: string[] };

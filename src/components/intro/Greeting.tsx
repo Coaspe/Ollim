@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { NavigateFunction } from "react-router-dom";
 import { loginWithEmailAndPassword } from "../../helpers/auth-email";
 import { leftPartType } from "../../type";
-import { pVariants, pVariants2, divVariants } from "../constants/variants";
+import { pVariants, pVariants2, divVariants } from "../../constants";
 
 interface props {
   setLeftPart: React.Dispatch<React.SetStateAction<leftPartType>>;

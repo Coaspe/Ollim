@@ -4,10 +4,10 @@ import { participateContest } from "../../services/firebase";
 import {
   contestWriting,
   genre,
-  genreMatching,
   getFirestoreContest,
   getFirestoreWriting,
 } from "../../type";
+import { expandVariants, genreMatching, partiVariants } from "../../constants";
 interface props {
   data: getFirestoreWriting;
   contestInfo: getFirestoreContest;
@@ -20,33 +20,6 @@ const ContestParticipantWritingRow: React.FC<props> = ({
   setContestInfo,
   setOpen,
 }) => {
-  const variants = {
-    initial: {
-      opacity: 0,
-      height: 0,
-    },
-    animate: {
-      opacity: 1,
-      height: "auto",
-    },
-    exit: {
-      opacity: 0,
-      height: 0,
-      transition: {
-        height: {
-          delay: 0.15,
-        },
-      },
-    },
-  };
-  const expandVariants = {
-    open: {
-      rotate: 0,
-    },
-    collapsed: {
-      rotate: 180,
-    },
-  };
   // Make submit button visible state
   const [btnVisible, setBtnVisible] = useState(false);
   const [expand, setExpand] = useState(false);
@@ -151,7 +124,7 @@ const ContestParticipantWritingRow: React.FC<props> = ({
                 e.stopPropagation();
               }}
               className="px-2 flex flex-col"
-              variants={variants}
+              variants={partiVariants}
               initial="initial"
               animate="animate"
               exit="exit"

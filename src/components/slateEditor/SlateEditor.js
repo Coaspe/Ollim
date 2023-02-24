@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import isHotkey from "is-hotkey";
-import { Editable, withReact, Slate, ReactEditor } from "slate-react";
+import { Editable, withReact, Slate } from "slate-react";
 import { Editor, createEditor } from "slate";
 import { withHistory } from "slate-history";
 import { Toolbar } from "./Component";
@@ -25,7 +25,7 @@ import "../../style/Slate.css";
 import ResizeObserver from "rc-resize-observer";
 import ParagraphWithoutNum from "./ParagraphWithoutNum";
 import SpinningSvg from "../SpinningSvg";
-
+import { tempSaveDivVariants, memoVariants } from '../../constants'
 const HOTKEYS = {
   "mod+b": "bold",
   "mod+i": "italic",
@@ -250,42 +250,11 @@ const SlateEditor = ({
   useEffect(() => {
     setLoading(false);
   }, [value]);
-  // window.addEventListener("beforeunload", function (e) {
-  //   var confirmationMessage = "o/";
-
-  //   (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-  //   return confirmationMessage; //Webkit, Safari, Chrome
-  // });
 
   const convertPXtoPercent = (px) => {
     const numberPX = parseInt(px.split("px")[0]) - 20;
     const pixel = 0.2645833333 * numberPX;
     return (pixel / 297) * 100;
-  };
-
-  const memoVariants = {
-    initial: {
-      x: "100%",
-    },
-    animate: {
-      x: "0%",
-    },
-    exit: {
-      x: "100%",
-    },
-  };
-  const tempSaveDivVariants = {
-    initial: {
-      y: "100%",
-      opacity: "0%",
-    },
-    animate: {
-      y: "0%",
-      opacity: "100%",
-    },
-    exit: {
-      opacity: "0%",
-    },
   };
 
   const isFullScreen = useAppSelector(

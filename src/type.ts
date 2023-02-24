@@ -196,38 +196,4 @@ export type editorValue = {
     fontStyle: string;
   }[];
 };
-
-export const genreMatching = {
-  NOVEL: "소설",
-  POEM: "시",
-  SCENARIO: "시나리오",
-};
-
-export const bgColor = {
-  1: "rgb(251 207 232)",
-  2: "rgb(249 168 212)",
-  3: "rgb(244 114 182)",
-  4: "rgb(236 72 153)",
-  5: "rgb(219 39 119)",
-  6: "rgb(190 24 93)",
-  7: "rgb(157 23 77)",
-  8: "rgb(131 24 67)",
-};
 export type leftPartType = "INTRO" | "LOGIN" | "SIGNUP";
-
-export const options: Array<{ value: contestType; label: string }> = [
-  { value: "PARTICIPATION", label: "참가" },
-  { value: "HOST", label: "개최" },
-  { value: "TOTAL", label: "전체" },
-];
-export const commentsModalVariants = {
-  initial: {
-    x: "100%",
-  },
-  animate: {
-    x: "0%",
-  },
-  exit: {
-    x: "100%",
-  },
-};
