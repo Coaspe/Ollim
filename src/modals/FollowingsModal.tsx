@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState } from "react";
 import FollowerRow from "../components/FollowerRow";
 import FollowersFollowingsSkeleton from "../components/skeleton/FollowersFollowingsSkeleton";
@@ -24,7 +24,6 @@ const FollowingsModal: React.FC<props> = ({
     profileOwnerInfo,
     followingsModalOpen
   );
-
   return (
     <motion.div
       animate={{
@@ -52,7 +51,7 @@ const FollowingsModal: React.FC<props> = ({
         }}
         className="flex flex-col items-center w-1/4 h-1/2 bg-white py-5 rounded-lg GalaxyS20Ultra:w-4/5"
       >
-        <span className="text-xl font-bold text-gray-500 mb-5">팔로워</span>
+        <span className="text-xl font-bold text-gray-500 mb-5">팔로우</span>
         <div
           onClick={(e) => {
             e.stopPropagation();
@@ -69,13 +68,13 @@ const FollowingsModal: React.FC<props> = ({
                 />
               ))}
               {/* Load more followers button */}
-              {followingsKey.current < profileOwnerInfo.followers.length && (
+              {followingsKey.current < followings.length && (
                 <div
                   onClick={handleMoreFollowings}
                   className={`${loading && "pointer-events-none"
                     } font-semibold text-sm shadow-inner cursor-pointer w-1/2 bg-white h-10 flex items-center justify-center rounded-xl text-gray-500`}
                 >
-                  {!loading && "더 불러오기"}
+                  더 불러오기
                 </div>
               )}
             </>

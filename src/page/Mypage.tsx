@@ -349,13 +349,13 @@ const Mypage = () => {
                   백일장 개최
                 </motion.button>
               )}
-            <motion.button
+            {/* <motion.button
               onClick={handleGoToCommunity}
               whileHover={{ y: "-10%" }}
               className="px-4 py-3 rounded-2xl bg-white shadow-md font-semibold"
             >
               다른 작가의 작품보기
-            </motion.button>
+            </motion.button> */}
           </div>
 
           {/* Calendar */}

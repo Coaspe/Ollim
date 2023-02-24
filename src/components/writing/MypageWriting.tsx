@@ -18,6 +18,8 @@ const MypageWriting: React.FC<props> = ({ data, widthSize }) => {
       layout
       animate={{ opacity: [0, 1] }}
       onClick={() => {
+        // Prevents memory leak
+        timer && clearTimeout(timer);
         navigator(`/writings/${data.userUID}/${data.writingDocID}`);
       }}
       onHoverStart={() => {

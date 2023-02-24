@@ -48,14 +48,14 @@ const Greeting: React.FC<props> = ({ setLeftPart, navigator }) => {
         <Tooltip title="로그인" placement="top" arrow>
           <motion.img
             whileHover={{ y: "-10%" }}
-            className="px-2 py-2 w-12 rounded-full bg-white shadow-md font-semibold cursor-pointer"
+            className="px-2 py-2 mr-5 w-12 rounded-full bg-white shadow-md font-semibold cursor-pointer"
             onClick={() => {
               setLeftPart("LOGIN");
             }}
             src="/icon/login.png"
           />
         </Tooltip>
-        <Tooltip title="커뮤니티" placement="top" arrow>
+        {/* <Tooltip title="커뮤니티" placement="top" arrow>
           <motion.img
             style={{ backgroundColor: "#c69e92" }}
             onClick={() => {
@@ -65,7 +65,7 @@ const Greeting: React.FC<props> = ({ setLeftPart, navigator }) => {
             className="px-2 py-2 w-12 rounded-full shadow-md font-semibold mx-5 cursor-pointer"
             src="/icon/browse.png"
           />
-        </Tooltip>
+        </Tooltip> */}
         <motion.div
           initial="initial"
           animate="animate"

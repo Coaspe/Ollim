@@ -77,9 +77,9 @@ const MypageSkeleton: React.FC<props> = ({ widthSize }) => {
             <button className="px-4 py-3 rounded-2xl text-gray-400 bg-gray-400 animate-pulse shadow-md font-semibold">
               백일장 개최
             </button>
-            <button className="px-4 py-3 rounded-2xl text-gray-400 bg-gray-400 animate-pulse shadow-md font-semibold">
+            {/* <button className="px-4 py-3 rounded-2xl text-gray-400 bg-gray-400 animate-pulse shadow-md font-semibold">
               다른 작가의 작품보기
-            </button>
+            </button> */}
           </div>
 
           {/* Calendar */}

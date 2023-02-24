@@ -24,6 +24,7 @@ const FollowersModal: React.FC<props> = ({
     profileOwnerInfo,
     followersModalOpen
   );
+
   return (
     <motion.div
       animate={{
@@ -58,6 +59,7 @@ const FollowersModal: React.FC<props> = ({
           }}
           className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scrolll"
         >
+          {/* Load more followers button */}
           {!loading ? (
             <>
               {followers.map((data) => (
@@ -67,7 +69,7 @@ const FollowersModal: React.FC<props> = ({
                   setFollowersModal={setFollowersModalOpen}
                 />
               ))}
-              {followersKey.current < profileOwnerInfo.followers.length && (
+              {followersKey.current < followers.length && (
                 <div
                   onClick={handleMoreFollowers}
                   className={`${loading && "pointer-events-none"
@@ -81,7 +83,6 @@ const FollowersModal: React.FC<props> = ({
             // Skeleton
             <FollowersFollowingsSkeleton lengthProp={followersLength.current} />
           )}
-          {/* Load more followers button */}
         </div>
       </motion.div>
     </motion.div>

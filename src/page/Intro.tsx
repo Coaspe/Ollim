@@ -40,6 +40,7 @@ const Intro = () => {
         )}
       </AnimatePresence>
       <motion.div className="flex flex-col h-screen w-screen font-noto">
+        <BackgroundImage />
         <div className="z-10 w-full h-20 flex items-center justify-between GalaxyS20Ultra:h-0">
           {/* logo */}
           <img
@@ -56,7 +57,6 @@ const Intro = () => {
                 : <Signup setLeftPart={setLeftPart} navigator={navigator} />}
           </AnimatePresence>
         </div>
-        <BackgroundImage />
       </motion.div>
     </>
   );
