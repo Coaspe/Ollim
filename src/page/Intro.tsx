@@ -8,10 +8,12 @@ import {
 import { useAppSelector } from "../hooks/useRedux";
 import { RootState } from "../redux/store";
 import { leftPartType } from "../type";
-import BackgroundImage from "../components/intro/BackgroundImage";
 import Greeting from "../components/intro/Greeting";
 import Signup from "../components/intro/Singup";
 import Login from "../components/intro/Login";
+import '../style/Background.css'
+import BackgroundImageCopyRight from "../components/intro/BackgroundImage";
+import IntroHeader from "../components/IntroHeader";
 
 const Intro = () => {
 
@@ -39,17 +41,11 @@ const Intro = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      <motion.div className="flex flex-col h-screen w-screen font-noto">
-        <BackgroundImage />
-        <div className="z-10 w-full h-20 flex items-center justify-between GalaxyS20Ultra:h-0">
-          {/* logo */}
-          <img
-            className="h-28 GalaxyS20Ultra:hidden GalaxyS20Ultra:h-0"
-            src="logo/Ollim-logos_transparent.png"
-            alt="header logo"
-          />
-        </div>
+      <motion.div className="bg-img flex flex-col font-noto">
+        {/* Header */}
+        <IntroHeader />
         <div className="w-4/5 h-full flex z-10 items-center justify-center GalaxyS20Ultra:w-full GalaxyS20Ultra:px-10">
+          {/* Main contents */}
           <AnimatePresence exitBeforeEnter>
             {leftPart === "INTRO" ?
               <Greeting setLeftPart={setLeftPart} navigator={navigator} />
@@ -58,6 +54,7 @@ const Intro = () => {
           </AnimatePresence>
         </div>
       </motion.div>
+      <BackgroundImageCopyRight />
     </>
   );
 };

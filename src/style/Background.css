@@ -1,0 +1,6 @@
+.bg-img {
+    height: 100vh;
+    background: url('/public/backgroundImage/main.jpg') no-repeat center center;
+    background-position: center;
+    background-size: cover;
+}

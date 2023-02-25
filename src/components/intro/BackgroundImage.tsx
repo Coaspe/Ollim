@@ -1,15 +1,6 @@
-// import './BackgroundImage.css'
-const BackgroundImage = () => {
-    return <>
-        {/* Background image */}
-        <div className="bg-svg z-0 absolute top-0 left-0 w-full h-full opacity-80 GalaxyS20Ultra:invisible">
-            <img
-                className="w-full h-full fit-cover"
-                src="backgroundImage/main.jpg"
-                alt="background"
-            />
-        </div>
 
+const BackgroundImageCopyRight = () => {
+    return <>
         {/* Background image copy right */}
         <div className="absolute right-3 bottom-3">
             <span className="text-slate-300 text-sm">
@@ -25,4 +16,4 @@ const BackgroundImage = () => {
         </div></>
 }
 
-export default BackgroundImage;
+export default BackgroundImageCopyRight;
