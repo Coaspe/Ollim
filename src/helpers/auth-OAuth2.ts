@@ -22,7 +22,7 @@ export const signInWithGoogle = (navi: NavigateFunction) => {
           });
         } else {
           // if exists login
-         navi(`/${result.user.uid}`)
+          navi(`/${result.user.uid}`)
         }
       });
     })
@@ -36,8 +36,7 @@ export const signOutAuth = () => {
   signOut(auth)
     .then(() => {
       // Sign-out successful.
-      console.log("Sign out");
-       window.location.reload()
+      window.location.reload()
     })
     .catch((error) => {
       // An error happened.

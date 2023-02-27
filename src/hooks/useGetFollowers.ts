@@ -4,7 +4,7 @@ import { getFirestoreUser } from "../type";
 
 const useGetFollowers = (
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-  profileOwnerInfo: getFirestoreUser,
+  followersUID: string[],
   followersModalOpen: boolean
 ) => {
   // To Prevent unnecessary re-rendering, use useRef
@@ -15,12 +15,12 @@ const useGetFollowers = (
   const handleMoreFollowers = useCallback(async () => {
     setLoading(true);
     if (
-      profileOwnerInfo.followers?.length > 0 &&
-      followersKey.current < profileOwnerInfo.followers.length
+      followersUID?.length > 0 &&
+      followersKey.current < followersUID.length
     ) {
       try {
         const res = await getFollowersInfinite(
-          profileOwnerInfo.followers,
+          followersUID,
           followersKey.current
         );
         let tmp = res.docs.map((doc: any) => ({
@@ -35,7 +35,7 @@ const useGetFollowers = (
         console.log(error);
       }
     }
-  }, [profileOwnerInfo.followers]);
+  }, [followersUID]);
 
   // When modal closed, reset followers, followings keys and list
   useEffect(() => {

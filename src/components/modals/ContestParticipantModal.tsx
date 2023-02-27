@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
-import useGetGenreWritings from "../hooks/useGetGenreWritings";
-import { getFirestoreContest } from "../type";
-import ContestParticipantWritingRow from "../components/writing/ContestParticipantWritingRow";
+import useGetGenreWritings from "../../hooks/useGetGenreWritings";
+import { getFirestoreContest } from "../../type";
+import ContestParticipantWritingRow from "../writing/ContestParticipantWritingRow";
 
 interface props {
   uid: string;

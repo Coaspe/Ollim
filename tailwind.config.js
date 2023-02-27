@@ -30,6 +30,7 @@ module.exports = {
       width: {
         fullScreenMenu: "90mm",
         noneFullScreenMenu: "220mm",
+        testModal: "500px"
       },
       height: {
         a4Height: "297mm",

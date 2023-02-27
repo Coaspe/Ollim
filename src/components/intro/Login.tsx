@@ -38,7 +38,7 @@ const Login: React.FC<props> = ({ setLeftPart, navigator }) => {
       </motion.p>
       <motion.div className="flex flex-col">
         <input
-          className="focus:outline-none placeholder:text-sm placeholder:text-slate-300 border-2 border-hoverSpanMenu rounded-2xl bg-transparent px-3 py-3 text-md mb-3 shadow-md"
+          className="focus:outline-none text-slate-300 placeholder:text-sm placeholder:text-slate-300 border-2 border-slate-300 rounded-2xl bg-transparent px-3 py-3 text-md mb-3 shadow-md"
           type="email"
           value={loginEmail}
           onChange={(e) => {
@@ -47,7 +47,7 @@ const Login: React.FC<props> = ({ setLeftPart, navigator }) => {
           placeholder="이메일"
         />
         <input
-          className="focus:outline-none placeholder:text-sm  placeholder:text-slate-300 border-2 border-hoverSpanMenu rounded-2xl bg-transparent px-3 py-3 text-md shadow-md"
+          className="focus:outline-none text-slate-300 placeholder:text-sm placeholder:text-slate-300 border-2 border-slate-300 rounded-2xl bg-transparent px-3 py-3 text-md shadow-md"
           type="password"
           value={loginPassword}
           onChange={(e) => {
@@ -87,16 +87,18 @@ const Login: React.FC<props> = ({ setLeftPart, navigator }) => {
         </Tooltip>
       </div>
       <motion.div className="w-1/2 flex items-center justify-center text-sm space-x-3">
-        <motion.span
-          onClick={() => {
-            setLeftPart("INTRO");
-          }}
-          whileHover={{ y: "-10%" }}
-          style={{ fontSize: "1.2rem", backgroundColor: "#eee" }}
-          className="px-3 py-3 rounded-full shadow-md font-semibold cursor-pointer material-symbols-outlined"
-        >
-          home
-        </motion.span>
+        <Tooltip placement="top" title="뒤로" arrow>
+          <motion.span
+            onClick={() => {
+              setLeftPart("INTRO");
+            }}
+            whileHover={{ y: "-10%" }}
+            style={{ fontSize: "1.2rem", backgroundColor: "#eee" }}
+            className="px-3 py-3 rounded-full shadow-md font-semibold cursor-pointer material-symbols-outlined"
+          >
+            arrow_back
+          </motion.span>
+        </Tooltip>
         <motion.span
           onClick={() => {
             try {

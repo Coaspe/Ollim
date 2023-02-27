@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { vote } from "../services/firebase";
-import { contestWriting } from "../type";
+import { vote } from "../../services/firebase";
+import { contestWriting } from "../../type";
 
 interface props {
   data: contestWriting;

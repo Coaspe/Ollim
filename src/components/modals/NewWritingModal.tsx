@@ -2,11 +2,11 @@ import { Tooltip } from "@mui/material";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
-import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
-import DiagramNewWritings from "../components/diagram/RelationShipDiagramNewWritings";
-import { alarmAction, elementsAction } from "../redux";
-import { RootState } from "../redux/store";
-import { addWritingArg, genre, page, disclosure, alarmType } from "../type";
+import { useAppSelector, useAppDispatch } from "../../hooks/useRedux";
+import DiagramNewWritings from "../diagram/RelationShipDiagramNewWritings";
+import { alarmAction, elementsAction } from "../../redux";
+import { RootState } from "../../redux/store";
+import { addWritingArg, genre, page, disclosure, alarmType } from "../../type";
 interface NewWritingProps {
   setNewWritingModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }

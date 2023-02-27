@@ -4,7 +4,7 @@ import { getFirestoreUser } from "../type";
 
 const useGetFollowings = (
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-  profileOwnerInfo: getFirestoreUser,
+  followingsUID: string[],
   followingsModal: boolean
 ) => {
   // To Prevent unnecessary re-rendering, use useRef
@@ -34,12 +34,12 @@ const useGetFollowings = (
   const handleMoreFollowings = useCallback(async () => {
     setLoading(true);
     if (
-      profileOwnerInfo.followings.length > 0 &&
-      followingsKey.current < profileOwnerInfo.followings.length
+      followingsUID.length > 0 &&
+      followingsKey.current < followingsUID.length
     ) {
       try {
         const res = await getFollowingsInfinite(
-          profileOwnerInfo.followings,
+          followingsUID,
           followingsKey.current
         );
         let tmp = res.docs.map((doc: any) => ({
@@ -54,7 +54,7 @@ const useGetFollowings = (
         console.log(error);
       }
     }
-  }, [profileOwnerInfo.followings]);
+  }, [followingsUID]);
 
   return {
     followingsKey,

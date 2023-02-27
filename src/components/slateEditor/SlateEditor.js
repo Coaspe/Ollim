@@ -911,7 +911,7 @@ const SlateEditor = ({
             animate={{ y: ["100%", "0%"] }}
             exit={{ y: ["0%", "100%"] }}
             transition={{ y: { duration: 0.3 } }}
-            style={{ boxShadow: "0px -4px 10px rgba(0,0,0,0.05)" }}
+            style={{ boxShadow: "0px -4px 10px rgba(0,0,0, 0.05)" }}
             className="z-50 bottom-0 fixed w-full h-1/3 bg-white"
           >
             <DiagramWrite

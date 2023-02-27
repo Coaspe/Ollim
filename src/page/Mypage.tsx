@@ -4,8 +4,7 @@ import MypageWriting from "../components/writing/MypageWriting";
 import UserContext from "../context/user";
 import { getUserByUID, getContetsArrayInfo } from "../services/firebase";
 import { signOutAuth } from "../helpers/auth-OAuth2";
-import NewWritingModal from "../modals/NewWritingModal";
-import CustomNodeFlow from "../components/diagram/RelationShipDiagram";
+import NewWritingModal from "../components/modals/NewWritingModal";
 import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 import { RootState } from "../redux/store";
 import {
@@ -15,7 +14,7 @@ import {
   contestType,
 } from "../type";
 import { alarmAction, userInfoAction, widthSizeAction } from "../redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import Calendar from "../components/calendar/Calendar";
 import { Alert, Tooltip } from "@mui/material";
@@ -23,7 +22,7 @@ import axios from "axios";
 
 import Header from "../components/Header";
 import Select from "react-select";
-import NewContestModal from "../modals/NewContestModal";
+import NewContestModal from "../components/modals/NewContestModal";
 import ContestRow from "../components/contest/ContestRow";
 
 import useImageCompress from "../hooks/useImageCompress";
@@ -31,8 +30,9 @@ import useGetWritings from "../hooks/useGetWritings";
 import MypageSkeleton from "../components/skeleton/MypageSkeleton";
 
 import { alertVariants, options } from "../constants";
-import FollowersModal from "../modals/FollowersModal";
-import FollowingsModal from "../modals/FollowingsModal";
+import FollowersModal from "../components/modals/FollowersModal";
+import FollowingsModal from "../components/modals/FollowingsModal";
+import TestAccountModal from "../components/modals/TestAccountModal";
 
 const Mypage = () => {
   // Profile owner's uid
@@ -50,6 +50,8 @@ const Mypage = () => {
   const [followersModalOpen, setFollowersModalOpen] = useState(false);
   const [followingsModalOpen, setFollowingsModalOpen] = useState(false);
 
+  // Recommands users for test account.
+  const [testModalOpen, setTestModalOpen] = useState(false);
   // Context user
   const { user: contextUser } = useContext(UserContext);
 
@@ -68,7 +70,6 @@ const Mypage = () => {
   const [totalContests, setTotalContests] = useState<
     Array<getFirestoreContest>
   >([]);
-  const navigator = useNavigate();
   const dispatch = useAppDispatch();
 
   // Header context redux userInfo
@@ -95,6 +96,11 @@ const Mypage = () => {
 
   // Window size changed detect!
   useEffect(() => {
+    if (contextUser && contextUser.email == "achoe628@naver.com"
+      && !window.localStorage.getItem("TEST_ACCOUNT")) {
+      setTestModalOpen(true)
+      window.localStorage.setItem("TEST_ACCOUNT", "TRUE")
+    }
     window.onresize = () => {
       setWidthSize(window.innerWidth);
     };
@@ -156,17 +162,13 @@ const Mypage = () => {
       });
   }, [profileOwnerInfo, contextUser]);
 
-  // Navigate to community
-  const handleGoToCommunity = () => {
-    navigator("/community");
-  };
   return (
     <>
       {followersModalOpen && profileOwnerInfo && (
         <FollowersModal
           followersModalOpen={followersModalOpen}
           setFollowersModalOpen={setFollowersModalOpen}
-          profileOwnerInfo={profileOwnerInfo}
+          followersUID={profileOwnerInfo.followers}
           followersLength={followersLength}
         />
       )}
@@ -174,11 +176,16 @@ const Mypage = () => {
         <FollowingsModal
           followingsModalOpen={followingsModalOpen}
           setFollowingsModalOpen={setFollowingsModalOpen}
-          profileOwnerInfo={profileOwnerInfo}
+          followingsUID={profileOwnerInfo.followings}
           followingsLength={followingsLength}
         />
       )}
-
+      {
+        contextUser && contextUser.email == 'achoe628@naver.com' && testModalOpen && (
+          <TestAccountModal data={profileOwnerInfo.followings} modalOpen={testModalOpen} setModalOpen={setTestModalOpen}
+          />
+        )
+      }
       {/* Alarm */}
       <AnimatePresence>
         {alarm[2] && (
@@ -267,7 +274,12 @@ const Mypage = () => {
             )}
             {contextUser && contextUser.uid === uid && (
               <svg
-                onClick={signOutAuth}
+                onClick={() => {
+                  if (window.localStorage.getItem("TEST_ACCOUNT")) {
+                    window.localStorage.removeItem("TEST_ACCOUNT")
+                  }
+                  signOutAuth()
+                }}
                 className="w-7 cursor-pointer"
                 x="0px"
                 y="0px"
@@ -348,13 +360,6 @@ const Mypage = () => {
                   백일장 개최
                 </motion.button>
               )}
-            {/* <motion.button
-              onClick={handleGoToCommunity}
-              whileHover={{ y: "-10%" }}
-              className="px-4 py-3 rounded-2xl bg-white shadow-md font-semibold"
-            >
-              다른 작가의 작품보기
-            </motion.button> */}
           </div>
 
           {/* Calendar */}

@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { commentType, getFirestoreUser, getFirestoreWriting } from "../type";
-import useGetComments from "../hooks/useGetComments";
-import CommentRow from "../components/CommentRow";
-import SpinningSvg from "../components/SpinningSvg";
-import { addComment } from "../services/firebase";
-import { commentsModalVariants } from "../constants";
+import { commentType, getFirestoreUser, getFirestoreWriting } from "../../type";
+import useGetComments from "../../hooks/useGetComments";
+import CommentRow from "../CommentRow";
+import SpinningSvg from "../SpinningSvg";
+import { addComment } from "../../services/firebase";
+import { commentsModalVariants } from "../../constants";
 
 interface props {
   commentModalOpen: boolean;

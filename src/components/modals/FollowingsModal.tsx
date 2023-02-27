@@ -1,27 +1,27 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import FollowerRow from "../components/FollowerRow";
-import FollowersFollowingsSkeleton from "../components/skeleton/FollowersFollowingsSkeleton";
-import useGetFollowings from "../hooks/useGetFollowings";
-import { getFirestoreUser } from "../type";
+import FollowerRow from "../FollowerRow";
+import FollowersFollowingsSkeleton from "../skeleton/FollowersFollowingsSkeleton";
+import useGetFollowings from "../../hooks/useGetFollowings";
+import { getFirestoreUser } from "../../type";
 
 interface props {
   followingsModalOpen: boolean;
   setFollowingsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  profileOwnerInfo: getFirestoreUser;
+  followingsUID: string[];
   followingsLength: React.MutableRefObject<number>;
 }
 
 const FollowingsModal: React.FC<props> = ({
   followingsModalOpen,
   setFollowingsModalOpen,
-  profileOwnerInfo,
+  followingsUID,
   followingsLength,
 }) => {
   const [loading, setLoading] = useState(false);
   const { followingsKey, followings, handleMoreFollowings } = useGetFollowings(
     setLoading,
-    profileOwnerInfo,
+    followingsUID,
     followingsModalOpen
   );
   return (

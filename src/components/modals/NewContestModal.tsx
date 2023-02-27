@@ -1,12 +1,12 @@
 import { Tooltip } from "@mui/material";
 import axios from "axios";
-import "../style/NewContestModal.css";
+import "../..//style/NewContestModal.css";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
-import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
-import { alarmAction } from "../redux";
-import { RootState } from "../redux/store";
-import { genre, alarmType, addContestArg } from "../type";
+import { useAppSelector, useAppDispatch } from "../../hooks/useRedux";
+import { alarmAction } from "../../redux";
+import { RootState } from "../../redux/store";
+import { genre, alarmType, addContestArg } from "../../type";
 import TextField from "@mui/material/TextField";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
@@ -166,8 +166,8 @@ const NewContestModal: React.FC<NewContestProps> = ({
                       }}
                       style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
                       className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${genrnState === "NOVEL"
-                          ? "text-slate-700 bg-genreSelectedBG"
-                          : "text-slate-400"
+                        ? "text-slate-700 bg-genreSelectedBG"
+                        : "text-slate-400"
                         }`}
                     >
                       menu_book
@@ -180,8 +180,8 @@ const NewContestModal: React.FC<NewContestProps> = ({
                       }}
                       style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
                       className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${genrnState === "POEM"
-                          ? "text-slate-700 bg-genreSelectedBG"
-                          : "text-slate-400"
+                        ? "text-slate-700 bg-genreSelectedBG"
+                        : "text-slate-400"
                         }`}
                     >
                       history_edu
@@ -194,8 +194,8 @@ const NewContestModal: React.FC<NewContestProps> = ({
                       }}
                       style={{ fontSize: "1.5rem", borderColor: "#e4d0ca" }}
                       className={`material-icons cursor-pointer border py-2 px-2 rounded-full hover:text-slate-500 hover:bg-hoverBGColor ${genrnState === "SCENARIO"
-                          ? "text-slate-700 bg-genreSelectedBG"
-                          : "text-slate-400"
+                        ? "text-slate-700 bg-genreSelectedBG"
+                        : "text-slate-400"
                         }`}
                     >
                       adf_scanner

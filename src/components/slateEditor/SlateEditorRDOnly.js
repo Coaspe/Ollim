@@ -10,7 +10,7 @@ import ParagraphWithoutNum from "./ParagraphWithoutNum";
 import { Tooltip } from "@mui/material";
 import { isFullScreenAction } from "../../redux";
 import { useAppSelector, useAppDispatch } from "../../hooks/useRedux";
-import CommentsModal from "../../modals/CommentsModal";
+import CommentsModal from "../modals/CommentsModal";
 
 const SlateEditorRDOnly = ({
   writingDocID,
