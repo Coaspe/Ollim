@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { alarmAction } from "../../redux";
 import { alarmType, getFirestoreContest } from "../../type";
 import { motion } from "framer-motion";
-import SpinningSvg from "../SpinningSvg";
+import SpinningSvg from "../mypage/SpinningSvg";
 import UserContext from "../../context/user";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DesktopDateTimePicker from "@mui/lab/DesktopDateTimePicker";

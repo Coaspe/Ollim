@@ -3,10 +3,10 @@ import { limitToLast, onChildAdded, query, ref } from "firebase/database";
 import { motion, useAnimation } from "framer-motion";
 import React, { memo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { rtDBRef } from "../lib/firebase";
-import AlarmModal from "./modals/AlarmModal";
-import { getAlarms } from "../services/firebase";
-import { AlarmMap, getFirestoreAlarmType, getFirestoreUser } from "../type";
+import { rtDBRef } from "../../lib/firebase";
+import AlarmModal from "../modals/AlarmModal";
+import { getAlarms } from "../../services/firebase";
+import { AlarmMap, getFirestoreAlarmType, getFirestoreUser } from "../../type";
 
 interface props {
   userInfo: getFirestoreUser;

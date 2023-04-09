@@ -20,7 +20,7 @@ import Calendar from "../components/calendar/Calendar";
 import { Alert, Tooltip } from "@mui/material";
 import axios from "axios";
 
-import Header from "../components/Header";
+import Header from "../components/header/Header";
 import Select from "react-select";
 import NewContestModal from "../components/modals/NewContestModal";
 import ContestRow from "../components/contest/ContestRow";

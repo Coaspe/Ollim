@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { alarmAction } from "../../redux";
 import { alarmType, getFirestoreWriting, disclosure } from "../../type";
 import { motion } from "framer-motion";
-import SpinningSvg from "../SpinningSvg";
+import SpinningSvg from "../mypage/SpinningSvg";
 import { useAppDispatch } from "../../hooks/useRedux";
 
 interface props {

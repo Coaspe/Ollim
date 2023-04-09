@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Editable, withReact, Slate, ReactEditor } from "slate-react";
 import { createEditor } from "slate";
 import { withHistory } from "slate-history";
@@ -181,6 +181,7 @@ const SlateEditorRDOnly = ({
                     {writingInfo.collection[
                       nowCollectionNum.toString()
                     ].commits.map((data) => {
+                      console.log(data);
                       const tmpData = Object.keys(data);
                       const key =
                         "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
@@ -188,7 +189,9 @@ const SlateEditorRDOnly = ({
                       const DateNight = date.includes("오전") ? "오전" : "오후";
                       return (
                         <div
-                          onClick={handleCommitChange}
+                          onClick={() => {
+                            handleCommitChange(selectedKey, data, key)
+                          }}
                           key={key}
                           className={`w-full flex items-center justify-center cursor-pointer shadow-lg px-2 py-2 rounded-2xl ${selectedKey === key && "bg-genreSelectedBG"
                             } hover:bg-wirtingButtonHover`}

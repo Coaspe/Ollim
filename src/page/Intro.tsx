@@ -13,7 +13,7 @@ import Signup from "../components/intro/Singup";
 import Login from "../components/intro/Login";
 import '../style/Background.css'
 import BackgroundImageCopyRight from "../components/intro/BackgroundImage";
-import IntroHeader from "../components/IntroHeader";
+import IntroHeader from "../components/header/IntroHeader";
 
 const Intro = () => {
 

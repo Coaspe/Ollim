@@ -1,7 +1,7 @@
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useContext, useState } from "react";
-import SpinningSvg from "../SpinningSvg";
+import SpinningSvg from "../mypage/SpinningSvg";
 import UserContext from "../../context/user";
 import { getFirestoreAlarmType } from "../../type";
 import AlarmRow from "../alarmrows/AlarmRow";

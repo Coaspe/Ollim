@@ -1,12 +1,12 @@
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { memo, useContext, useEffect, useState } from "react";
-import UserContext from "../context/user";
-import { useAppDispatch } from "../hooks/useRedux";
-import { alarmAction } from "../redux";
-import { deleteComment, getUserByUID, updateCommentLikes } from "../services/firebase";
-import { alarmType, commentType, getFirestoreUser } from "../type";
-import SpinningSvg from "./SpinningSvg";
+import UserContext from "../../context/user";
+import { useAppDispatch } from "../../hooks/useRedux";
+import { alarmAction } from "../../redux";
+import { deleteComment, getUserByUID, updateCommentLikes } from "../../services/firebase";
+import { alarmType, commentType, getFirestoreUser } from "../../type";
+import SpinningSvg from "../mypage/SpinningSvg";
 
 interface props {
   writingDocID: string;

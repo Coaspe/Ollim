@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import Header from "../components/Header";
+import Header from "../components/header/Header";
 import UserContext from "../context/user";
 import { userInfoAction } from "../redux";
 import { RootState } from "../redux/store";
@@ -13,7 +13,7 @@ import { getFirestoreUser } from "../type";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
 import { AnimatePresence, motion } from "framer-motion";
-import WriterRecommandation from "../components/WriterRecommandation";
+import WriterRecommandation from "../components/mypage/WriterRecommandation";
 import BestWritings from "../components/writing/BestWritings";
 import SearchAutoComplete from "../components/searchAutoComplete/SearchAutoComplete";
 import FormatResultWriting from "../components/searchAutoComplete/FormatResultWriting";

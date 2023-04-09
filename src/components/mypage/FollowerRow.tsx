@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { useNavigate } from "react-router-dom";
-import { getFirestoreUser } from "../type";
+import { getFirestoreUser } from "../../type";
 import { motion } from "framer-motion";
 
 interface props {

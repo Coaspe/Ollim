@@ -31,9 +31,9 @@ import { Alert } from "@mui/material";
 import { Elements } from "react-flow-renderer";
 import { initialValue } from "../components/slateEditor/utils"
 import WritingSetting from "../components/writing/WritingSetting";
-import Header from "../components/Header";
+import Header from "../components/header/Header";
 import axios from "axios";
-import SpinningSvg from "../components/SpinningSvg";
+import SpinningSvg from "../components/mypage/SpinningSvg";
 import WritingWrite from "../components/writing/WritingWrite";
 import { alertVariants, genreMatching } from "../constants";
 

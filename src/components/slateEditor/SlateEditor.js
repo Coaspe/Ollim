@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import isHotkey from "is-hotkey";
 import { Editable, withReact, Slate } from "slate-react";
 import { Editor, createEditor } from "slate";
@@ -24,8 +24,9 @@ import { Tooltip } from "@mui/material";
 import "../../style/Slate.css";
 import ResizeObserver from "rc-resize-observer";
 import ParagraphWithoutNum from "./ParagraphWithoutNum";
-import SpinningSvg from "../SpinningSvg";
+import SpinningSvg from "../mypage/SpinningSvg";
 import { tempSaveDivVariants, memoVariants } from '../../constants'
+
 const HOTKEYS = {
   "mod+b": "bold",
   "mod+i": "italic",
@@ -101,7 +102,7 @@ const SlateEditor = ({
   const editorDiv = useRef(null)
   const loadTemp = useRef(true);
 
-  const [totalTextLength, setTotalTextLegnth] = useState(0)
+  const [_, setTotalTextLegnth] = useState(0)
 
   // Render Slate element
   const renderElement = ({ element, attributes, children }) => {
@@ -269,7 +270,7 @@ const SlateEditor = ({
 
   return (
     <>
-      {/* Submit Commitment modal */}
+      {/* Submit commit modal */}
       {openModal && (
         <motion.div
           animate={{

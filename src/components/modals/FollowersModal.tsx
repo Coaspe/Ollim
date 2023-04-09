@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import FollowerRow from "../FollowerRow";
+import FollowerRow from "../mypage/FollowerRow";
 import FollowersFollowingsSkeleton from "../skeleton/FollowersFollowingsSkeleton";
 import useGetFollowers from "../../hooks/useGetFollowers";
 
