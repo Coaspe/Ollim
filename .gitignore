@@ -24,3 +24,6 @@ yarn-error.log*
 
 # Local Netlify folder
 .netlify
+
+# Api key
+/src/lib/firebase.js
