@@ -1,6 +1,6 @@
 import { Elements } from "react-flow-renderer";
 export type bgColorType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-export type disclosure = "PUBLIC" | "PRIVATE" | "FOLLOWERS";
+export type disclosure = "PUBLIC" | "PRIVATE";
 export type page = "MAIN" | "DIAGRAM";
 export type genre = "SCENARIO" | "POEM" | "NOVEL";
 export type tableType = "OVERVIEW" | "WRITE" | "SETTING" | "BROWSE";

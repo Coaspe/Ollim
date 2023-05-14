@@ -54,7 +54,6 @@ const WritingSetting: React.FC<props> = ({
     useState(false);
   const [disclosureSaveButtonDisabled, setDisclosureSaveButtonDisabled] =
     useState(false);
-  const [exportFile, setExportFile] = useState("HANCOM");
 
   // Handle BGM file changed
   const handleBGMChange = () => {
@@ -322,18 +321,6 @@ const WritingSetting: React.FC<props> = ({
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "FOLLOWERS" &&
-                "bg-genreSelectedBG shadow-genreSelectedBG shadow-md"
-                }`}
-              onClick={() => {
-                setDisclosure("FOLLOWERS");
-              }}
-            >
-              팔로워
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
               className={`text-md font-bold border border-writingSettingBorder py-2 px-3 rounded-full hover:bg-writingSettingHoverBG ${disclosure === "PRIVATE" &&
                 "bg-genreSelectedBG shadow-genreSelectedBG shadow-md"
                 }`}
@@ -345,6 +332,7 @@ const WritingSetting: React.FC<props> = ({
             </motion.button>
           </div>
         </div>
+
         {/* Delete div */}
         <div className="flex flex-col items-start w-1/3 GalaxyS20Ultra:w-full">
           <div className="flex flex-col">

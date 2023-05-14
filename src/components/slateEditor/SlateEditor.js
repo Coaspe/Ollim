@@ -54,7 +54,6 @@ const SlateEditor = ({
   // Writing Info loading state
   const [loading, setLoading] = useState(false);
 
-  // Commit sccess
   const commitSuccess = useRef(false);
 
   const [commitButtonEnable, setCommitButtonEnable] = useState(true);

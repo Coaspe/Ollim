@@ -96,15 +96,18 @@ const Mypage = () => {
 
   // Window size changed detect!
   useEffect(() => {
-    if (contextUser && contextUser.email == "achoe628@naver.com"
-      && !window.localStorage.getItem("TEST_ACCOUNT")) {
-      setTestModalOpen(true)
-      window.localStorage.setItem("TEST_ACCOUNT", "TRUE")
-    }
     window.onresize = () => {
       setWidthSize(window.innerWidth);
     };
   }, []);
+
+  useEffect(() => {
+    if (contextUser && contextUser.email === "achoe628@naver.com"
+      && !window.localStorage.getItem("TEST_ACCOUNT")) {
+      setTestModalOpen(true)
+      window.localStorage.setItem("TEST_ACCOUNT", "TRUE")
+    }
+  }, [contextUser, contextUser.email])
 
   const {
     poems,
@@ -113,7 +116,7 @@ const Mypage = () => {
     totalWritings,
     userWritings,
     writingsLoading,
-  } = useGetWritings(uid);
+  } = useGetWritings(uid, contextUser.uid);
 
   // Get profileOwner's and user's information
   useEffect(() => {
@@ -124,13 +127,13 @@ const Mypage = () => {
       const host = contestsDocID["host"];
       const participation = contestsDocID["participation"];
 
-      const tmp: Array<any> =
+      const contests: Array<any> =
         host || participation
           ? await getContetsArrayInfo(
             Array.prototype.concat(host, participation)
           )
           : [];
-      setTotalContests(tmp);
+      setTotalContests(contests);
     };
     if (uid) {
       // Get user information
