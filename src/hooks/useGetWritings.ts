@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getUserWritings, getWritingsArrayInfo } from "../services/firebase";
 import { getFirestoreUserWritings, getFirestoreWriting } from "../type";
 
-const useGetWritings = (uid: string | undefined) => {
+const useGetWritings = (uid: string | undefined, contextUid: string | null) => {
   // Profile owner's poems list
   const [poems, setPoems] = useState<Array<getFirestoreWriting>>([]);
   // Profile owner's novels list
@@ -25,6 +25,8 @@ const useGetWritings = (uid: string | undefined) => {
       const userWritings = await getUserWritings(uid as string);
       if (userWritings) {
         setUserWritings(userWritings as getFirestoreUserWritings);
+
+        // 확장성이 좋지 않음
         const poem = userWritings.poemDocID
           ? (
             (await getWritingsArrayInfo(
@@ -53,6 +55,7 @@ const useGetWritings = (uid: string | undefined) => {
           Array.prototype
             .concat(poem, novel, scenario)
             .sort((a, b) => b.dateCreated - a.dateCreated)
+            .filter(writing => uid === contextUid || writing.disclosure === "PUBLIC")
         );
       }
     } catch (error) {

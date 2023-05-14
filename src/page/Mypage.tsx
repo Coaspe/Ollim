@@ -107,7 +107,7 @@ const Mypage = () => {
       setTestModalOpen(true)
       window.localStorage.setItem("TEST_ACCOUNT", "TRUE")
     }
-  }, [contextUser, contextUser.email])
+  }, [contextUser])
 
   const {
     poems,
@@ -116,7 +116,7 @@ const Mypage = () => {
     totalWritings,
     userWritings,
     writingsLoading,
-  } = useGetWritings(uid, contextUser.uid);
+  } = useGetWritings(uid, contextUser && contextUser.uid);
 
   // Get profileOwner's and user's information
   useEffect(() => {
@@ -184,7 +184,7 @@ const Mypage = () => {
         />
       )}
       {
-        contextUser && contextUser.email == 'achoe628@naver.com' && testModalOpen && (
+        contextUser && contextUser.email === 'achoe628@naver.com' && testModalOpen && (
           <TestAccountModal data={profileOwnerInfo.followings} modalOpen={testModalOpen} setModalOpen={setTestModalOpen}
           />
         )
