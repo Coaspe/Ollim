@@ -64,9 +64,11 @@ const useGetWritings = (uid: string | undefined, contextUid: string | null) => {
       setWritingsLoading(false);
     }
   };
+
   useEffect(() => {
     uid && getWritings(uid);
   }, [uid]);
+
   return {
     poems,
     novels,

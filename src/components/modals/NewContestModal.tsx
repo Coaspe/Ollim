@@ -48,7 +48,6 @@ const NewContestModal: React.FC<NewContestProps> = ({
   const setAlarm = (alarm: [string, alarmType, boolean]) => {
     dispatch(alarmAction.setAlarm({ alarm }));
   };
-  // https://ollim.onrender.com
   const handleAddContest = () => {
     const data: addContestArg = {
       limitNumOfPeople: limitNumOfPeople as number,

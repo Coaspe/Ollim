@@ -6,7 +6,7 @@ import { withHistory } from "slate-history";
 import { Toolbar } from "./Component";
 import { cx, css } from "@emotion/css";
 import { alarmAction, isFullScreenAction } from "../../redux";
-import { getWritingInfo } from "../../services/firebase";
+import { commit, getWritingInfo, removeTemporarySave, saveTemporarySave, addCollectionElement } from "../../services/firebase";
 import { motion, AnimatePresence } from "framer-motion";
 import DiagramWrite from "../diagram/RelationShipDiagram";
 import {
@@ -121,35 +121,26 @@ const SlateEditor = ({
   // Handle Save fuctions
   const handleRequestTempSave = () => {
     const date = new Date().getTime();
-    axios
-      .post(`https://ollim.onrender.com/temporarySave`, {
-        contents: JSON.stringify(value),
-        writingDocID,
-        genre: writingInfo.genre,
-        collectionNum: nowCollectionNum,
-      })
-      .then((res) => {
-        setTemporarySaveButtonEnable(true);
-        setAlarm(res.data);
-        res.data[1] === "success" &&
-          setTempSaveState({ date, contents: value });
-        setTimeout(() => {
-          setAlarm(["", "success", false]);
-        }, 2000);
-      });
+    saveTemporarySave(value,
+      writingDocID,
+      nowCollectionNum,
+    ).then((res) => {
+      setTemporarySaveButtonEnable(true);
+      setAlarm(res);
+      res[1] === "success" &&
+        setTempSaveState({ date, contents: value });
+      setTimeout(() => {
+        setAlarm(["", "success", false]);
+      }, 2000);
+    });
   };
   // Handle Remove Temporary save function
   const handleRequestTempSaveRemove = () => {
-    axios
-      .post(`https://ollim.onrender.com/removeTempSave`, {
-        writingDocID,
-        genre: writingInfo.genre,
-        collectionNum: nowCollectionNum,
-      })
+    removeTemporarySave(writingDocID, nowCollectionNum)
       .then((res) => {
         setTemporarySaveButtonEnable(true);
-        setAlarm(res.data);
-        res.data[1] === "success" && setTempSaveState({});
+        setAlarm(res);
+        res[1] === "success" && setTempSaveState({});
         setTimeout(() => {
           setAlarm(["", "success", false]);
         }, 2000);
@@ -157,33 +148,29 @@ const SlateEditor = ({
   };
   // Handle Commit function
   const handleRequestCommit = () => {
-    axios
-      .post("https://ollim.onrender.com/commit", {
-        contents: JSON.stringify(value),
-        userUID: writingInfo.userUID,
-        writingDocID,
-        title: writingInfo.title,
-        memo: commitDescription,
-        collectionNum: nowCollectionNum,
-      })
-      .then((res) => {
-        commitSuccess.current = !commitSuccess.current;
-        setCommitButtonEnable(true);
-        setAlarm(res.data);
-        setTimeout(() => {
-          setAlarm(["", "success", false]);
-        }, 2000);
-      });
+    commit(
+      value,
+      writingInfo.userUID,
+      writingDocID,
+      writingInfo.title,
+      commitDescription,
+      nowCollectionNum,
+    ).then((res) => {
+      commitSuccess.current = !commitSuccess.current;
+      setCommitButtonEnable(true);
+      setAlarm(res.data);
+      setTimeout(() => {
+        setAlarm(["", "success", false]);
+      }, 2000);
+    });
   };
   const handleAddCollectionElement = () => {
     setOpenNewCollectionElementModal(false);
-    axios
-      .post("https://ollim.onrender.com/addCollectionElement", {
-        genre,
-        writingDocID,
-        collectionElementNum: collectionNumArray.length + 1,
-        title: newCollectionElementTitle,
-      })
+    addCollectionElement(
+      writingDocID,
+      collectionNumArray.length + 1,
+      newCollectionElementTitle,
+    )
       .then((res) => {
         commitSuccess.current = !commitSuccess.current;
         setAlarm(res.data);

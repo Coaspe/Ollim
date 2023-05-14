@@ -1,7 +1,7 @@
-import axios from "axios";
 import { useState } from "react";
 import { alarmType, getFirestoreUser } from "../type";
 import Compressor from "compressorjs";
+import { updateProfileImage } from "../services/firebase";
 
 const useImageCompress = (
   profileOwnerInfo: getFirestoreUser,
@@ -33,15 +33,14 @@ const useImageCompress = (
         formData.append("userUID", profileOwnerInfo.uid);
         formData.append("userEmail", profileOwnerInfo.userEmail);
         formData.append("file", result);
-        axios
-          .post(`https://ollim.onrender.com/updateProfileImage`, formData)
-          .then((res) => {
-            setAlarm(res.data);
+        updateProfileImage(profileOwnerInfo.uid, profileOwnerInfo.userEmail, result)
+          .then((res: any) => {
+            setAlarm(res);
+            setProfileImage(url);
             setTimeout(() => {
               setAlarm(["", "success", false]);
             }, 3000);
           });
-        setProfileImage(url);
       },
       error(err) {
         console.log(err.message);

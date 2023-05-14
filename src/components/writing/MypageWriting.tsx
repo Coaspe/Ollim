@@ -60,7 +60,7 @@ const MypageWriting: React.FC<props> = ({ data, widthSize }) => {
                 {genreMatching[data.genre as genre]}
               </span>
               <span style={{ fontSize: "0.7rem" }}>
-                {data.likes.length} 좋아요
+                {data.likes.size} 좋아요
               </span>
             </div>
           </div>

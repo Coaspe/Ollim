@@ -18,7 +18,7 @@ import {
 import { RootState } from "../../redux/store";
 import ButtonEdge from "./ButtonEdge";
 import { toObjectElements, alarmType } from "../../type";
-import axios from "axios";
+import { editDiagram } from "../../services/firebase";
 const initBgColor = "#faf6f5";
 const edgeTypes = {
   buttonedge: ButtonEdge,
@@ -170,22 +170,21 @@ const DiagramWrite: React.FC<props> = ({
             // If diagram changed
             if (isInitialMount && isInitialMount.current === 2) {
               // Edit firestore diagram info
-              axios
-                .post(`https://ollim.onrender.com/editDiagram`, {
-                  diagram: JSON.stringify(diagram),
-                  genre,
-                  writingDocID,
-                })
-                .then((res) => {
-                  timer && clearTimeout(timer);
-                  setAlarm(res.data);
-                  isInitialMount.current = 0;
-                  const dum = setTimeout(() => {
-                    setAlarm(["", "success", false]);
-                    setAlarmTimer(null);
-                  }, 2000);
-                  setAlarmTimer(dum);
-                });
+              if (writingDocID) {
+                editDiagram(
+                  JSON.stringify(diagram),
+                  writingDocID)
+                  .then((res: any) => {
+                    timer && clearTimeout(timer);
+                    setAlarm(res);
+                    isInitialMount.current = 0;
+                    const dum = setTimeout(() => {
+                      setAlarm(["", "success", false]);
+                      setAlarmTimer(null);
+                    }, 2000);
+                    setAlarmTimer(dum);
+                  });
+              }
               // If nothing has changed, Alarm "there is no changed"
             } else {
               timer && clearTimeout(timer);

@@ -31,13 +31,7 @@ const CommentRow: React.FC<props> = ({
   const { user } = useContext(UserContext);
   const [commentSettingOpen, setCommentSettingOpen] = useState(false);
   const [deleteBtnDisable, setDeleteBtnDisable] = useState(false);
-  const [reportBtnDisable, setReportBtnDisable] = useState(false);
-  const [reasonForReport, setResonForReport] = useState("");
 
-  const dispatch = useAppDispatch();
-  const setAlarm = (alarm: [string, alarmType, boolean]) => {
-    dispatch(alarmAction.setAlarm({ alarm }));
-  };
   useEffect(() => {
     getUserByUID(commentData.commentOwnerUID).then((res: any) => {
       setCommentOwnerInfo(res);
@@ -100,23 +94,6 @@ const CommentRow: React.FC<props> = ({
       setDeleteBtnDisable(false);
     }
 
-  };
-  const handleCommentReport = () => {
-    setReportBtnDisable(true);
-    axios
-      .post("https://ollim.onrender.com/reportComment", {
-        reportUID: user.uid,
-        reportedUID: commentData.commentOwnerUID,
-        commentDocID: commentData.docID,
-        reasonForReport,
-      })
-      .then((res) => {
-        setReportBtnDisable(false);
-        setAlarm(res.data);
-        setTimeout(() => {
-          setAlarm(["", "success", false]);
-        }, 3000);
-      });
   };
   return (
     <>

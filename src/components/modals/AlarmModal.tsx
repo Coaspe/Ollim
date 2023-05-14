@@ -1,11 +1,10 @@
-import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useContext, useState } from "react";
 import SpinningSvg from "../mypage/SpinningSvg";
 import UserContext from "../../context/user";
 import { getFirestoreAlarmType } from "../../type";
 import AlarmRow from "../alarmrows/AlarmRow";
-import { removeAllAlarms } from "../../services/firebase";
+import { makeAllAlarmSeen, removeAllAlarms } from "../../services/firebase";
 
 interface props {
   open: boolean;
@@ -33,11 +32,7 @@ const AlarmModal: React.FC<props> = ({
     setComfirmAllBtnDisable(true);
     e.stopPropagation();
     if (setUnConfirmedAlarms.length !== 0) {
-      axios
-        .post("https://ollim.onrender.com/makeAllAlarmsSeen", {
-          alarmKeys: JSON.stringify(Array.from(alarmMap.keys())),
-          userUID: user.uid,
-        })
+      makeAllAlarmSeen(Array.from(alarmMap.keys()), user.uid)
         .then(() => {
           setComfirmAllBtnDisable(false);
           setAlarmMap((origin) => {

@@ -19,9 +19,6 @@ import { isFullScreenAction, widthSizeAction } from "../redux";
 import { RootState } from "../redux/store";
 import { Alert } from "@mui/material";
 import Header from "../components/header/Header";
-import axios from "axios";
-import SpinningSvg from "../components/mypage/SpinningSvg";
-import ContestSetting from "../components/contest/ContestSetting";
 import { css, cx } from "@emotion/css";
 import SlateEditorContest from "../components/slateEditor/SlateEditorContest";
 import ContestWriting from "../components/writing/ContestWriting";
@@ -75,47 +72,6 @@ const Contest = () => {
   // alarm state
   // alarm[0] : alarm message, alarm[1] : alarm type, alarm[2] : alarm on, off
   const alarm = useAppSelector((state: RootState) => state.setAlarm.alarm);
-
-  // Server check state
-  const [isServerClosedBtnDisable, setIsServerClosedDisable] = useState(false);
-  const [isServerClosedComment, setIsServerClosedComment] =
-    useState("서버 확인");
-
-  // Check server is opened function
-  const isOpened = () => {
-    setIsServerClosedDisable(true);
-    axios
-      .get("https://ollim.onrender.com/isOpened")
-      .then(() => {
-        setIsServerClosedComment("서버 열림");
-        setIsServerClosedDisable(false);
-        setTimeout(() => {
-          setIsServerClosedComment("서버 확인");
-        }, 5000);
-      })
-      .catch(function (error) {
-        setIsServerClosedComment("서버 닫힘");
-        setIsServerClosedDisable(false);
-        setTimeout(() => {
-          setIsServerClosedComment("서버 확인");
-        }, 5000);
-        if (error.response) {
-          // 요청이 이루어졌으며 서버가 2xx의 범위를 벗어나는 상태 코드로 응답했습니다.
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          // 요청이 이루어 졌으나 응답을 받지 못했습니다.
-          // `error.request`는 브라우저의 XMLHttpRequest 인스턴스 또는
-          // Node.js의 http.ClientRequest 인스턴스입니다.
-          console.log(error.request);
-        } else {
-          // 오류를 발생시킨 요청을 설정하는 중에 문제가 발생했습니다.
-          console.log("Error", error.message);
-        }
-        console.log(error.config);
-      });
-  };
 
   // Window width size
   const setWidthSize = (widthSize: number) => {
@@ -283,31 +239,6 @@ const Contest = () => {
                       >
                         settings
                       </span>
-                      <button
-                        disabled={
-                          isServerClosedBtnDisable ||
-                          isServerClosedComment === "서버 열림" ||
-                          isServerClosedComment === "서버 닫힘"
-                        }
-                        onClick={isOpened}
-                        className={`text-white flex flex-col items-center justify-center cursor-pointer ml-5 h-8 rounded-2xl px-2
-                            ${isServerClosedComment === "서버 닫힘" &&
-                          "bg-red-400"
-                          }
-                            ${isServerClosedComment === "서버 열림" &&
-                          "bg-green-400"
-                          }
-                            ${isServerClosedComment === "서버 확인" &&
-                          "bg-gray-400"
-                          }
-                        `}
-                      >
-                        {isServerClosedBtnDisable ? (
-                          <SpinningSvg />
-                        ) : (
-                          isServerClosedComment
-                        )}
-                      </button>
                     </>
                   )}
               </div>
@@ -474,13 +405,13 @@ const Contest = () => {
             )}
 
             {/* Table SETTING */}
-            {table === "SETTING" && contestInfo.hostUID === contextUser.uid && (
+            {/* {table === "SETTING" && contestInfo.hostUID === contextUser.uid && (
               <ContestSetting
                 setContestInfo={setContestInfo}
                 contestInfo={contestInfo}
                 contestDocID={contestDocID as string}
               />
-            )}
+            )} */}
           </div>
         )}
     </>

@@ -1,6 +1,7 @@
 import { memo } from "react";
 
-const CommitRow = ({ data, selectedKey, handleCommitChange }) => {
+
+const CommitRow = (data, selectedKey, handleCommitChange) => {
     const tmpData = Object.keys(data);
     const key =
         "memo" === tmpData[0] ? tmpData[1] : tmpData[0];

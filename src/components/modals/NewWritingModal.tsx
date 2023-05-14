@@ -7,6 +7,7 @@ import DiagramNewWritings from "../diagram/RelationShipDiagramNewWritings";
 import { alarmAction, elementsAction } from "../../redux";
 import { RootState } from "../../redux/store";
 import { addWritingArg, genre, page, disclosure, alarmType } from "../../type";
+import { addWriting } from "../../services/firebase";
 interface NewWritingProps {
   setNewWritingModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -65,20 +66,18 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
     dispatch(alarmAction.setAlarm({ alarm }));
   };
   const handleAddWriting = (data: addWritingArg, genre: string) => {
-    axios
-      .post(`https://ollim.onrender.com/addWriting`, {
-        data: JSON.stringify(data),
-        genre: genre.toLocaleUpperCase(),
-      })
-      .then((res) => {
-        setAlarm(res.data);
-        setTimeout(() => {
-          setAlarm(["", "success", false]);
-        }, 3000);
-        if (res.data[1] === "success") {
-          window.location.reload();
-        }
-      });
+    addWriting(
+      data,
+      genrn
+    ).then((res: any) => {
+      setAlarm(res);
+      setTimeout(() => {
+        setAlarm(["", "success", false]);
+      }, 3000);
+      if (res[1] === "success") {
+        window.location.reload();
+      }
+    });
   };
 
   return (

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getUserWritings, getWritingsArrayInfo } from "../services/firebase";
-import { gerneDocIDType, getFirestoreWriting } from "../type";
+import { genreDocIDType, getFirestoreWriting } from "../type";
 
 const useGetGenreWritings = (uid: string | undefined, genre: string) => {
   const [writingsInfo, setWritingsInfo] = useState<Array<getFirestoreWriting>>(
@@ -13,15 +13,15 @@ const useGetGenreWritings = (uid: string | undefined, genre: string) => {
       const userWritings = await getUserWritings(uid as string);
       if (userWritings) {
         const writingsInfo = userWritings[
-          `${genre.toLocaleLowerCase()}DocID` as gerneDocIDType
+          `${genre.toLocaleLowerCase()}DocID` as genreDocIDType
         ]
           ? (
-              (await getWritingsArrayInfo(
-                userWritings[
-                  `${genre.toLocaleLowerCase()}DocID` as gerneDocIDType
-                ]
-              )) as Array<getFirestoreWriting>
-            ).sort((a, b) => b.dateCreated - a.dateCreated)
+            (await getWritingsArrayInfo(
+              userWritings[
+              `${genre.toLocaleLowerCase()}DocID` as genreDocIDType
+              ]
+            )) as Array<getFirestoreWriting>
+          ).sort((a, b) => b.dateCreated - a.dateCreated)
           : [];
         setWritingsInfo(writingsInfo);
       }

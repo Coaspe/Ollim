@@ -11,6 +11,7 @@ import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DesktopDateTimePicker from "@mui/lab/DesktopDateTimePicker";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import { TextField } from "@mui/material";
+import { deleteWriting } from "../../services/firebase";
 
 interface props {
   contestInfo: getFirestoreContest;
@@ -62,21 +63,6 @@ const ContestSetting: React.FC<props> = ({
   const handleOnClick = (arg: arg) => {
     if (contestInfo[arg] !== arg) {
       setTitleSaveButtonDisabled(true);
-      axios
-        .post(`https://ollim.onrender.com/updateContest${arg}`, {
-          contestDocID,
-          arg,
-        })
-        .then((res) => {
-          let tmp = Object.assign({}, contestInfo);
-          tmp[arg] = arg;
-          setContestInfo(tmp);
-          setAlarm(res.data);
-          btnDisabledMatching[arg](false);
-          setTimeout(() => {
-            setAlarm(["", "success", false]);
-          }, 2000);
-        });
     }
   };
 
@@ -199,12 +185,11 @@ const ContestSetting: React.FC<props> = ({
                   className="border mr-5 px-2 py-2 rounded-xl focus:outline-none"
                   type="text"
                 />
-                <button
+                {/* <button
                   onClick={() => {
-                    axios
-                      .post(`https://ollim.onrender.com/deleteWriting`, {
-                        contestDocID,
-                      })
+                    deleteWriting(
+                      contestDocID,
+                    )
                       .then((res) => {
                         setAlarm(res.data);
                         setDeleteModalOpen(false);
@@ -220,7 +205,7 @@ const ContestSetting: React.FC<props> = ({
                     } `}
                 >
                   삭제
-                </button>
+                </button> */}
               </div>
             </div>
           </div>

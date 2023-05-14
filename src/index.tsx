@@ -3,11 +3,11 @@ import "./index.css";
 import App from "./App";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import FirebaseContext from "./context/firebase";
-import { firebase, storageRef, FieldValue } from "./lib/firebase";
+import { firebase, storage, FieldValue } from "./lib/firebase";
 import { store } from "./redux/store";
 import { Provider } from "react-redux";
 ReactDOM.render(
-  <FirebaseContext.Provider value={{ firebase, FieldValue, storageRef }}>
+  <FirebaseContext.Provider value={{ firebase, FieldValue, storage }}>
     <Provider store={store}>
       <App />
     </Provider>

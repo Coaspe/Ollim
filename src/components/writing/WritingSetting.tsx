@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { alarmAction } from "../../redux";
@@ -6,6 +5,7 @@ import { alarmType, getFirestoreWriting, disclosure } from "../../type";
 import { motion } from "framer-motion";
 import SpinningSvg from "../mypage/SpinningSvg";
 import { useAppDispatch } from "../../hooks/useRedux";
+import { deleteWriting, updateBGM, updateDisclosure, updateSynopsis, updateTitle } from "../../services/firebase";
 
 interface props {
   writingInfo: getFirestoreWriting;
@@ -14,7 +14,7 @@ interface props {
   title: string;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   writingDocID: string;
-  disclosure: string;
+  disclosure: disclosure;
   setDisclosure: React.Dispatch<React.SetStateAction<disclosure>>;
   bgm: string;
   setBgm: React.Dispatch<React.SetStateAction<string>>;
@@ -58,19 +58,16 @@ const WritingSetting: React.FC<props> = ({
   // Handle BGM file changed
   const handleBGMChange = () => {
     if (mp4File) {
-      const formData = new FormData();
-      formData.append("userUID", writingInfo.userUID);
-      formData.append("writingDocID", writingDocID);
-      formData.append("file", mp4File);
-      // https://ollim.onrender.com
-      axios
-        .post(`https://ollim.onrender.com/updateBGM`, formData)
-        .then((res) => {
-          setAlarm(res.data);
-          setTimeout(() => {
-            setAlarm(["", "success", false]);
-          }, 3000);
-        });
+      updateBGM(
+        writingInfo.userUID,
+        writingDocID,
+        mp4File
+      ).then((res: any) => {
+        setAlarm(res);
+        setTimeout(() => {
+          setAlarm(["", "success", false]);
+        }, 3000);
+      });
     }
   };
   // Set preview BGM
@@ -87,6 +84,7 @@ const WritingSetting: React.FC<props> = ({
       // audioRef.current.play();
     }
   }, [bgm]);
+
   return (
     <>
       {/* Delete modal*/}
@@ -129,15 +127,14 @@ const WritingSetting: React.FC<props> = ({
                 />
                 <button
                   onClick={() => {
-                    axios
-                      .post(`https://ollim.onrender.com/deleteWriting`, {
-                        writingDocID,
-                        genre: writingInfo.genre,
-                      })
-                      .then((res) => {
-                        setAlarm(res.data);
+                    deleteWriting(
+                      writingDocID,
+                      writingInfo.genre
+                    )
+                      .then((res: any) => {
+                        setAlarm(res);
                         setDeleteModalOpen(false);
-                        res.data[1] === "success" &&
+                        res[1] === "success" &&
                           navigate(`/${writingInfo.userUID}`);
                         setTimeout(() => {
                           setAlarm(["", "success", false]);
@@ -164,22 +161,15 @@ const WritingSetting: React.FC<props> = ({
               disabled={titleSaveButtonDisabled}
               style={{ fontSize: "0.75rem" }}
               onClick={() => {
-                if (writingInfo.title !== title) {
-                  setTitleSaveButtonDisabled(true);
-                  axios
-                    .post(`https://ollim.onrender.com/updateTitle`, {
-                      genre: writingInfo.genre,
-                      writingDocID,
-                      title,
-                    })
-                    .then((res) => {
-                      setAlarm(res.data);
-                      setTitleSaveButtonDisabled(false);
-                      setTimeout(() => {
-                        setAlarm(["", "success", false]);
-                      }, 2000);
-                    });
-                }
+                setTitleSaveButtonDisabled(true);
+                updateTitle(writingDocID, title)
+                  .then((res: any) => {
+                    setAlarm(res);
+                    setTitleSaveButtonDisabled(false);
+                    setTimeout(() => {
+                      setAlarm(["", "success", false]);
+                    }, 3000);
+                  });
               }}
               className="flex items-center justify-center border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
             >
@@ -206,22 +196,18 @@ const WritingSetting: React.FC<props> = ({
               style={{ fontSize: "0.75rem" }}
               disabled={synopsisSaveButtonDisabled}
               onClick={() => {
-                if (writingInfo.synopsis !== synopsis) {
-                  setSynopsisSaveButtonDisabled(true);
-                  axios
-                    .post(`https://ollim.onrender.com/updateSynopsis`, {
-                      genre: writingInfo.genre,
-                      writingDocID,
-                      synopsis,
-                    })
-                    .then((res) => {
-                      setAlarm(res.data);
-                      setSynopsisSaveButtonDisabled(false);
-                      setTimeout(() => {
-                        setAlarm(["", "success", false]);
-                      }, 2000);
-                    });
-                }
+                setSynopsisSaveButtonDisabled(true);
+                updateSynopsis(
+                  writingDocID,
+                  synopsis
+                )
+                  .then((res: any) => {
+                    setAlarm(res);
+                    setSynopsisSaveButtonDisabled(false);
+                    setTimeout(() => {
+                      setAlarm(["", "success", false]);
+                    }, 2000);
+                  });
               }}
               className="border border-blue-400 px-3 py-1 rounded-xl text-blue-400 hover:bg-blue-100"
             >
@@ -285,14 +271,9 @@ const WritingSetting: React.FC<props> = ({
               onClick={() => {
                 if (writingInfo.disclosure !== disclosure) {
                   setDisclosureSaveButtonDisabled(true);
-                  axios
-                    .post(`https://ollim.onrender.com/updateDisclosure`, {
-                      genre: writingInfo.genre,
-                      writingDocID,
-                      disclosure,
-                    })
-                    .then((res) => {
-                      setAlarm(res.data);
+                  updateDisclosure(writingDocID, disclosure)
+                    .then((res: any) => {
+                      setAlarm(res);
                       setDisclosureSaveButtonDisabled(false);
                       setTimeout(() => {
                         setAlarm(["", "success", false]);

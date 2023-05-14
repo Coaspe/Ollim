@@ -5,8 +5,8 @@ export type page = "MAIN" | "DIAGRAM";
 export type genre = "SCENARIO" | "POEM" | "NOVEL";
 export type tableType = "OVERVIEW" | "WRITE" | "SETTING" | "BROWSE";
 export type contestTableType = "OVERVIEW" | "BROWSE" | "VOTE" | "SETTING";
-export type gerneType = "NOVEL" | "POEM" | "SCENARIO";
-export type gerneDocIDType = "novelDocID" | "poemDocID" | "scenarioDocID";
+export type genreType = "NOVEL" | "POEM" | "SCENARIO";
+export type genreDocIDType = "novelDocID" | "poemDocID" | "scenarioDocID";
 export type alarmType = "error" | "warning" | "info" | "success";
 export type contestType = "HOST" | "PARTICIPATION" | "TOTAL";
 export type medal = "GOLD" | "SILVER" | "BRONZE";
@@ -121,7 +121,7 @@ export type addWritingArg = {
   title: string;
   userUID: string;
   diagram?: toObjectElements;
-  disclosure: string;
+  disclosure: disclosure;
   writingUID?: string;
 };
 export interface addContestArg {
@@ -159,11 +159,11 @@ export type getFirestoreWriting = {
   title: string;
   userEmail: string;
   userUID: string;
-  genre: string;
+  genre: genreType;
   writingDocID: string;
   disclosure: disclosure;
   memo: string;
-  likes: string[];
+  likes: Map<string, number>;
   isCollection: boolean;
   bgm?: string;
   duplicatedForContest?: boolean;

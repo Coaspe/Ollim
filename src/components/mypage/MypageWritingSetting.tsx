@@ -8,7 +8,7 @@ interface props {
     synopsis: string
 }
 const MypageWritingSetting: React.FC<props> = ({ title, genre, killingVerse, synopsis }) => {
-    const gerneType = {
+    const genreType = {
         SCENARIO: "시나리오",
         POEM: "시",
         NOVEL: "소설"
@@ -35,7 +35,7 @@ const MypageWritingSetting: React.FC<props> = ({ title, genre, killingVerse, syn
                     {infoVisible && <span className="absolute bg-gray-800 text-white top-1 right-1 text-xs rounded-lg px-2 py-1">기다려서 세부사항을 확인하기</span>}
                     <div className="mb-3">
                         <span className="text-xl font-black">{title}</span>
-                        <span className="text-sm text-gray-700 font-black ml-3">{gerneType[genre]}</span>
+                        <span className="text-sm text-gray-700 font-black ml-3">{genreType[genre]}</span>
                     </div>
                     <textarea value={synopsis} readOnly className="cursor-pointer pointer-event-none text-sm text-gray-400 mb-3 font-semibold resize-none bg-transparent overflow-y-hidden">{synopsis}</textarea>
                 </motion.div>

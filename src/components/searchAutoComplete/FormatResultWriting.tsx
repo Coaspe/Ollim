@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { genreMatching } from "../../constants";
-import { gerneType } from "../../type";
+import { genreType } from "../../type";
 interface props {
   item: any;
 }
@@ -21,7 +21,7 @@ const FormatResultWriting: React.FC<props> = ({ item }) => {
       className="w-full px-5 py-2 space-x-2 flex items-center font-noto cursor-pointer hover:bg-gray-200 focus:bg-gray-200"
     >
       <span className="font-bold">
-        {genreMatching[item.genre as gerneType]}
+        {genreMatching[item.genre as genreType]}
       </span>
       <span>-</span>
       <span>{item.title}</span>

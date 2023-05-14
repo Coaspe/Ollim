@@ -18,7 +18,7 @@ const firebaseConfig = {
 const Firebase = initializeApp(firebaseConfig);
 const firebase = Firebase.firebase;
 const firestore = getFirestore(Firebase);
-const storageRef = getStorage(Firebase);
+const storage = getStorage(Firebase, "gs://ollim-df732.appspot.com");
 const rtDBRef = getDatabase(Firebase);
 
-export { Firebase, firebase, firestore, FieldValue, storageRef, rtDBRef };
+export { Firebase, firebase, firestore, FieldValue, storage, rtDBRef };

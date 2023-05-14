@@ -1,4 +1,4 @@
-import { firestore, rtDBRef } from "../lib/firebase";
+import { firestore, rtDBRef, storage } from "../lib/firebase";
 import {
   doc,
   getDoc,
@@ -22,9 +22,21 @@ import {
   getFirestoreUser,
   getFirestoreContest,
   commentType,
+  addWritingArg,
+  genreType,
+  getFirestoreUserWritings,
+  disclosure,
 } from "../type";
 import { get, ref, remove, set, update } from "firebase/database";
-
+import { getDownloadURL, uploadBytes } from "firebase/storage";
+import { ref as strRef } from "firebase/storage"
+const generateResponseMsg = (word: string, success: boolean) => {
+  if (success) {
+    return [`${word} 성공하였습니다.`, "success", true]
+  } else {
+    return [`${word} 실패하였습니다.`, "success", true]
+  }
+}
 export const signInWithGoogleInfo = (info: any) => {
   const batch = writeBatch(firestore);
 
@@ -248,6 +260,43 @@ export const updateCommentLikes = (like: boolean, commentDocID: string, userUID:
     return false
   }
 };
+export const updateFollowing = async (followedUserEmail: string, followedUserUID: string, followingState: boolean, followingUserEmail: string, followingUserUID: string, followingUsername: string) => {
+  try {
+    if (!followingState) {
+      const data = {
+        dateCreated: new Date().getTime(),
+        category: "FOLLOWING",
+        seen: false,
+        info: {
+          followingUserUID,
+          followingUsername,
+        },
+      };
+      set(
+        ref(rtDBRef,
+          `alarms/${followedUserUID}/${data.dateCreated}_FOLLOWING_${followingUserUID}`
+        ),
+        data
+      )
+    }
+
+    const batch = writeBatch(firestore)
+    batch.update(doc(firestore, "users", followingUserEmail), {
+      followings: followingState
+        ? arrayRemove(followedUserUID)
+        : arrayUnion(followedUserUID)
+    })
+    batch.update(doc(firestore, "users", followedUserEmail), {
+      followers: followingState
+        ? arrayRemove(followingUserUID)
+        : arrayUnion(followingUserUID)
+    })
+    await batch.commit()
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const getBestWritings = async () => {
   const date = new Date();
   const year = date.getFullYear();
@@ -377,9 +426,7 @@ export const vote = (
 };
 export const makeAlarmSeen = (alarmKey: string, userUID: string) => {
   try {
-    let tmp: any = {};
-    tmp["seen"] = true;
-    return update(ref(rtDBRef, `alarms/${userUID}/${alarmKey}`), tmp)
+    return update(ref(rtDBRef, `alarms/${userUID}/${alarmKey}`), { seen: true })
   } catch (error) {
 
   }
@@ -398,5 +445,336 @@ export const getAlarms = async (userUID: string) => {
   } catch (error) {
     console.log(`getAlarms error: ${error}`)
     return null
+  }
+}
+
+export const editDiagram = async (diagram: any, writingDocID: string) => {
+  try {
+    const ref = doc(firestore, "allWritings", writingDocID)
+    await updateDoc(ref, { diagram })
+    return ["변경을 저장했습니다.", "success", true]
+  } catch (error) {
+    return ["저장을 실패했습니다.", "error", true]
+  }
+}
+
+export const makeAllAlarmSeen = async (alarmKeys: Array<string>, userUID: string) => {
+  try {
+    return Promise.all(
+      alarmKeys.map((key) =>
+        makeAlarmSeen(key, userUID)
+      )
+    )
+  } catch (error) {
+
+  }
+}
+
+export const addWriting = async (data: addWritingArg, genre: genreType) => {
+  try {
+    const batch = writeBatch(firestore)
+    const docRef = await addDoc(collection(firestore, "writings"), {})
+
+    batch.set(doc(firestore, `allWritings/${docRef.id}`), {
+      ...data,
+      killingVerse: [],
+      done: false,
+      dataCreated: new Date().getTime(),
+      genre,
+      likes: [],
+    })
+
+    const updateWritingsRef = doc(firestore, "writings", data.userUID)
+    switch (genre) {
+      case "POEM":
+        batch.update(updateWritingsRef, {
+          poemDocID: arrayUnion(docRef.id)
+        })
+        break;
+      case "NOVEL":
+        batch.update(updateWritingsRef, {
+          novelDocID: arrayUnion(docRef.id)
+        })
+        break;
+      case "SCENARIO":
+        batch.update(updateWritingsRef, {
+          scenarioDocID: arrayUnion(docRef.id)
+        })
+        break;
+      default:
+        break;
+    }
+    await batch.commit();
+    return generateResponseMsg("생성을", true)
+
+  } catch (error) {
+    return generateResponseMsg("생성을", false)
+  }
+}
+
+export const saveTemporarySave = async (
+  contents: any,
+  writingDocID: string,
+  collectionNum: number) => {
+
+  const date = new Date().getTime()
+  const update: any = {}
+  update[`collection.${collectionNum}.tempSave`] = { contents, date };
+  try {
+    await
+      await updateDoc(doc(firestore, "allWritings", writingDocID), update)
+    return generateResponseMsg("임시저장을", true)
+  } catch (error) {
+    return generateResponseMsg("임시저장을", false)
+  }
+}
+export const removeTemporarySave = async (
+  writingDocID: string,
+  collectionNum: number
+) => {
+  try {
+    const update: any = {}
+    update[`collection.${collectionNum}.tempSave`] = {};
+    await updateDoc(doc(firestore, "allWritings", writingDocID), update)
+    return generateResponseMsg("임시저장 삭제를", true)
+  } catch (error) {
+    return generateResponseMsg("임시저장 삭제를", false)
+  }
+}
+export const deleteWriting = async (
+  writingDocID: string,
+  genre: genreType) => {
+  try {
+    const writingInfo = ((await getDoc(doc(firestore, "allWritings", writingDocID))).data())
+    if (writingInfo) {
+      const totalCommits = ((await getDoc(doc(firestore, "writings", writingInfo.userUID))).data() as getFirestoreUserWritings).totalCommits
+      const batch = writeBatch(firestore)
+
+      const writingsRef = doc(firestore, "writings", writingInfo.userUID)
+
+      let commits: any[] = [];
+      Object.values(writingInfo.collection).forEach((num: any) => {
+        commits.concat(num.commits);
+      });
+
+      // Delete writing's past commits
+      commits.forEach((commit) => {
+        let keys = Object.keys(commit);
+        let key = -1
+        keys[0] === "memo"
+          ? (key = Number(keys[1]))
+          : (key = Number(keys[0]));
+        delete totalCommits[key];
+      });
+
+      // Update Writings collection
+      switch (genre) {
+        case "POEM":
+          batch.update(writingsRef, {
+            poemDocID: arrayRemove(writingDocID),
+            totalCommits
+          })
+          break;
+        case "NOVEL":
+          batch.update(writingsRef, {
+            novelDocID: arrayRemove(writingDocID),
+            totalCommits
+          })
+          break;
+        case "SCENARIO":
+          batch.update(writingsRef, {
+            scenarioDocID: arrayRemove(writingDocID),
+            totalCommits
+          })
+          break;
+        default:
+          break;
+      }
+
+      // Update user's writings list
+      const userRef = doc(firestore, "users", writingInfo.userEmail)
+      batch.update(userRef, { writingDocID: arrayRemove(writingDocID) })
+
+      const genreRef = doc(firestore, "allWritings", writingDocID)
+
+      // Delete writing
+      batch.delete(genreRef)
+
+      await batch.commit()
+      return generateResponseMsg("글 삭제를", true)
+    }
+    throw Error()
+  } catch (error) {
+    return generateResponseMsg("글 삭제를", false)
+  }
+}
+
+export const commit = async (
+  value: any,
+  userUID: string,
+  writingDocID: string,
+  writingTitle: string,
+  memo: string,
+  collectionNum: number
+) => {
+  try {
+    const date = new Date().getTime();
+    const batch = writeBatch(firestore);
+    let tmp: any = {};
+    tmp[date] = value;
+    tmp["memo"] = memo;
+
+    const updates: any = {};
+    updates[`collection.${collectionNum}.commits`] = arrayUnion(tmp);
+    updates["updateAt"] = serverTimestamp();
+    batch.update(doc(firestore, "allWritings", writingDocID), updates)
+
+    const totalCommits = ((await getDoc(doc(firestore, "writings", userUID))).data() as getFirestoreUserWritings).totalCommits
+    totalCommits[date] = memo;
+
+    const totalCommitsRef = doc(firestore, "writings", userUID)
+    batch.update(totalCommitsRef, { totalCommits })
+
+    const updateTemp: any = {}
+    updateTemp[`collection.${collectionNum}.tempSave`] = {};
+    const tempSaveRef = doc(firestore, "allWritings", writingDocID)
+    batch.update(tempSaveRef, updateTemp)
+
+    // Alarm to followers
+    const time = new Date().getTime();
+
+    const userData = (
+      await getDocs(
+        query(
+          collection(firestore, "users"),
+          where("uid", "==", userUID)
+        )
+      )
+    ).docs[0].data()
+
+    userData.followers.forEach((uid: string) => {
+      const key = `${time}_NEWCOMMIT_${writingDocID}`;
+      update(ref(rtDBRef, `alarms/${uid}/${key}`), {
+        category: "NEWCOMMIT",
+        dateCreated: time,
+        seen: false,
+        info: {
+          writingTitle,
+          writingDocID,
+          writingOwnerUID: userUID,
+          writingOwnerUsername: userData.username,
+        },
+      })
+    })
+
+    await batch.commit();
+    return generateResponseMsg("제출을", true)
+
+  } catch (error) {
+    return generateResponseMsg("제출을", false)
+  }
+}
+export const addCollectionElement = async (
+  writingDocID: string,
+  collectionElementNum: number,
+  title: string
+) => {
+  try {
+    const update: any = {};
+    update[`collection.${collectionElementNum}`] = {
+      tempSave: {},
+      commits: [],
+      title,
+    };
+
+    await updateDoc(doc(firestore, "allWritings", writingDocID), update)
+    return generateResponseMsg("추가를", true)
+  } catch (error) {
+    return generateResponseMsg("추가를", false)
+  }
+}
+
+export const updateBGM = async (
+  userUID: string, writingDocID: string, bgm: File
+) => {
+  try {
+    let fileUploadRef = strRef(storage, `${userUID}/BGM/${writingDocID}`);
+    await uploadBytes(fileUploadRef, bgm)
+    const token = await getDownloadURL(fileUploadRef)
+    await updateDoc(doc(firestore, "allWritings", writingDocID), {
+      bgm: token
+    })
+    return generateResponseMsg("업로드를", true)
+  } catch (error) {
+    return generateResponseMsg("업로드를", false)
+
+  }
+}
+
+export const updateTitle = async (writingDocID: string, title: string) => {
+  try {
+    await updateDoc(doc(firestore, "allWritings", writingDocID), { title })
+    return generateResponseMsg("수정을", true)
+  } catch (_) {
+    return generateResponseMsg("수정을", false)
+  }
+}
+export const updateSynopsis = async (writingDocID: string, synopsis: string) => {
+  try {
+    await updateDoc(doc(firestore, "allWritings", writingDocID), { synopsis })
+    return generateResponseMsg("수정을", true)
+  } catch (_) {
+    return generateResponseMsg("수정을", false)
+  }
+}
+
+export const updateDisclosure = async (writingDocID: string, disclosure: disclosure) => {
+  try {
+    await updateDoc(doc(firestore, "allWritings", writingDocID), { disclosure })
+    return generateResponseMsg("수정을", true)
+  } catch (_) {
+    return generateResponseMsg("수정을", false)
+  }
+}
+
+export const updateProfileImage = async (userUID: string, userEmail: string, image: File) => {
+  try {
+    let newFileName = `${Date.now()}_${userUID}`;
+    let fileUploadRef = strRef(storage, `${userUID}/profileImg/${newFileName}`)
+    await uploadBytes(fileUploadRef, image)
+    const token = await getDownloadURL(fileUploadRef)
+    await updateDoc(doc(firestore, "users", userEmail), {
+      profileImg: token
+    })
+    return generateResponseMsg("업로드를", true)
+  } catch (_) {
+    return generateResponseMsg("업로드를", false)
+  }
+}
+
+export const updateLikeWriting = async (
+  likeUserEmail: string,
+  likeUserUID: string,
+  likedWritingDocID: string,
+  likeWritingState: boolean
+) => {
+  try {
+    const batch = writeBatch(firestore)
+    const date = new Date().getTime()
+    const updateUserRef = doc(firestore, "users", likeUserEmail)
+    const updateUser: any = {}
+    updateUser[`likeWritings.${likedWritingDocID}`] = likeWritingState ? deleteField() : date
+    batch.update(updateUserRef, updateUser)
+
+    const updateWritingRef = doc(firestore, "allWritings", likedWritingDocID)
+    const updateWriting: any = {}
+    updateWriting[`likes.${likeUserUID}`] = likeWritingState ? deleteField() : date
+    batch.update(updateWritingRef, updateWriting)
+
+    await batch.commit()
+
+  } catch (error) {
+    console.log(error);
+
   }
 }

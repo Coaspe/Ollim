@@ -126,7 +126,7 @@ const MypageSkeleton: React.FC<props> = ({ widthSize }) => {
             </div>
 
             {/* Contest */}
-            <div className="w-full grid grid-cols-3 items-center my-10 GalaxyS20Ultra:flex GalaxyS20Ultra:flex-col GalaxyS20Ultra:items-center GalaxyS20Ultra:space-y-10">
+            {/* <div className="w-full grid grid-cols-3 items-center my-10 GalaxyS20Ultra:flex GalaxyS20Ultra:flex-col GalaxyS20Ultra:items-center GalaxyS20Ultra:space-y-10">
               <span className="text-2xl font-bold justify-center col-start-2 w-full text-center">
                 올림 백일장
               </span>
@@ -136,7 +136,7 @@ const MypageSkeleton: React.FC<props> = ({ widthSize }) => {
               {Array.from({ length: 3 }, () => 0).map((v, idx) => (
                 <MypageWritingSkeleton key={`${idx}_contest`} />
               ))}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

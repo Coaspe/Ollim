@@ -7,10 +7,11 @@ import {
   getUserByEmail,
   getUserByUID,
   getWritingInfo,
+  updateLikeWriting,
 } from "../services/firebase";
 import {
   tableType,
-  gerneType,
+  genreType,
   disclosure,
   getFirestoreWriting,
   getFirestoreUser,
@@ -32,8 +33,6 @@ import { Elements } from "react-flow-renderer";
 import { initialValue } from "../components/slateEditor/utils"
 import WritingSetting from "../components/writing/WritingSetting";
 import Header from "../components/header/Header";
-import axios from "axios";
-import SpinningSvg from "../components/mypage/SpinningSvg";
 import WritingWrite from "../components/writing/WritingWrite";
 import { alertVariants, genreMatching } from "../constants";
 
@@ -141,6 +140,12 @@ const Writing = () => {
       (table === "OVERVIEW" || table === "WRITE" || table === "BROWSE")
     ) {
       getWritingInfo(writingDocID).then((res: any) => {
+        const likes = new Map<string, number>()
+        if (res.likes) {
+          for (const [key, value] of Object.entries(res.likes)) {
+            likes.set(key, value as number)
+          }
+        }
         if (res.genre !== "POEM") {
           // Poem doesn't have diagram, diagram's elements fields
           setDiagram(res.diagram as toObjectElements);
@@ -157,7 +162,7 @@ const Writing = () => {
         setTitle(res.title);
         contextUser &&
           contextUser.email &&
-          setLikeWritingState(res.likes.includes(contextUser.email));
+          setLikeWritingState(likes.has(contextUser.uid));
       });
     }
   }, [table, writingDocID]);
@@ -178,54 +183,17 @@ const Writing = () => {
   // Handle like writing function
   const handleLikeWriting = () => {
     setLikeWritingState((origin) => {
-      axios.post("https://ollim.onrender.com/updateLikeWriting", {
-        likeUserEmail: contextUserInfo.userEmail,
-        likedWritingDocID: writingDocID,
-        likeWritingState: origin,
-      });
-      return !origin;
+      if (writingDocID) {
+        updateLikeWriting(
+          contextUserInfo.userEmail,
+          contextUserInfo.uid,
+          writingDocID,
+          origin
+        )
+        return !origin;
+      }
+      return origin
     });
-  };
-
-  // Server check state
-  const [isServerClosedBtnDisable, setIsServerClosedDisable] = useState(false);
-  const [isServerClosedComment, setIsServerClosedComment] =
-    useState("서버 확인");
-
-  // Check server is opened function
-  const isOpened = () => {
-    setIsServerClosedDisable(true);
-    axios
-      .get("https://ollim.onrender.com/isOpened")
-      .then(() => {
-        setIsServerClosedComment("서버 열림");
-        setIsServerClosedDisable(false);
-        setTimeout(() => {
-          setIsServerClosedComment("서버 확인");
-        }, 5000);
-      })
-      .catch(function (error) {
-        setIsServerClosedComment("서버 닫힘");
-        setIsServerClosedDisable(false);
-        setTimeout(() => {
-          setIsServerClosedComment("서버 확인");
-        }, 5000);
-        if (error.response) {
-          // 요청이 이루어졌으며 서버가 2xx의 범위를 벗어나는 상태 코드로 응답했습니다.
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          // 요청이 이루어 졌으나 응답을 받지 못했습니다.
-          // `error.request`는 브라우저의 XMLHttpRequest 인스턴스 또는
-          // Node.js의 http.ClientRequest 인스턴스입니다.
-          console.log(error.request);
-        } else {
-          // 오류를 발생시킨 요청을 설정하는 중에 문제가 발생했습니다.
-          console.log("Error", error.message);
-        }
-        console.log(error.config);
-      });
   };
 
   // Window width size
@@ -286,7 +254,7 @@ const Writing = () => {
                 <span className="text-2xl">{writingInfo.title}</span>
                 <span className="text-lg">·</span>
                 <span className="text-lg">
-                  {genreMatching[writingInfo.genre as gerneType]}
+                  {genreMatching[writingInfo.genre as genreType]}
                 </span>
                 {contextUser && contextUser.uid && (
                   <>
@@ -350,31 +318,6 @@ const Writing = () => {
                   >
                     settings
                   </span>
-                  <button
-                    disabled={
-                      isServerClosedBtnDisable ||
-                      isServerClosedComment === "서버 열림" ||
-                      isServerClosedComment === "서버 닫힘"
-                    }
-                    onClick={isOpened}
-                    className={`text-white flex flex-col items-center justify-center cursor-pointer ml-5 h-8 rounded-2xl px-2 
-                            ${isServerClosedComment === "서버 닫힘" &&
-                      "bg-red-400"
-                      }
-                            ${isServerClosedComment === "서버 열림" &&
-                      "bg-green-400"
-                      }
-                            ${isServerClosedComment === "서버 확인" &&
-                      "bg-gray-400"
-                      }
-                        `}
-                  >
-                    {isServerClosedBtnDisable ? (
-                      <SpinningSvg />
-                    ) : (
-                      isServerClosedComment
-                    )}
-                  </button>
                 </>
               )}
             </div>

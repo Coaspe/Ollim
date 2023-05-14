@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useContext, useEffect, useRef, useState } from "react";
 import MypageWriting from "../components/writing/MypageWriting";
 import UserContext from "../context/user";
-import { getUserByUID, getContetsArrayInfo } from "../services/firebase";
+import { getUserByUID, getContetsArrayInfo, updateFollowing } from "../services/firebase";
 import { signOutAuth } from "../helpers/auth-OAuth2";
 import NewWritingModal from "../components/modals/NewWritingModal";
 import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
@@ -227,7 +227,7 @@ const Mypage = () => {
                 transition={{ type: "spring", duration: 0.3 }}
                 className="rounded-full w-64 h-64 shadow-xl object-cover"
                 src={
-                  profileOwnerInfo.profileImg || "/svg/user-svgrepo-com.svg"
+                  profileImage || profileOwnerInfo.profileImg || "/svg/user-svgrepo-com.svg"
                 }
                 alt="profile"
               />
@@ -255,17 +255,13 @@ const Mypage = () => {
                     origin
                       ? (followersLength.current -= 1)
                       : (followersLength.current += 1);
-                    axios.post(
-                      `https://ollim.onrender.com/updateFollowing`,
-                      {
-                        followingUserEmail: userInfo.userEmail,
-                        followedUserEmail: profileOwnerInfo.userEmail,
-                        followingUserUID: userInfo.uid,
-                        followedUserUID: profileOwnerInfo.uid,
-                        followingUsername: userInfo.username,
-                        followingState: origin,
-                      }
-                    );
+                    updateFollowing(
+                      profileOwnerInfo.userEmail,
+                      profileOwnerInfo.uid,
+                      origin,
+                      userInfo.userEmail,
+                      userInfo.uid,
+                      userInfo.username,)
                     return !origin;
                   });
                 }}
@@ -350,7 +346,7 @@ const Mypage = () => {
                 새 작품 추가
               </motion.button>
             )}
-            {contextUser &&
+            {/* {contextUser &&
               uid === contextUser.uid &&
               userInfo.contestAuth && (
                 <motion.button
@@ -362,7 +358,7 @@ const Mypage = () => {
                 >
                   백일장 개최
                 </motion.button>
-              )}
+              )} */}
           </div>
 
           {/* Calendar */}
@@ -514,7 +510,7 @@ const Mypage = () => {
           </div>
 
           {/* Contest */}
-          <div className="flex px-5 items-center flex-col mb-20 w-2/3 GalaxyS20Ultra:mb-10">
+          {/* <div className="flex px-5 items-center flex-col mb-20 w-2/3 GalaxyS20Ultra:mb-10">
             <div className="w-full grid grid-cols-3 items-center mb-10 GalaxyS20Ultra:flex GalaxyS20Ultra:flex-col GalaxyS20Ultra:items-center GalaxyS20Ultra:space-y-10">
               <span className="text-2xl font-bold justify-center col-start-2 w-full text-center">
                 올림 백일장
@@ -543,11 +539,12 @@ const Mypage = () => {
                   />
                 ))}
             </motion.div>
-          </div>
+          </div> */}
         </div>
       ) : (
         <MypageSkeleton widthSize={widthSize} />
-      )}
+      )
+      }
     </>
   );
 };

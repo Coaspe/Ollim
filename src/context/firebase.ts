@@ -6,7 +6,7 @@ import { FirebaseStorage } from "@firebase/storage";
 type FirebaseContextProps = {
   firebase: Firebase.app.App;
   FieldValue: Firestore.FieldValue | any;
-  storageRef: FirebaseStorage | any;
+  storage: FirebaseStorage | any;
 }
 
 const FirebaseContext = createContext<FirebaseContextProps>({} as FirebaseContextProps)
