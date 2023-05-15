@@ -46,6 +46,8 @@ const Header: React.FC<props> = ({ userInfo }) => {
         }
       }
     }
+    console.log(userInfo);
+
     initAlarms()
   }, [userInfo.uid]);
 
@@ -84,9 +86,7 @@ const Header: React.FC<props> = ({ userInfo }) => {
       {/* logo */}
       <img
         onClick={() => {
-          userInfo.uid
-            ? navigator(`/${userInfo.uid}`)
-            : navigator("/community");
+          navigator(`/${userInfo.uid}`)
         }}
         className="h-28 cursor-pointer GalaxyS20Ultra:h-16"
         src="/logo/Ollim-logos_transparent.png"

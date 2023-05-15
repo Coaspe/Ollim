@@ -28,11 +28,11 @@ const WriterRecommandation: React.FC<props> = ({ data }) => {
           className="flex items-center space-x-3"
         >
           <div className="flex flex-col items-center">
-            <span>{data.followers.length}</span>
+            <span>{data.followers.size}</span>
             <span>팔로워</span>
           </div>
           <div className="flex flex-col items-center">
-            <span>{data.followings.length}</span>
+            <span>{data.followings.size}</span>
             <span>팔로잉</span>
           </div>
         </div>

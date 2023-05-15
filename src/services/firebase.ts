@@ -48,7 +48,7 @@ export const signInWithGoogleInfo = (info: any) => {
   });
 
   batch.set(doc(firestore, "users", info.user.email), {
-    likeWritings: [],
+    likeWritings: {},
     contests: { host: [], participation: [] },
     userEmail: info.user.email.toLowerCase(),
     uid: info.user.uid,
@@ -73,7 +73,7 @@ export const signupWithEmail = (user: any, username: string) => {
     });
 
     batch.set(doc(firestore, "users", user.email), {
-      likeWritings: [],
+      likeWritings: {},
       contests: { host: [], participation: [] },
       userEmail: user.email.toLowerCase(),
       uid: user.uid,
@@ -775,6 +775,14 @@ export const updateLikeWriting = async (
 
   } catch (error) {
     console.log(error);
+  }
+}
 
+
+export const testFollowersModel = async () => {
+  const users = await (await getDocs(query(collection(firestore, "users")))).docs
+  const x = users.map((user) => user.data().uid)
+  for await (const id of x) {
+    updateDoc(doc(firestore, "users", "achoe628@gmail.com"), { followings: arrayUnion(id) })
   }
 }

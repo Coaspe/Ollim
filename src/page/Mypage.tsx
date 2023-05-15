@@ -1,98 +1,65 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MypageWriting from "../components/writing/MypageWriting";
 import UserContext from "../context/user";
-import { getUserByUID, getContetsArrayInfo, updateFollowing } from "../services/firebase";
-import { signOutAuth } from "../helpers/auth-OAuth2";
-import NewWritingModal from "../components/modals/NewWritingModal";
+
 import { useAppSelector, useAppDispatch } from "../hooks/useRedux";
 import { RootState } from "../redux/store";
-import {
-  alarmType,
-  getFirestoreUser,
-  getFirestoreContest,
-  contestType,
-} from "../type";
-import { alarmAction, userInfoAction, widthSizeAction } from "../redux";
+
+import { userInfoAction, widthSizeAction } from "../redux";
 import { useParams } from "react-router-dom";
 
 import Calendar from "../components/calendar/Calendar";
 import { Alert, Tooltip } from "@mui/material";
-import axios from "axios";
 
 import Header from "../components/header/Header";
-import Select from "react-select";
-import NewContestModal from "../components/modals/NewContestModal";
-import ContestRow from "../components/contest/ContestRow";
 
-import useImageCompress from "../hooks/useImageCompress";
 import useGetWritings from "../hooks/useGetWritings";
+import useGetProfileOwnerinfo from "../hooks/useGetProfileOwnerInfo"
 import MypageSkeleton from "../components/skeleton/MypageSkeleton";
 
-import { alertVariants, options } from "../constants";
-import FollowersModal from "../components/modals/FollowersModal";
-import FollowingsModal from "../components/modals/FollowingsModal";
+import { alertVariants } from "../constants";
 import TestAccountModal from "../components/modals/TestAccountModal";
+import NewWritingModal from "../components/modals/NewWritingModal";
+import NewContestModal from "../components/modals/NewContestModal";
+import Profile from "../components/mypage/Profile";
+import { getUserByUID } from "../services/firebase";
+import { getFirestoreUser } from "../type";
 
 const Mypage = () => {
   // Profile owner's uid
   const { uid } = useParams();
-  // Profile ownser's firestore information
-  const [profileOwnerInfo, setProfileOwnerInfo] = useState<getFirestoreUser>(
-    {} as getFirestoreUser
-  );
 
-  // For more natural UI of the number of followers of followings, followers
-  const followingsLength = useRef(0);
-  const followersLength = useRef(0);
-
-  // Profile owner's followers, followings datas and modal open states
-  const [followersModalOpen, setFollowersModalOpen] = useState(false);
-  const [followingsModalOpen, setFollowingsModalOpen] = useState(false);
+  const [profileImage, setProfileImage] = useState("");
 
   // Recommands users for test account.
   const [testModalOpen, setTestModalOpen] = useState(false);
-  // Context user
+
+  // Context user information as firebase.User
   const { user: contextUser } = useContext(UserContext);
 
-  // New Writing modal state
-  const [newWritingModalOpen, setNewWritingModalOpen] = useState(false);
-  // New Contest modal state
-  const [newContestModalOpen, setNewContestModalOpen] = useState(false);
   // Writing category state
   const [onWritingCategory, setOnWritingCategory] = useState("TOTAL");
-  // Contest category state
-  const [contestCategory, setContestCategory] = useState<contestType>("TOTAL");
 
-  // Does User Follow Profile Owner?
-  const [doseUserFollow, setDoseUserFollow] = useState(false);
-
-  const [totalContests, setTotalContests] = useState<
-    Array<getFirestoreContest>
-  >([]);
   const dispatch = useAppDispatch();
 
-  // Header context redux userInfo
-  const setUserInfo = (userInfo: getFirestoreUser) => {
-    dispatch(userInfoAction.setUserInfo({ userInfo }));
-  };
+  // Context user information as getFirestoreUser
   const userInfo = useAppSelector(
     (state: RootState) => state.setUserInfo.userInfo
   );
+  const setUserInfo = (userInfo: getFirestoreUser) => {
+    dispatch(userInfoAction.setUserInfo({ userInfo }));
+  };
 
   // Window width size
-  const setWidthSize = (widthSize: number) => {
-    dispatch(widthSizeAction.setWidthSize({ widthSize }));
-  };
   const widthSize = useAppSelector(
     (state: RootState) => state.setWidthSize.widthSize
   );
-  const alarm = useAppSelector((state: RootState) => state.setAlarm.alarm);
-  const setAlarm = (alarm: [string, alarmType, boolean]) => {
-    dispatch(alarmAction.setAlarm({ alarm }));
+  const setWidthSize = (widthSize: number) => {
+    dispatch(widthSizeAction.setWidthSize({ widthSize }));
   };
-  const { profileImage, setProfileImage, handleProfileImgOnChange } =
-    useImageCompress(profileOwnerInfo, setAlarm);
+
+  const alarm = useAppSelector((state: RootState) => state.setAlarm.alarm);
 
   // Window size changed detect!
   useEffect(() => {
@@ -101,13 +68,24 @@ const Mypage = () => {
     };
   }, []);
 
+  // Get contextUser information as getFirestoreUser and set userInfo redux state 
   useEffect(() => {
-    if (contextUser && contextUser.email === "achoe628@naver.com"
-      && !window.localStorage.getItem("TEST_ACCOUNT")) {
-      setTestModalOpen(true)
-      window.localStorage.setItem("TEST_ACCOUNT", "TRUE")
+    const initContextUser = async () => {
+      if (contextUser && Object.keys(contextUser).length) {
+        // Check test account
+        if (contextUser.uid === "DkWmsoSIi5VJYdb6uNueeIFbP8O2"
+          && !window.localStorage.getItem("TEST_ACCOUNT")) {
+          setTestModalOpen(true)
+          window.localStorage.setItem("TEST_ACCOUNT", "TRUE")
+        }
+        const contextUserInfo = await getUserByUID(contextUser.uid)
+        if (contextUserInfo.uid) {
+          setUserInfo(contextUserInfo);
+        }
+      }
     }
-  }, [contextUser])
+    initContextUser()
+  }, [contextUser, userInfo])
 
   const {
     poems,
@@ -118,74 +96,26 @@ const Mypage = () => {
     writingsLoading,
   } = useGetWritings(uid, contextUser && contextUser.uid);
 
-  // Get profileOwner's and user's information
+  const {
+    profileOwnerInfo,
+    followerUIDs,
+    followingUIDs,
+    totalContests,
+    setFollowerUIDs,
+  } = useGetProfileOwnerinfo(uid, setProfileImage)
+
+  // New Writing modal state
+  const [newWritingModalOpen, setNewWritingModalOpen] = useState(false);
+  // New Contest modal state
+  const [newContestModalOpen, setNewContestModalOpen] = useState(false);
   useEffect(() => {
-    const getContests = async (contestsDocID: {
-      host: string[];
-      participation: string[];
-    }) => {
-      const host = contestsDocID["host"];
-      const participation = contestsDocID["participation"];
-
-      const contests: Array<any> =
-        host || participation
-          ? await getContetsArrayInfo(
-            Array.prototype.concat(host, participation)
-          )
-          : [];
-      setTotalContests(contests);
-    };
-    if (uid) {
-      // Get user information
-      getUserByUID(uid as string).then((res: any) => {
-        if (res.username) {
-          setProfileOwnerInfo(res);
-          setProfileImage(res.profileImg);
-          getContests(res.contests);
-          followersLength.current = res.followers.length;
-          followingsLength.current = res.followings.length;
-        }
-      });
-
-      followingsLength.current = 0;
-      followersLength.current = 0;
-    }
-  }, [uid]);
-
-  // Get context user's information
-  useEffect(() => {
-    profileOwnerInfo.userEmail &&
-      contextUser &&
-      contextUser.uid &&
-      getUserByUID(contextUser.uid).then((res: any) => {
-        if (res.uid) {
-          setUserInfo(res);
-          setDoseUserFollow(res.followings.includes(profileOwnerInfo.uid));
-        }
-      });
-  }, [profileOwnerInfo, contextUser]);
-
+    console.log(totalWritings);
+  }, [totalWritings])
   return (
     <>
-      {followersModalOpen && profileOwnerInfo && (
-        <FollowersModal
-          followersModalOpen={followersModalOpen}
-          setFollowersModalOpen={setFollowersModalOpen}
-          followersUID={profileOwnerInfo.followers}
-          followersLength={followersLength}
-        />
-      )}
-      {followingsModalOpen && profileOwnerInfo && (
-        <FollowingsModal
-          followingsModalOpen={followingsModalOpen}
-          setFollowingsModalOpen={setFollowingsModalOpen}
-          followingsUID={profileOwnerInfo.followings}
-          followingsLength={followingsLength}
-        />
-      )}
       {
         contextUser && contextUser.email === 'achoe628@naver.com' && testModalOpen && (
-          <TestAccountModal data={profileOwnerInfo.followings} modalOpen={testModalOpen} setModalOpen={setTestModalOpen}
+          <TestAccountModal userUIDs={followingUIDs} setModalOpen={setTestModalOpen}
           />
         )
       }
@@ -204,12 +134,11 @@ const Mypage = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
       {/* New Writing Modal */}
       {newWritingModalOpen && (
         <NewWritingModal setNewWritingModalOpen={setNewWritingModalOpen} />
       )}
-      {/* New Writing Modal */}
+      {/* New Contest Modal */}
       {newContestModalOpen && (
         <NewContestModal setNewContestModalOpen={setNewContestModalOpen} />
       )}
@@ -217,123 +146,10 @@ const Mypage = () => {
       {<Header userInfo={userInfo} />}
       {profileOwnerInfo && !writingsLoading ? (
         <div className="font-noto w-full flex flex-col items-center justify-between">
-          {/* Profile Image */}
-          <div className="relative">
-            {/* Profile Image Edit */}
-            <label htmlFor="profileImg">
-              <div className="opacity-0 absolute flex items-center justify-center rounded-full w-full h-full cursor-pointer hover:opacity-20 hover:bg-black" />
-              <motion.img
-                animate={{ scale: [0, 1] }}
-                transition={{ type: "spring", duration: 0.3 }}
-                className="rounded-full w-64 h-64 shadow-xl object-cover"
-                src={
-                  profileImage || profileOwnerInfo.profileImg || "/svg/user-svgrepo-com.svg"
-                }
-                alt="profile"
-              />
-            </label>
-            {contextUser && contextUser.uid && contextUser.uid === uid && (
-              <input
-                onChange={handleProfileImgOnChange}
-                style={{ display: "none" }}
-                type="file"
-                name="profileImg"
-                id="profileImg"
-              />
-            )}
-          </div>
 
-          {/* Username */}
-          <div className="flex items-center justify-center">
-            <span className="text-2xl font-bold my-7 mr-3">
-              {profileOwnerInfo.username}
-            </span>
-            {uid && contextUser && contextUser.uid && contextUser.uid !== uid && (
-              <button
-                onClick={() => {
-                  setDoseUserFollow((origin) => {
-                    origin
-                      ? (followersLength.current -= 1)
-                      : (followersLength.current += 1);
-                    updateFollowing(
-                      profileOwnerInfo.userEmail,
-                      profileOwnerInfo.uid,
-                      origin,
-                      userInfo.userEmail,
-                      userInfo.uid,
-                      userInfo.username,)
-                    return !origin;
-                  });
-                }}
-                className={`${!doseUserFollow ? "bg-blue-400" : "bg-gray-300"
-                  } px-2 py-1 rounded-xl text-xs font-Nanum_Gothic font-bold text-gray-700`}
-              >
-                {doseUserFollow ? "팔로우 취소" : "팔로우"}
-              </button>
-            )}
-            {contextUser && contextUser.uid === uid && (
-              <svg
-                onClick={() => {
-                  if (window.localStorage.getItem("TEST_ACCOUNT")) {
-                    window.localStorage.removeItem("TEST_ACCOUNT")
-                  }
-                  signOutAuth()
-                }}
-                className="w-7 cursor-pointer"
-                x="0px"
-                y="0px"
-                viewBox="0 0 490.3 490.3"
-              >
-                <g>
-                  <g>
-                    <path
-                      d="M0,121.05v248.2c0,34.2,27.9,62.1,62.1,62.1h200.6c34.2,0,62.1-27.9,62.1-62.1v-40.2c0-6.8-5.5-12.3-12.3-12.3
-                                            s-12.3,5.5-12.3,12.3v40.2c0,20.7-16.9,37.6-37.6,37.6H62.1c-20.7,0-37.6-16.9-37.6-37.6v-248.2c0-20.7,16.9-37.6,37.6-37.6h200.6
-                                            c20.7,0,37.6,16.9,37.6,37.6v40.2c0,6.8,5.5,12.3,12.3,12.3s12.3-5.5,12.3-12.3v-40.2c0-34.2-27.9-62.1-62.1-62.1H62.1
-                                            C27.9,58.95,0,86.75,0,121.05z"
-                    />
-                    <path
-                      d="M385.4,337.65c2.4,2.4,5.5,3.6,8.7,3.6s6.3-1.2,8.7-3.6l83.9-83.9c4.8-4.8,4.8-12.5,0-17.3l-83.9-83.9
-                                            c-4.8-4.8-12.5-4.8-17.3,0s-4.8,12.5,0,17.3l63,63H218.6c-6.8,0-12.3,5.5-12.3,12.3c0,6.8,5.5,12.3,12.3,12.3h229.8l-63,63
-                                            C380.6,325.15,380.6,332.95,385.4,337.65z"
-                    />
-                  </g>
-                </g>
-              </svg>
-            )}
-          </div>
+          {/* Main Profile */}
+          <Profile uid={uid} profileImage={profileImage} profileOwnerInfo={profileOwnerInfo} setProfileImage={setProfileImage} followers={followerUIDs} followings={followingUIDs} totalContests={totalContests} setFollowers={setFollowerUIDs} writingsLength={totalWritings.length} />
 
-          {/* Posts, Followers, Followings */}
-          <div className="flex w-full items-center justify-center text-sm">
-            <div className="flex flex-col items-center justify-center">
-              <span className="font-bold text-gray-400 font-Nanum_Gothic">
-                {totalWritings.length}
-              </span>
-              <span>글</span>
-            </div>
-            <div
-              onClick={() => {
-                followersLength.current && setFollowersModalOpen(true);
-              }}
-              className="flex flex-col items-center justify-center mx-5 cursor-pointer"
-            >
-              <span className="font-bold text-gray-400 font-Nanum_Gothic">
-                {followersLength.current}
-              </span>
-              <span>팔로워</span>
-            </div>
-            <div
-              onClick={() => {
-                followingsLength.current && setFollowingsModalOpen(true);
-              }}
-              className="flex flex-col items-center justify-center cursor-pointer"
-            >
-              <span className="font-bold text-gray-400 font-Nanum_Gothic">
-                {followingsLength.current}
-              </span>
-              <span>팔로우</span>
-            </div>
-          </div>
           <div className="flex w-full items-center justify-center my-10 space-x-5">
             {widthSize > 500 && contextUser && uid === contextUser.uid && (
               <motion.button
@@ -360,7 +176,6 @@ const Mypage = () => {
                 </motion.button>
               )} */}
           </div>
-
           {/* Calendar */}
           <Calendar
             totalCommits={userWritings.totalCommits}
@@ -472,7 +287,7 @@ const Mypage = () => {
                 novels &&
                 novels.map((data) => (
                   <MypageWriting
-                    key={data.dateCreated}
+                    key={data.writingDocID}
                     data={data}
                     widthSize={widthSize}
                   />
@@ -481,7 +296,7 @@ const Mypage = () => {
                 poems &&
                 poems.map((data) => (
                   <MypageWriting
-                    key={data.dateCreated}
+                    key={data.writingDocID}
                     data={data}
                     widthSize={widthSize}
                   />
@@ -490,7 +305,7 @@ const Mypage = () => {
                 scenarioes &&
                 scenarioes.map((data) => (
                   <MypageWriting
-                    key={data.dateCreated}
+                    key={data.writingDocID}
                     data={data}
                     widthSize={widthSize}
                   />
@@ -500,7 +315,7 @@ const Mypage = () => {
                 totalWritings.map((data) => {
                   return (
                     <MypageWriting
-                      key={data.dateCreated}
+                      key={data.writingDocID}
                       data={data}
                       widthSize={widthSize}
                     />

@@ -1,20 +1,39 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
-import useGetFollowers from "../../hooks/useGetFollowers";
+import { useEffect, useState } from "react";
+import { getFollowersInfinite } from "../../services/firebase";
+import { getFirestoreUser } from "../../type";
 import FollowerRow from "../mypage/FollowerRow";
 import FollowersFollowingsSkeleton from "../skeleton/FollowersFollowingsSkeleton";
 interface props {
-    modalOpen: boolean
-    data: string[];
-    setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    userUIDs: Set<string>;
+    setModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
-const TestAccountModal: React.FC<props> = ({ data, setModalOpen, modalOpen }) => {
+const TestAccountModal: React.FC<props> = ({ userUIDs, setModalOpen }) => {
     const [loading, setLoading] = useState(false);
-    const { followersKey, followers, handleMoreFollowers } = useGetFollowers(
-        setLoading,
-        data,
-        modalOpen
-    );
+    const [followers, setFollowers] = useState<getFirestoreUser[]>([]);
+    useEffect(() => {
+        const handleFollowers = async () => {
+            if (userUIDs?.size) {
+                try {
+                    setLoading(true);
+                    const res = await getFollowersInfinite(Array.from(userUIDs), 0);
+                    let tmp = res.docs.map((doc: any) => ({
+                        ...doc.data(),
+                        docID: doc.id,
+                    }));
+                    setFollowers((origin: any) => {
+                        return [...origin, ...tmp];
+                    });
+                } catch (error) {
+                    console.log(error);
+                } finally {
+                    setLoading(false)
+                }
+            }
+        }
+        handleFollowers()
+    }, [userUIDs])
+
     return <motion.div
         animate={{
             backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],

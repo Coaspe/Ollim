@@ -3,7 +3,7 @@ interface props {
 }
 const FollowersFollowingsSkeleton: React.FC<props> = ({ lengthProp }) => {
   return (
-    <>
+    <div className="flex flex-col w-full h-full gap-3 overflow-y-scrolll">
       {Array(lengthProp)
         .fill(0)
         .map((data, index) => (
@@ -17,7 +17,7 @@ const FollowersFollowingsSkeleton: React.FC<props> = ({ lengthProp }) => {
             </span>
           </div>
         ))}
-    </>
+    </div>
   );
 };
 

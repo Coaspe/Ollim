@@ -66,8 +66,8 @@ export type alarmAddWritingInfo = {
 };
 export type getFirestoreUser = {
   dateCreated: number;
-  followers: Array<string>;
-  followings: Array<string>;
+  followers: Set<string>;
+  followings: Set<string>;
   profileCaption: string;
   profileImg: string;
   uid: string;

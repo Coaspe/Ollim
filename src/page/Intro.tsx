@@ -1,7 +1,6 @@
 import { Alert } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   alertVariants,
 } from "../constants";
@@ -21,7 +20,6 @@ const Intro = () => {
   const [leftPart, setLeftPart] = useState<leftPartType>(
     "INTRO"
   );
-  const navigator = useNavigate();
   const alarm = useAppSelector((state: RootState) => state.setAlarm.alarm);
 
   return (
@@ -48,9 +46,9 @@ const Intro = () => {
           {/* Main contents */}
           <AnimatePresence exitBeforeEnter>
             {leftPart === "INTRO" ?
-              <Greeting setLeftPart={setLeftPart} navigator={navigator} />
-              : leftPart === "LOGIN" ? <Login setLeftPart={setLeftPart} navigator={navigator} />
-                : <Signup setLeftPart={setLeftPart} navigator={navigator} />}
+              <Greeting setLeftPart={setLeftPart} />
+              : leftPart === "LOGIN" ? <Login setLeftPart={setLeftPart} />
+                : <Signup setLeftPart={setLeftPart} />}
           </AnimatePresence>
         </div>
       </motion.div>

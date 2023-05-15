@@ -1,7 +1,7 @@
 import { Tooltip } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { NavigateFunction, } from "react-router-dom";
+import { useNavigate, } from "react-router-dom";
 import { createAccountWithEmailAndPassword, verifyEmail } from "../../helpers/auth-email";
 import { useAppDispatch } from "../../hooks/useRedux";
 import useProfileData from "../../hooks/useVerification";
@@ -11,9 +11,8 @@ import { alarmType, leftPartType } from "../../type";
 
 interface props {
   setLeftPart: React.Dispatch<React.SetStateAction<leftPartType>>;
-  navigator: NavigateFunction;
 }
-const Signup: React.FC<props> = ({ setLeftPart, navigator }) => {
+const Signup: React.FC<props> = ({ setLeftPart }) => {
   const [signupPassword, setSignupPassword] = useState("");
   const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
   const [signupName, setSignupName] = useState("");
@@ -29,7 +28,7 @@ const Signup: React.FC<props> = ({ setLeftPart, navigator }) => {
   ) => {
     setState(e.target.value);
   };
-
+  const navigator = useNavigate()
   useEffect(() => {
     setSignupEmail(verificatedEmail);
   }, [verificatedEmail]);

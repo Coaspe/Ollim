@@ -3,27 +3,22 @@ import { useState } from "react";
 import FollowerRow from "../mypage/FollowerRow";
 import FollowersFollowingsSkeleton from "../skeleton/FollowersFollowingsSkeleton";
 import useGetFollowings from "../../hooks/useGetFollowings";
-import { getFirestoreUser } from "../../type";
 
 interface props {
-  followingsModalOpen: boolean;
   setFollowingsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  followingsUID: string[];
-  followingsLength: React.MutableRefObject<number>;
+  followingsUID: Set<string>;
 }
 
 const FollowingsModal: React.FC<props> = ({
-  followingsModalOpen,
   setFollowingsModalOpen,
   followingsUID,
-  followingsLength,
 }) => {
   const [loading, setLoading] = useState(false);
-  const { followingsKey, followings, handleMoreFollowings } = useGetFollowings(
+  const { followings, handleMoreFollowings } = useGetFollowings(
     setLoading,
-    followingsUID,
-    followingsModalOpen
+    Array.from(followingsUID),
   );
+
   return (
     <motion.div
       animate={{
@@ -56,19 +51,21 @@ const FollowingsModal: React.FC<props> = ({
           onClick={(e) => {
             e.stopPropagation();
           }}
-          className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scrolll"
+          className="flex flex-col items-center w-full h-full px-10"
         >
           {!loading ? (
             <>
-              {followings.map((data) => (
-                <FollowerRow
-                  key={data.userEmail}
-                  data={data}
-                  setFollowersModal={setFollowingsModalOpen}
-                />
-              ))}
+              <div className="flex flex-col w-full h-full gap-3 overflow-y-scrolll">
+                {followings.map((data) => (
+                  <FollowerRow
+                    key={data.userEmail}
+                    data={data}
+                    setFollowersModal={setFollowingsModalOpen}
+                  />
+                ))}
+              </div>
               {/* Load more followers button */}
-              {followingsKey.current < followings.length && (
+              {followings.length < followingsUID.size && (
                 <div
                   onClick={handleMoreFollowings}
                   className={`${loading && "pointer-events-none"
@@ -81,7 +78,7 @@ const FollowingsModal: React.FC<props> = ({
           ) : (
             // Skeleton
             <FollowersFollowingsSkeleton
-              lengthProp={followingsLength.current}
+              lengthProp={followingsUID.size}
             />
           )}
         </div>

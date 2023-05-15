@@ -5,25 +5,19 @@ import FollowersFollowingsSkeleton from "../skeleton/FollowersFollowingsSkeleton
 import useGetFollowers from "../../hooks/useGetFollowers";
 
 interface props {
-  followersModalOpen: boolean;
   setFollowersModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  followersUID: string[];
-  followersLength: React.MutableRefObject<number>;
+  followersUID: Set<string>;
 }
 
 const FollowersModal: React.FC<props> = ({
-  followersModalOpen,
   setFollowersModalOpen,
   followersUID,
-  followersLength,
 }) => {
   const [loading, setLoading] = useState(false);
-  const { followersKey, followers, handleMoreFollowers } = useGetFollowers(
+  const { followers, handleMoreFollowers } = useGetFollowers(
     setLoading,
-    followersUID,
-    followersModalOpen
+    Array.from(followersUID),
   );
-
   return (
     <motion.div
       animate={{
@@ -56,19 +50,21 @@ const FollowersModal: React.FC<props> = ({
           onClick={(e) => {
             e.stopPropagation();
           }}
-          className="flex flex-col items-center w-full h-full px-10 gap-3 overflow-y-scrolll"
+          className="flex flex-col items-center w-full h-full px-10 overflow-y-scrolll"
         >
-          {/* Load more followers button */}
           {!loading ? (
             <>
-              {followers.map((data) => (
-                <FollowerRow
-                  key={data.userEmail}
-                  data={data}
-                  setFollowersModal={setFollowersModalOpen}
-                />
-              ))}
-              {followersKey.current < followers.length && (
+              <div className="flex flex-col w-full h-full gap-3 overflow-y-scrolll">
+                {followers.map((data) => (
+                  <FollowerRow
+                    key={data.userEmail}
+                    data={data}
+                    setFollowersModal={setFollowersModalOpen}
+                  />
+                ))}
+              </div>
+              {/* Load more followers button */}
+              {followers.length < followersUID.size && (
                 <div
                   onClick={handleMoreFollowers}
                   className={`${loading && "pointer-events-none"
@@ -80,7 +76,7 @@ const FollowersModal: React.FC<props> = ({
             </>
           ) : (
             // Skeleton
-            <FollowersFollowingsSkeleton lengthProp={followersLength.current} />
+            <FollowersFollowingsSkeleton lengthProp={followersUID.size} />
           )}
         </div>
       </motion.div>

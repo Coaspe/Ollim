@@ -1,5 +1,4 @@
 import { Tooltip } from "@mui/material";
-import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import { useAppSelector, useAppDispatch } from "../../hooks/useRedux";
@@ -85,7 +84,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
       onClick={() => {
         setNewWritingModalOpen(false);
       }}
-      className="font-noto flex items-center justify-center z-20 fixed w-full h-full"
+      className="font-noto fixed top-0 left-0 right-0 bottom-0 z-20"
       animate={{
         backgroundColor: ["hsla(0, 0%, 0%, 0)", "hsla(0, 0%, 0%, 0.8)"],
       }}
@@ -106,7 +105,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
             e.stopPropagation();
           }}
           style={{ backgroundColor: "#faf6f5" }}
-          className="relative w-1/2 h-3/4 flex flex-col items-center justify-center rounded-xl"
+          className="absolute !transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 w-1/2 h-3/4 flex flex-col items-center justify-center rounded-xl z-50"
         >
           {/* right arrow (scenario, novel) or confirm svg (poem) */}
           {genrn !== "POEM" ? (
@@ -190,7 +189,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
             </motion.svg>
           )}
           <div className="w-3/4 h-5/6 flex flex-col items-center justify-between">
-            {/* Genrn, isCollection, Disclosure Div */}
+            {/* Genrn, isCollection, Disclosure scope Div */}
             <div className="flex w-full h-1/3 items-center justify-between">
               {/* Genrn div */}
               <div className="flex flex-col items-start w-1/4 h-full">
@@ -290,7 +289,7 @@ const NewWritingModal: React.FC<NewWritingProps> = ({
                 </div>
               </div>
 
-              {/* Disclosure */}
+              {/* Disclosure scope */}
               <div className="flex flex-col items-start w-1/4 h-full">
                 <span className="text-xl font-bold">공개 범위</span>
                 <div className="w-full flex items-center mt-5 justify-between">

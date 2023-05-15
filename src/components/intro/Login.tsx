@@ -1,7 +1,7 @@
 import { Tooltip } from "@mui/material";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { NavigateFunction } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { loginWithEmailAndPassword } from "../../helpers/auth-email";
 import { signInWithGoogle } from "../../helpers/auth-OAuth2";
 import { useAppDispatch } from "../../hooks/useRedux";
@@ -10,9 +10,9 @@ import { alarmType, leftPartType } from "../../type";
 
 interface props {
   setLeftPart: React.Dispatch<React.SetStateAction<leftPartType>>;
-  navigator: NavigateFunction;
 }
-const Login: React.FC<props> = ({ setLeftPart, navigator }) => {
+const Login: React.FC<props> = ({ setLeftPart }) => {
+  const navi = useNavigate()
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const handleInputChanged = (
@@ -25,6 +25,38 @@ const Login: React.FC<props> = ({ setLeftPart, navigator }) => {
   const setAlarm = (alarm: [string, alarmType, boolean]) => {
     dispatch(alarmAction.setAlarm({ alarm }));
   };
+
+  const handleLoginWithEmailAndPassword = async (loginEmail: string, loginPassword: string) => {
+    try {
+      await loginWithEmailAndPassword(loginEmail, loginPassword);
+    } catch (error: any) {
+      switch (error.code) {
+        case "auth/invalid-email":
+          setAlarm([
+            "유효하지 않는 이메일 입니다.",
+            "error",
+            true,
+          ]);
+          break;
+
+        case "auth/wrong-password":
+          setAlarm(["틀린 비밀번호 입니다.", "error", true]);
+          break;
+
+        default:
+          setAlarm([
+            "로그인에 실패하였습니다.",
+            "error",
+            true,
+          ]);
+          break;
+      }
+      setTimeout(() => {
+        setAlarm(["", "success", false]);
+      }, 2000);
+      throw error
+    }
+  }
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -65,7 +97,7 @@ const Login: React.FC<props> = ({ setLeftPart, navigator }) => {
         <Tooltip placement="top" title="구글 아이디로 로그인" arrow>
           <motion.img
             onClick={() => {
-              signInWithGoogle(navigator);
+              signInWithGoogle(navi)
             }}
             whileHover={{ y: "-10%" }}
             className="w-7 cursor-pointer"
@@ -101,34 +133,7 @@ const Login: React.FC<props> = ({ setLeftPart, navigator }) => {
         </Tooltip>
         <motion.span
           onClick={() => {
-            try {
-              loginWithEmailAndPassword(loginEmail, loginPassword);
-            } catch (error: any) {
-              switch (error.code) {
-                case "auth/invalid-email":
-                  setAlarm([
-                    "유효하지 않는 이메일 입니다.",
-                    "error",
-                    true,
-                  ]);
-                  break;
-
-                case "auth/wrong-password":
-                  setAlarm(["틀린 비밀번호 입니다.", "error", true]);
-                  break;
-
-                default:
-                  setAlarm([
-                    "로그인에 실패하였습니다.",
-                    "error",
-                    true,
-                  ]);
-                  break;
-              }
-              setTimeout(() => {
-                setAlarm(["", "success", false]);
-              }, 2000);
-            }
+            handleLoginWithEmailAndPassword(loginEmail, loginPassword)
           }}
           whileHover={{ y: "-10%" }}
           style={{ fontSize: "1.2rem", backgroundColor: "#eee" }}

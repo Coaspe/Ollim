@@ -1,13 +1,12 @@
-import { useState } from "react";
 import { alarmType, getFirestoreUser } from "../type";
 import Compressor from "compressorjs";
 import { updateProfileImage } from "../services/firebase";
 
 const useImageCompress = (
   profileOwnerInfo: getFirestoreUser,
-  setAlarm: (alarm: [string, alarmType, boolean]) => void
+  setAlarm: (alarm: [string, alarmType, boolean]) => void,
+  setProfileImage: React.Dispatch<React.SetStateAction<string>>
 ) => {
-  const [profileImage, setProfileImage] = useState("");
   // Image Compress process
   const handleProfileImgOnChange = (event: any) => {
     const element = event.target.files[0];
@@ -48,7 +47,7 @@ const useImageCompress = (
       },
     });
   };
-  return { profileImage, setProfileImage, handleProfileImgOnChange };
+  return handleProfileImgOnChange
 };
 
 export default useImageCompress;

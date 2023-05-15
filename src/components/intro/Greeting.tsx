@@ -1,15 +1,13 @@
 import { Tooltip } from "@mui/material";
 import { motion } from "framer-motion";
-import { NavigateFunction } from "react-router-dom";
 import { loginWithEmailAndPassword } from "../../helpers/auth-email";
 import { leftPartType } from "../../type";
 import { pVariants, pVariants2, divVariants } from "../../constants";
 
 interface props {
   setLeftPart: React.Dispatch<React.SetStateAction<leftPartType>>;
-  navigator: NavigateFunction;
 }
-const Greeting: React.FC<props> = ({ setLeftPart, navigator }) => {
+const Greeting: React.FC<props> = ({ setLeftPart }) => {
   return (
     <motion.div
       key="Greeting"
