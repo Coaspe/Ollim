@@ -301,7 +301,7 @@ export const DictButton = ({ selectedProp, setIsFullScreen }) => {
         }}
         onClick={() => {
           setIsFullScreen(false);
-          // Seleted text
+          // Search with selected text
           const seleted = editor.selection;
           seleted
             ? window.open(

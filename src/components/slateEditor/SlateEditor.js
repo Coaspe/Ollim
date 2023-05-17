@@ -603,7 +603,7 @@ const SlateEditor = ({
                 {/* percentage */}
                 <Tooltip
                   placement="top"
-                  title={`A4 ${parseInt(percentage / 100)} 매`}
+                  title={`A4 ${parseInt(percentage * 0.01)} 매`}
                   arrow
                 >
                   <div className="">
@@ -618,35 +618,12 @@ const SlateEditor = ({
                         style={{ fontSize: "0.8rem" }}
                         className="ml-2 font-bold text-gray-500"
                       >
-                        {parseInt(percentage / 100)} 매
+                        {parseInt(percentage * 0.01)} 매
                       </span>
                     </div>
                   </div>
                 </Tooltip>
 
-                {/* 원고지 */}
-                {/* <Tooltip
-                  placement="top"
-                  title={`원고지 ${Math.round((totalTextLength) * 0.005)} 매`}
-                  arrow
-                >
-                  <div className="">
-                    <div className="flex items-center">
-                      <div className="h-3 w-10 rounded-2xl border flex items-center">
-                        <div
-                          className="h-full rounded-2xl bg-hoverSpanMenu bg-opacity-50"
-                          style={{ width: `${((totalTextLength) * 0.5) % 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </Tooltip>
-                <span
-                  style={{ fontSize: "0.8rem" }}
-                  className="ml-2 font-bold text-gray-500"
-                >
-                  {totalTextLength} 자
-                </span> */}
                 {/* Chapter */}
                 {writingInfo && writingInfo.isCollection && (
                   <div className="ml-3">

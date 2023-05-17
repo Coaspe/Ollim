@@ -49,20 +49,18 @@ const Calendar: React.FC<props> = ({ totalCommits, widthSize }) => {
           commitTimeInUnix >= twoMonthsBeforeStartDayUnix
         ) {
           twoMonthBefore.push(commitTimeInUnix);
-        } else if (twoMonthsBeforeStartDayUnix > commitTimeInUnix) {
-          continue;
         }
       }
 
-      const tmp: any = {};
-      tmp[`${twoMonthsBeforeYear}-${twoMonthsBeforeMonth}`] = twoMonthBefore;
-      tmp[
+      const recent3MonthsCommitsTmp: any = {};
+      recent3MonthsCommitsTmp[`${twoMonthsBeforeYear}-${twoMonthsBeforeMonth}`] = twoMonthBefore;
+      recent3MonthsCommitsTmp[
         `${moment().subtract(1, "months").year()}-${moment().subtract(1, "months").month() + 1
         }`
       ] = oneMonthBefore;
-      tmp[`${moment().format("YYYY-MM")}`] = currentMonth;
+      recent3MonthsCommitsTmp[`${moment().format("YYYY-MM")}`] = currentMonth;
 
-      setRecent3MonthsCommits(tmp);
+      setRecent3MonthsCommits(recent3MonthsCommitsTmp);
     };
 
     if (totalCommits) {
