@@ -286,7 +286,7 @@ const WritingSetting: React.FC<props> = ({
               저장
             </button>
           </div>
-          <div className="w-full flex items-center justify-between mt-5 py-2 px-3">
+          <div className="flex items-center justify-between mt-5 py-2 px-3 gap-5">
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
