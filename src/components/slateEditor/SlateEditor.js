@@ -18,22 +18,13 @@ import {
   DictButton,
   MarkButton,
 } from "./utils";
-import axios from "axios";
 import { useAppSelector, useAppDispatch } from "../../hooks/useRedux";
 import { Tooltip } from "@mui/material";
 import "../../style/Slate.css";
 import ResizeObserver from "rc-resize-observer";
 import ParagraphWithoutNum from "./ParagraphWithoutNum";
 import SpinningSvg from "../mypage/SpinningSvg";
-import { tempSaveDivVariants, memoVariants } from '../../constants'
-
-const HOTKEYS = {
-  "mod+b": "bold",
-  "mod+i": "italic",
-  "mod+u": "underline",
-  "mod+d": "diagram",
-  "mod+s": "tempSave",
-};
+import { tempSaveDivVariants, memoVariants, HOTKEYS } from '../../constants'
 
 const SlateEditor = ({
   openDiagram,
@@ -284,6 +275,8 @@ const SlateEditor = ({
                     nowCollectionNum.toString()
                   ].commits.map((data) => {
                     const tmpData = Object.keys(data);
+                    console.log(tmpData);
+                    // key is dateCreated (unix timestamp)
                     const key = "memo" === tmpData[0] ? tmpData[1] : tmpData[0];
                     const date = new Date(parseInt(key)).toLocaleString();
                     const DateNight = date.includes("오전") ? "오전" : "오후";
@@ -291,6 +284,7 @@ const SlateEditor = ({
                       <div
                         onClick={(e) => {
                           e.stopPropagation();
+                          // Load previous commit
                           if (selectedKey !== key) {
                             setLoading(true);
                             setSelectedKey(key);
