@@ -229,10 +229,12 @@ const SlateEditor = ({
     setLoading(false);
   }, [value]);
 
-  const convertPXtoPercent = (px) => {
+  // 1 px -> 0.2645833333 mm
+  // A4 wide -> 297 x 210mm (height x width)
+  const convertPXtoMMPercent = (px) => {
     const numberPX = parseInt(px.split("px")[0]) - 20;
-    const pixel = 0.2645833333 * numberPX;
-    return (pixel / 297) * 100;
+    const heightToMM = 0.2645833333 * numberPX;
+    return (heightToMM / 297) * 100;
   };
 
   const isFullScreen = useAppSelector(
@@ -674,7 +676,7 @@ const SlateEditor = ({
                   onResize={() => {
                     const doc = document.querySelector(".editable-container");
                     setPercentage(
-                      convertPXtoPercent(getComputedStyle(doc).height)
+                      convertPXtoMMPercent(getComputedStyle(doc).height)
                     );
                   }}
                 >
