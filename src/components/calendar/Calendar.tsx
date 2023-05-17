@@ -72,7 +72,7 @@ const Calendar: React.FC<props> = ({ totalCommits, widthSize }) => {
     <>
       {widthSize > 500 ? (
         <div className="w-2/3 my-10 grid grid-cols-3 gap-4">
-          {recent3MonthsCommits &&
+          {Object.keys(recent3MonthsCommits).length &&
             Object.keys(recent3MonthsCommits).map((commitsChunk) => (
               <CalendarElement
                 key={commitsChunk}
@@ -84,7 +84,7 @@ const Calendar: React.FC<props> = ({ totalCommits, widthSize }) => {
         </div>
       ) : (
         <div className="w-2/3 flex items-center justify-center">
-          {recent3MonthsCommits && (
+          {Object.keys(recent3MonthsCommits).length && (
             <CalendarElement
               key={
                 Object.keys(recent3MonthsCommits)[
